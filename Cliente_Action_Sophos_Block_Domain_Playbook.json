@@ -7,8 +7,8 @@
             "type": "string"
         },
         "Block_IOC_Playbook_Name": {
-            "defaultValue": "MSSP_Automation_Sophos_Block_IOC_Playbook",
-            "type": "String"
+            "defaultValue": "Cliente_Automation_Sophos_Block_IOC_Playbook",
+            "type": "string"
         }
     },
     "variables": { "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]" },
