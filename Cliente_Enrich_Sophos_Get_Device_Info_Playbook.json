@@ -918,7 +918,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['keyvault-1']['connectionId']"
+                                        "name": "@parameters('$connections')['keyvault']['connectionId']"
                                     }
                                 },
                                 "method": "get",
@@ -943,7 +943,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['keyvault-1']['connectionId']"
+                                        "name": "@parameters('$connections')['keyvault']['connectionId']"
                                     }
                                 },
                                 "method": "get",
