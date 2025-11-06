@@ -12,11 +12,11 @@
         },
 		"keyvault_ClientID": {
             "defaultValue": "sophos-velorcios-client-id",
-            "type": "String"
+            "type": "string"
         },
         "keyvault_Secret": {
             "defaultValue": "sophos-velorcios-client-secret",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {
