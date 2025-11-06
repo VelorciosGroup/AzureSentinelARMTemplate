@@ -358,7 +358,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/secrets/@{encodeURIComponent('parameters[keyvault_ClientID]')}/value"
+                                "path": "/secrets/@{encodeURIComponent('parameters(keyvault_ClientID)')}/value"
                             },
                             "runtimeConfiguration": {
                                 "secureData": {
@@ -383,7 +383,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/secrets/@{encodeURIComponent('parameters[keyvault_Secret]')}/value"
+                                "path": "/secrets/@{encodeURIComponent('parameters(keyvault_Secret)')}/value"
                             },
                             "runtimeConfiguration": {
                                 "secureData": {
