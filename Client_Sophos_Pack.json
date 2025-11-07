@@ -17,6 +17,10 @@
         "keyvault_Secret_Pack": {
             "defaultValue": "sophos-velorcios-client-secret",
             "type": "string"
+        },
+		"api_block_tag_Pack": {
+            "defaultValue": "Blocked by SOC",
+            "type": "string"
         }
 	},
 
@@ -153,7 +157,11 @@
 					},
 					"keyvault_Secret": {
 						"value": "[parameters('keyvault_Secret_Pack')]"
-					}
+					},
+					"api_block_tag": {
+                        "defaultValue": "[parameters('api_block_tag_Pack')]",
+                        "type": "string"
+                    }
         		}
       		}
     	},

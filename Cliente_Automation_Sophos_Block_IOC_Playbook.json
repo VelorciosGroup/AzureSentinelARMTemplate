@@ -17,6 +17,10 @@
         "keyvault_Secret": {
             "defaultValue": "sophos-velorcios-client-secret",
             "type": "string"
+        },
+        "api_block_tag": {
+            "defaultValue": "Blocked by SOC",
+            "type": "string"
         }
     },
     "variables": {
@@ -54,7 +58,12 @@
                         "keyvault_Secret": {
                             "type": "String",
                             "defaultValue": "[parameters('keyvault_Secret')]"
+                        },
+                        "api_block_tag": {
+                            "defaultValue": "Blocked by SOC",
+                            "type": "string"
                         }
+                        
                     },
                     "triggers": {
                         "manual": {
@@ -308,7 +317,7 @@
                                                         "tags": [
                                                             "@{variables('Category')}"
                                                         ],
-                                                        "comment": "Blocked by api"
+                                                        "comment": "parameters('api_block_tag')"
                                                     }
                                                 },
                                                 "runtimeConfiguration": {
