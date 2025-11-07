@@ -50,12 +50,16 @@
                     },
                     "actions": {
                         "Entidades:_obtener_FileHashes": {
-                            "runAfter": {},
+                            "runAfter": {
+                                "Initialize_variables": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -65,7 +69,7 @@
                         },
                         "Sophos_Block_IOC": {
                             "runAfter": {
-                                "Entidades:_obtener_FileHashes": [
+                                "For_each": [
                                     "Succeeded"
                                 ]
                             },
@@ -73,15 +77,122 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('Block_IOC_Playbook_Name'))]"
+                                        "id": "[parameters('workflows_Sophos_Block_IOC_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 },
                                 "body": {
                                     "type": "HASH",
-                                    "content": "@body('Entidades:_obtener_FileHashes')"
+                                    "content": "@variables('Hashes')"
                                 }
                             }
+                        },
+                        "Parse_JSON_Hashes": {
+                            "runAfter": {
+                                "Entidades:_obtener_FileHashes": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Entidades:_obtener_FileHashes')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Filehashes": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "hashValue": {
+                                                        "type": "string"
+                                                    },
+                                                    "algorithm": {
+                                                        "type": "string"
+                                                    },
+                                                    "friendlyName": {
+                                                        "type": "string"
+                                                    },
+                                                    "Type": {
+                                                        "type": "string"
+                                                    },
+                                                    "Value": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "hashValue",
+                                                    "algorithm",
+                                                    "friendlyName",
+                                                    "Type",
+                                                    "Value"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Initialize_variables": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Hashes",
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each": {
+                            "foreach": "@body('Parse_JSON_Hashes')?['Filehashes']",
+                            "actions": {
+                                "Append_to_array_variable": {
+                                    "runAfter": {
+                                        "Parse_JSON_Current_Hash": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "Hashes",
+                                        "value": "@body('Parse_JSON_Current_Hash')?['hashValue']"
+                                    }
+                                },
+                                "Parse_JSON_Current_Hash": {
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@items('For_each')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "hashValue": {
+                                                    "type": "string"
+                                                },
+                                                "algorithm": {
+                                                    "type": "string"
+                                                },
+                                                "friendlyName": {
+                                                    "type": "string"
+                                                },
+                                                "Type": {
+                                                    "type": "string"
+                                                },
+                                                "Value": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_JSON_Hashes": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
                         }
                     },
                     "outputs": {}
