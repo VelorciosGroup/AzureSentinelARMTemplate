@@ -50,12 +50,16 @@
                     },
                     "actions": {
                         "Entidades:_obtener_IP": {
-                            "runAfter": {},
+                            "runAfter": {
+                                "Initialize_variables": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -65,7 +69,7 @@
                         },
                         "Sophos_Block_IOC": {
                             "runAfter": {
-                                "Entidades:_obtener_IP": [
+                                "For_each": [
                                     "Succeeded"
                                 ]
                             },
@@ -73,13 +77,106 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('Block_IOC_Playbook_Name'))]"
+                                        "id": "[parameters('workflows_Sophos_Block_IOC_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 },
                                 "body": {
                                     "type": "IP",
-                                    "content": "@body('Entidades:_obtener_IP')"
+                                    "content": "@variables('ips')"
+                                }
+                            }
+                        },
+                        "For_each": {
+                            "foreach": "@body('Parse_JSON_IPs')?['Ips']",
+                            "actions": {
+                                "Append_to_array_variable": {
+                                    "runAfter": {
+                                        "Parse_JSON_Current_Item": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "ips",
+                                        "value": "@body('Parse_JSON_Current_Item')?['address']"
+                                    }
+                                },
+                                "Parse_JSON_Current_Item": {
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@items('For_each')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "address": {
+                                                    "type": "string"
+                                                },
+                                                "friendlyName": {
+                                                    "type": "string"
+                                                },
+                                                "Type": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_JSON_IPs": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Initialize_variables": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "ips",
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        },
+                        "Parse_JSON_IPs": {
+                            "runAfter": {
+                                "Entidades:_obtener_IP": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Entidades:_obtener_IP')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Ips": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "address": {
+                                                        "type": "string"
+                                                    },
+                                                    "friendlyName": {
+                                                        "type": "string"
+                                                    },
+                                                    "Type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "address",
+                                                    "friendlyName",
+                                                    "Type"
+                                                ]
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
