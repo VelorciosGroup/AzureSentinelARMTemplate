@@ -308,6 +308,10 @@
         "postDeployNote": {
             "type": "string",
             "value": "✅ Despliegue completado.\n⚠️ Ahora debes asignar permisos de comentarios a los playbooks: \n⚫ Cliente_Enrich_Sophos_Get_Device_Info_Playbook\n⚫ Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook\nY permisos de keyvault a los playbooks:\n⚫ Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook\n⚫ Cliente_Enrich_Sophos_Get_Device_Info_Playbook\n⚫ Cliente_Automation_Sophos_Block_IOC_Playbook\n⚫ Cliente_Action_Sophos_Launch_Antivirus_Playbook\n⚫ Cliente_Action_Sophos_Device_Isolation_Playbook\n⚫ Cliente_Action_Sophos_Block_IP_Playbook\n"
+        },
+		"postDeployApiTagInstructions": {
+            "type": "string",
+            "value": "Para asignar correctamente el tag en las policy ⚠️: Acceder a Sophos Central → Mis productos → Endpoint → Policy → Configuración → Añadir nuevo. En el campo \"Etiqueta de sitio web\" hay que poner el tag escogido en el despliegue y en el campo \"Acción\" hay que poner la opción de bloquear"
         }
     }
 }
