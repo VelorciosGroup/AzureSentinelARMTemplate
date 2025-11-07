@@ -159,8 +159,7 @@
 						"value": "[parameters('keyvault_Secret_Pack')]"
 					},
 					"api_block_tag": {
-                        "defaultValue": "[parameters('api_block_tag_Pack')]",
-                        "type": "string"
+                        "value": "[parameters('api_block_tag_Pack')]"
                     }
         		}
       		}
