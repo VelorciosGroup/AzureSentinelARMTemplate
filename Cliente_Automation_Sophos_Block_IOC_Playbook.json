@@ -46,6 +46,14 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "keyvault_ClientID": {
+                            "type": "String",
+                            "defaultValue": "[parameters('keyvault_ClientID')]"
+                        },
+                        "keyvault_Secret": {
+                            "type": "String",
+                            "defaultValue": "[parameters('keyvault_Secret')]"
                         }
                     },
                     "triggers": {
