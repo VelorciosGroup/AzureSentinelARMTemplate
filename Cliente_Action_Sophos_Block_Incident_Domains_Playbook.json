@@ -50,12 +50,16 @@
                     },
                     "actions": {
                         "Entidades:_obtener_URL": {
-                            "runAfter": {},
+                            "runAfter": {
+                                "Initialize_variables": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -65,7 +69,7 @@
                         },
                         "Sophos_Block_IOC": {
                             "runAfter": {
-                                "Entidades:_obtener_URL": [
+                                "For_each": [
                                     "Succeeded"
                                 ]
                             },
@@ -73,15 +77,108 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('Block_IOC_Playbook_Name'))]"
+                                        "id": "[parameters('workflows_Sophos_Block_IOC_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 },
                                 "body": {
                                     "type": "URL",
-                                    "content": "@body('Entidades:_obtener_URL')"
+                                    "content": "@variables('Urls')"
                                 }
                             }
+                        },
+                        "Parse_JSON_Urls": {
+                            "runAfter": {
+                                "Entidades:_obtener_URL": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Entidades:_obtener_URL')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Urls": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "url": {
+                                                        "type": "string"
+                                                    },
+                                                    "friendlyName": {
+                                                        "type": "string"
+                                                    },
+                                                    "Type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "url",
+                                                    "friendlyName",
+                                                    "Type"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Initialize_variables": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Urls",
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each": {
+                            "foreach": "@body('Parse_JSON_Urls')?['Urls']",
+                            "actions": {
+                                "Parse_JSON_1": {
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@items('For_each')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string"
+                                                },
+                                                "friendlyName": {
+                                                    "type": "string"
+                                                },
+                                                "Type": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "Append_to_array_variable": {
+                                    "runAfter": {
+                                        "Parse_JSON_1": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "Urls",
+                                        "value": "@body('Parse_JSON_1')?['url']"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_JSON_Urls": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
                         }
                     },
                     "outputs": {}
