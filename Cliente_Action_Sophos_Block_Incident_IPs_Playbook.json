@@ -77,7 +77,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_Sophos_Block_IOC_externalid')]"
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('Block_IOC_Playbook_Name'))]"
                                     },
                                     "triggerName": "manual"
                                 },
