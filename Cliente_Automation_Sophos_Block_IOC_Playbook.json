@@ -227,7 +227,7 @@
                                                     "properties": {
                                                         "sha256": "@{items('For_Every_HASH_in_List')}"
                                                     },
-                                                    "comment": "parameters('api_block_tag')"
+                                                    "comment": "[parameters('api_block_tag')]"
                                                 }
                                             },
                                             "runtimeConfiguration": {
