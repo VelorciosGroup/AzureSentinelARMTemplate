@@ -48,7 +48,7 @@
 				}
 			}
 		},
-				{
+		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
 			"name": "Action_API_Parser_Incident_Playbook",
