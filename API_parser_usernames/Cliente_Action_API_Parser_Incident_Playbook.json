@@ -6,25 +6,19 @@
             "defaultValue": "incident_API_Parser",
             "type": "string"
         },
-        "workflows_API_parser_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/API_parser",
-            "type": "string"
-        },
-        "connections_azuresentinel_incident_API_Parser_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-incident_API_Parser",
-            "type": "string"
-        },
-        "connections_azuresentinel_5_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-5",
+        "API_Parser_Playbook_Name": {
+            "defaultValue": "Cliente_Automation_API_Parser_Playbook",
             "type": "string"
         }
     },
-    "variables": {},
+    "variables": {
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_incident_API_Parser_name')]",
+            "name": "[parameters('PlaybookName')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -79,7 +73,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel-3']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -149,7 +143,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_API_parser_externalid')]"
+                                       "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_Parser_Playbook_Name'))]"
                                     },
                                     "triggerName": "Manual"
                                 },
@@ -163,19 +157,9 @@
                     "$connections": {
                         "value": {
                             "azuresentinel": {
-                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_incident_API_Parser_externalid')]",
-                                "connectionName": "[concat('azuresentinel-', parameters('workflows_incident_API_Parser_name'))]",
-                                "connectionProperties": {
-                                    "authentication": {
-                                        "type": "ManagedServiceIdentity"
-                                    }
-                                }
-                            },
-                            "azuresentinel-3": {
-                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_5_externalid')]",
-                                "connectionName": "azuresentinel-5",
+                                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"
@@ -184,6 +168,24 @@
                             }
                         }
                     }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('AzureSentinelConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('AzureSentinelConnectionName')]",
+                "customParameterValues": {},
+                "parameterValueType": "Alternative",
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
                 }
             }
         }
