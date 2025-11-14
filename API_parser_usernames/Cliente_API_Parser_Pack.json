@@ -17,7 +17,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/Sophos/Cliente_Action_Sophos_Device_Isolation_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_Parser_Account_Entity_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
