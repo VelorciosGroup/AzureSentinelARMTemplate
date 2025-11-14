@@ -12,7 +12,7 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "Action_Sophos_Device_Isolation_Playbook",
+			"name": "Action_Parser_Account_Entity_Playbook",
 			"dependsOn": [],
 			"properties": {
 				"mode": "Incremental",
