@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "PlaybookName": {
-            "defaultValue": "Cliente_Action_Parser_Account_Entity",
+            "defaultValue": "Cliente_Action_API_Parser_Account_Entity",
             "type": "string"
         },
         "API_parser_Playbook_Name": {
