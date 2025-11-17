@@ -44,7 +44,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuremonitorlogs']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -204,7 +204,7 @@
             "kind": "V1",
             "properties": {
                 "displayName": "[variables('AzureSentinelConnectionName')]",
-                "customParameterValues": {},
+                "customParameterValues": {}, 
                 "parameterValueType": "Alternative",
                 "api": {
                     "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
