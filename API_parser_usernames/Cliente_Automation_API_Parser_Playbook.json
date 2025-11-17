@@ -9,7 +9,10 @@
 	},
 	"variables": {
 		"AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]",
-		"MonitorLogsConnectionName": "[concat('monitorlogs-connection-', parameters('PlaybookName'))]"
+		"connections_azuremonitorlogs_2_externalid": {
+			"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuremonitorlogs-2",
+			"type": "String"
+		}
 	},
 	"resources": [
 		{
