@@ -22,8 +22,7 @@
 				},
 				"parameters": {
 					"PlaybookName": {
-						"defaultValue": "Automation_API_Parser_Playbook",
-						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+						"defaultValue": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
 					}
 				}
 			}
@@ -41,8 +40,7 @@
 				},
 				"parameters": {
 					"PlaybookName": {
-						"defaultValue": "Automation_API_Parser_Playbook",
-						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Account_Entity')]"
+						"defaultValue": "[concat(parameters('client_Name'), '_Action_API_Parser_Account_Entity')]"
 					},
 					"API_Parser_Playbook_Name": {
 						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
@@ -63,8 +61,7 @@
 				},
 				"parameters": {
 					"PlaybookName": {
-						"defaultValue": "Automation_API_Parser_Playbook",
-						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Alert')]"
+						"defaultValue": "[concat(parameters('client_Name'), '_Action_API_Parser_Alert')]"
 					},
 					"API_Parser_Playbook_Name": {
 						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
@@ -85,8 +82,7 @@
 				},
 				"parameters": {
 					"PlaybookName": {
-						"defaultValue": "Automation_API_Parser_Playbook",
-						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Incident')]"
+						"defaultValue": "[concat(parameters('client_Name'), '_Action_API_Parser_Incident')]"
 					},
 					"API_Parser_Playbook_Name": {
 						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
