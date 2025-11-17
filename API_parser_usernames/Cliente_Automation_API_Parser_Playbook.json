@@ -187,11 +187,6 @@
                                         "type": "ManagedServiceIdentity"
                                     }
                                 }
-                            },
-														"azuremonitorlogs": {
-                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuremonitorlogs",
-                                "connectionId": "[parameters('connections_azuremonitorlogs_externalid')]",
-                                "connectionName": "azuremonitorlogs"
                             }
                         }
                     }
