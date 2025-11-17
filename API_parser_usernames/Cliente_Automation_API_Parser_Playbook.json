@@ -7,9 +7,7 @@
             "type": "string"
         }
     },
-    "variables": {
-        "AzureSentinelConnectionName": "[concat('azuremonitorlogs-', parameters('PlaybookName'))]"
-    },
+    "variables": {"AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"},
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
@@ -180,10 +178,10 @@
                 "parameters": {
                     "$connections": {
                         "value": {
-                            "azuremonitorlogs": {
+                            "azuresentinel": {
                                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
                                 "connectionName": "[variables('AzureSentinelConnectionName')]",
-                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]",
+                                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"
@@ -207,8 +205,9 @@
             "properties": {
                 "displayName": "[variables('AzureSentinelConnectionName')]",
                 "customParameterValues": {},
+                "parameterValueType": "Alternative",
                 "api": {
-                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]"
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
                 }
             }
         }
