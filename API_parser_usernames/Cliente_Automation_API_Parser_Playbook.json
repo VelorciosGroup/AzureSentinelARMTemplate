@@ -47,7 +47,7 @@
 							"inputs": {
 								"host": {
 									"connection": {
-										"name": "@parameters('$connections')['monitorlogs']['connectionId']"
+										"name": "@parameters('$connections')['azuremonitorlogs-1']['connectionId']"
 									}
 								},
 								"method": "post",
