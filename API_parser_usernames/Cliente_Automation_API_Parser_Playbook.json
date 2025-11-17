@@ -55,9 +55,9 @@
 								"path": "/queryData",
 								"queries": {
 									"subscriptions": "a7be9652-e6e6-4284-b1b2-14b4079f777d",
-									"resourcegroups": "Blueteam",
+									"resourcegroups": "mssp_sentinel_desarollo_resourcegroup",
 									"resourcetype": "Log Analytics Workspace",
-									"resourcename": "MSSP-Velorcios",
+									"resourcename": "MSSP-Sentinel-Desarollo-ResourceGroup",
 									"timerange": "1d"
 								}
 							}
@@ -191,10 +191,10 @@
 									}
 								}
 							},
-							"monitorlogs": {
-								"connectionId": "[resourceId('Microsoft.Web/connections', variables('MonitorLogsConnectionName'))]",
-								"connectionName": "[variables('MonitorLogsConnectionName')]",
-								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/monitorlogs')]",
+							"azuremonitorlogs-1": {
+								"id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuremonitorlogs",
+								"connectionId": "[parameters('connections_azuremonitorlogs_2_externalid')]",
+								"connectionName": "azuremonitorlogs-2",
 								"connectionProperties": {
 									"authentication": {
 										"type": "ManagedServiceIdentity"
