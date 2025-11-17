@@ -9,7 +9,7 @@
 	},
 	"variables": {
 		"AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]",
-		"connections_azuremonitorlogs_2_externalid": {
+		"MonitorLogsConnectionName": {
 			"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuremonitorlogs-2",
 			"type": "String"
 		}
@@ -50,7 +50,7 @@
 							"inputs": {
 								"host": {
 									"connection": {
-										"name": "@parameters('$connections')['azuremonitorlogs-1']['connectionId']"
+										"name": "@parameters('$connections')['MonitorLogsConnectionName']['connectionId']"
 									}
 								},
 								"method": "post",
@@ -194,10 +194,10 @@
 									}
 								}
 							},
-							"azuremonitorlogs-1": {
+							"azuremonitorlogs": {
 								"id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuremonitorlogs",
-								"connectionId": "[parameters('connections_azuremonitorlogs_2_externalid')]",
-								"connectionName": "azuremonitorlogs-2",
+								"connectionId": "[parameters('MonitorLogsConnectionName')]",
+								"connectionName": "azuremonitorlogs",
 								"connectionProperties": {
 									"authentication": {
 										"type": "ManagedServiceIdentity"
@@ -230,11 +230,11 @@
 		{
 			"type": "Microsoft.Web/connections",
 			"apiVersion": "2016-06-01",
-			"name": "[variables('connections_azuremonitorlogs_2_externalid')]",
+			"name": "[variables('MonitorLogsConnectionName')]",
 			"location": "[resourceGroup().location]",
 			"kind": "V1",
 			"properties": {
-				"displayName": "[variables('connections_azuremonitorlogs_2_externalid')]",
+				"displayName": "[variables('MonitorLogsConnectionName')]",
 				"customParameterValues": {},
 				"parameterValueType": "Alternative",
 				"api": {
