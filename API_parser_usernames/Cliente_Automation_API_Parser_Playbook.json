@@ -53,7 +53,7 @@
 								"body": "let Usernames = datatable(Username:string) @{triggerBody()};\nUsernames\n| extend CleanUsername = \n    case(\n        Username matches regex @\"^[^\\s@]+@[^@]+$\", extract(@\"^([^\\s@]+)@\", 1, Username),   // correo\n        Username matches regex @\"^[^\\\\\\s@]+\\\\[^\\s@]+$\", extract(@\"[^\\\\]+$\", 0, Username),   // NTDomain\n        Username matches regex @\"^[^\\s@]+$\", Username,                                     // nombre simple\n        \"\"                                                                                 // inválido\n    )\n| where CleanUsername != \"\"\n| distinct CleanUsername",
 								"path": "/queryData",
 								"queries": {
-									"subscriptions": "a7be9652-e6e6-4284-b1b2-14b4079f777d",
+									"subscriptions": "MSSP - Sentinel",
 									"resourcegroups": "Blueteam",
 									"resourcetype": "Log Analytics Workspace",
 									"resourcename": "MSSP-Velorcios",
