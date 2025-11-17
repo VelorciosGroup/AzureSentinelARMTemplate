@@ -22,8 +22,7 @@
 				},
 				"parameters": {
 					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]",
-						"defaultValue": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_Automation_API_PARSER_Playbook')]"
 					}
 				}
 			}
