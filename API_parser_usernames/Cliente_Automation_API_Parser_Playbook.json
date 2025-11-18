@@ -230,7 +230,7 @@
 			"properties": {
 				"displayName": "[variables('MonitorLogsConnectionName')]",
 				"customParameterValues": {},
-				"parameterValues": {},
+				"parameterValues": {}, 
 				"api": {
 					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]"
 				}
