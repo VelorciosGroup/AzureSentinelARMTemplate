@@ -155,6 +155,40 @@
                                 "body": "@triggerBody()?['Entities']",
                                 "path": "/entities/account"
                             }
+                        },
+                        "ParsedUsernames": {
+                            "runAfter": {
+                                "API_parser": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "ParsedUsernames",
+                                        "type": "array",
+                                        "value": "@body('API_parser')"
+                                    }
+                                ]
+                            }
+                        },
+                        "API_Parser_Petition": {
+                            "runAfter": {
+                                "ParsedUsernames": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_API_Parser_Petition_externalid')]"
+                                    },
+                                    "triggerName": "Manual"
+                                },
+                                "body": "@variables('ParsedUsernames')"
+                            }
                         }
                     },
                     "outputs": {}
