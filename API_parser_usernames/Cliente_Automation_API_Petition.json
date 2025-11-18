@@ -14,7 +14,7 @@
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
-      "name": "[parameters('workflows_API_Parser_Petition_name')]",
+      "name": "[parameters('PlaybookName')]",
       "location": "westeurope",
       "identity": {
         "type": "SystemAssigned"
