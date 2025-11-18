@@ -9,9 +9,15 @@
         "API_parser_Playbook_Name": {
             "defaultValue": "Cliente_Automation_API_Parser_Usernames_Playbook",
             "type": "string"
+        },
+        "API_Parser_Petition_Playbook_Name": {
+            "defaultValue": "Cliente_Automation_API_Parser_Usernames_Playbook",
+            "type": "string"
         }
     },
-    "variables": { "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]" },
+    "variables": {
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
@@ -100,6 +106,40 @@
                             "inputs": {
                                 "name": "Username",
                                 "value": "@triggerBody()?['Entity']?['properties']?['Name']"
+                            }
+                        },
+                        "API_Parser_Petition": {
+                            "runAfter": {
+                                "ParsedUsernamesArray": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_Parser_Petition_Playbook_Name'))]"
+                                    },
+                                    "triggerName": "Manual"
+                                },
+                                "body": "@variables('ParsedUsernamesArray')"
+                            }
+                        },
+                        "ParsedUsernamesArray": {
+                            "runAfter": {
+                                "API_parser": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "ParsedUsernamesArray",
+                                        "type": "array",
+                                        "value": "@body('API_parser')"
+                                    }
+                                ]
                             }
                         }
                     },
