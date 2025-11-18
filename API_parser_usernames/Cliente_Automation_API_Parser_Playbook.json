@@ -206,8 +206,7 @@
 				}
 			},
 			"dependsOn": [
-				"[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
-				"[resourceId('Microsoft.Web/connections', variables('MonitorLogsConnectionName'))]"
+				"[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
 			]
 		},
 		{
