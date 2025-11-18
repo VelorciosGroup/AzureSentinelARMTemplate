@@ -84,6 +84,9 @@
 					},
 					"API_Parser_Playbook_Name": {
 						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+					},
+					"API_Parser_Petition_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Petition_Playbook')]"
 					}
 				}
 			}
