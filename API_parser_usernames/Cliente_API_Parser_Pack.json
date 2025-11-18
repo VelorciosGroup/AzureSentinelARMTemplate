@@ -26,6 +26,75 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_API_Parser_Account_Entity_Playbook",
+			"dependsOn": [
+				"Automation_API_Parser_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_API_Parser_Account_Entity_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Account_Entity')]"
+					},
+					"API_Parser_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_API_Parser_Alert_Playbook",
+			"dependsOn": [
+				"Automation_API_Parser_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_API_Parser_Alert_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Alert')]"
+					},
+					"API_Parser_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_API_Parser_Incident_Playbook",
+			"dependsOn": [
+				"Automation_API_Parser_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_API_Parser_Incident_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Incident')]"
+					},
+					"API_Parser_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+					}
+				}
+			}
 		}
 	]
 }
