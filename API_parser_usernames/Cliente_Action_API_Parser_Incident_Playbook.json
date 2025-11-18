@@ -9,6 +9,10 @@
         "API_Parser_Playbook_Name": {
             "defaultValue": "Cliente_Automation_API_Parser_Playbook",
             "type": "string"
+        },
+        "API_Parser_Petition_Playbook_Name": {
+            "defaultValue": "Cliente_Automation_API_Parser_Petition_Playbook",
+            "type": "string"
         }
     },
     "variables": {
@@ -143,11 +147,45 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                       "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_Parser_Playbook_Name'))]"
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_parser_Playbook_Name'))]"
                                     },
                                     "triggerName": "Manual"
                                 },
                                 "body": "@variables('Usernames')"
+                            }
+                        },
+                        "ParsedUsernamesArray": {
+                            "runAfter": {
+                                "API_parser": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "ParsedUsernamesArray",
+                                        "type": "array",
+                                        "value": "@body('API_parser')"
+                                    }
+                                ]
+                            }
+                        },
+                        "API_Parser_Petition": {
+                            "runAfter": {
+                                "ParsedUsernamesArray": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_Parser_Petition_Playbook_Name'))]"
+                                    },
+                                    "triggerName": "Manual"
+                                },
+                                "body": "@variables('ParsedUsernamesArray')"
                             }
                         }
                     },

@@ -11,7 +11,7 @@
             "type": "string"
         },
         "API_Parser_Petition_Playbook_Name": {
-            "defaultValue": "Cliente_Automation_API_Parser_Usernames_Playbook",
+            "defaultValue": "Cliente_Automation_API_Parser_Petition_Playbook",
             "type": "string"
         }
     },
