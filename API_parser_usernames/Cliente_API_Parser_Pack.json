@@ -49,9 +49,6 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
 			"name": "Action_API_Parser_Account_Entity_Playbook",
-			"dependsOn": [
-				"Automation_API_Parser_Playbook"
-			],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
@@ -64,6 +61,10 @@
 					},
 					"API_Parser_Playbook_Name": {
 						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Playbook')]"
+					},
+					"API_Parser_Petition_Playbook_Name": {
+						"defaultValue": "Cliente_Automation_API_Parser_Usernames_Playbook",
+						"type": "string"
 					}
 				}
 			}
