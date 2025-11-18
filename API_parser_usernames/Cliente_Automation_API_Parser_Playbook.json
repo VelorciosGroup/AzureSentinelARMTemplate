@@ -197,7 +197,7 @@
 								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]",
 								"connectionProperties": {
 									"authentication": {
-										"type": "managedIdentityAuth"
+										"type": "ManagedServiceIdentity"
 									}
 								}
 							}
