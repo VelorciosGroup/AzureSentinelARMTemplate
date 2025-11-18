@@ -184,12 +184,7 @@
 							"azuresentinel": {
 								"connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
 								"connectionName": "[variables('AzureSentinelConnectionName')]",
-								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
-								"connectionProperties": {
-									"authentication": {
-										"type": "ManagedServiceIdentity"
-									}
-								}
+								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
 							},
 							"monitorlogs": {
 								"connectionId": "[resourceId('Microsoft.Web/connections', variables('MonitorLogsConnectionName'))]",
@@ -220,9 +215,7 @@
 				"displayName": "[variables('AzureSentinelConnectionName')]",
 				"customParameterValues": {},
 				"parameterValueType": "Alternative",
-				"parameterValues": {
-					"authType": "ManagedServiceIdentity"
-				},
+				"parameterValues": {},
 				"api": {
 					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
 				}
