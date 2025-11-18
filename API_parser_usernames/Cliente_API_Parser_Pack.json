@@ -31,9 +31,6 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
 			"name": "Action_API_Parser_Account_Entity_Playbook",
-			"dependsOn": [
-				"Automation_API_Parser_Playbook"
-			],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
@@ -54,9 +51,6 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
 			"name": "Action_API_Parser_Alert_Playbook",
-			"dependsOn": [
-				"Automation_API_Parser_Playbook"
-			],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
@@ -77,9 +71,6 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
 			"name": "Action_API_Parser_Incident_Playbook",
-			"dependsOn": [
-				"Automation_API_Parser_Playbook"
-			],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
