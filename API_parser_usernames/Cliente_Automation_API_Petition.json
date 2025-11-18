@@ -69,12 +69,12 @@
                 "HTTP": {
                   "type": "Http",
                   "inputs": {
-                    "uri": "https://api-private/9999999999999999999/",
+                    "uri": "https://jsonplaceholder.typicode.com/posts/1",
                     "method": "POST",
                     "body": {
                       "data": {
                         "username": "@items('For_each')",
-                        "description": "Prueba realizada por el soc"
+                        "description": "COMMENT"
                       }
                     }
                   },
