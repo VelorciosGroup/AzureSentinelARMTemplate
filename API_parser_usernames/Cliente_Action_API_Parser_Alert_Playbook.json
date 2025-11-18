@@ -64,7 +64,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_Parser_Playbook_Name'))]"
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_parser_Playbook_Name'))]"
                                     },
                                     "triggerName": "Manual"
                                 },
@@ -148,7 +148,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -183,7 +183,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_API_Parser_Petition_externalid')]"
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('API_Parser_Petition_Playbook_Name'))]"
                                     },
                                     "triggerName": "Manual"
                                 },
