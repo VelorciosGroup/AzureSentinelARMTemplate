@@ -28,6 +28,24 @@
 			}
 		},
 		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Automation_API_Parser_Petition_Playbook",
+			"dependsOn": [],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Automation_API_Petition.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Automation_API_Parser_Petition_Playbook')]"
+					}
+				}
+			}
+		},
+		{
 			"type": "Microsoft.Resources/deployments", 
 			"apiVersion": "2025-03-01",
 			"name": "Action_API_Parser_Account_Entity_Playbook",
