@@ -220,9 +220,7 @@
 				"displayName": "[variables('AzureSentinelConnectionName')]",
 				"customParameterValues": {},
 				"parameterValueType": "Alternative",
-				"parameterValues": {
-					"authType": "ManagedServiceIdentity"
-				},
+				"parameterValues": {},
 				"api": {
 					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
 				}
