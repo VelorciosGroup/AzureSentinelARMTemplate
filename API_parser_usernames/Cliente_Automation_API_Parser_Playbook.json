@@ -194,12 +194,8 @@
 							"monitorlogs": {
 								"connectionId": "[resourceId('Microsoft.Web/connections', variables('MonitorLogsConnectionName'))]",
 								"connectionName": "[variables('MonitorLogsConnectionName')]",
-								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]",
-								"connectionProperties": {
-									"authentication": {
-										"type": "managedIdentityAuth"
-									}
-								}
+								"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]"
+						
 							}
 						}
 					}
@@ -234,6 +230,7 @@
 			"properties": {
 				"displayName": "[variables('MonitorLogsConnectionName')]",
 				"customParameterValues": {},
+				"parameterValues": {},
 				"api": {
 					"id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuremonitorlogs')]"
 				}
