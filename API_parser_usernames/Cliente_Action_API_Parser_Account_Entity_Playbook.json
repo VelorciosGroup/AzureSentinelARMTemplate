@@ -114,6 +114,9 @@
                                     "Succeeded"
                                 ]
                             },
+                            "limit": {
+                                "timeout": "PT5M"
+                            },
                             "type": "Workflow",
                             "inputs": {
                                 "host": {
