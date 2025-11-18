@@ -111,5 +111,15 @@
 				}
 			}
 		}
-	]
+	],
+	"outputs": {
+		"postDeployNote": {
+			"type": "string",
+			"value": "✅ Despliegue completado.\n⚠️ Ahora debes cambiar la conexión a la base de datos del playbook: \"Automation_API_Parser_Playbook\""
+		},
+		"postDeployApiTagInstructions": {
+			"type": "string",
+			"value": "✅ Despliegue completado.\n⚠️ Ahora se debe cambiar la petición a la API del cliente en el playbook \"Automation_API_Parser_Petition_Playbook\""
+		}
+	}
 }
