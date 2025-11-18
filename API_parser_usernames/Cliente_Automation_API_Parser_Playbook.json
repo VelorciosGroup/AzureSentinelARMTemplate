@@ -159,21 +159,6 @@
 								]
 							},
 							"type": "If"
-						},
-						"InternalServerError": {
-							"runAfter": {
-								"Condition": [
-									"Succeeded"
-								]
-							},
-							"type": "Response",
-							"kind": "Http",
-							"inputs": {
-								"statusCode": 500,
-								"body": {
-									"error": "InternalSeverError"
-								}
-							}
 						}
 					},
 					"outputs": {}

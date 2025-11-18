@@ -70,7 +70,7 @@
                   "type": "Http",
                   "inputs": {
                     "uri": "https://jsonplaceholder.typicode.com/posts/1",
-                    "method": "POST",
+                    "method": "PUT",
                     "body": {
                       "data": {
                         "username": "@items('For_each')",
