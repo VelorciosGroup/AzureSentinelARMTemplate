@@ -1,0 +1,26 @@
+name: TemporalButton
+on:
+  workflow_dispatch:
+
+jobs:
+  create-button:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Add temporary button to README
+        run: |
+          BUTTON="\n\n## 🔵 Botón temporal\n[![RemoveButton](https://img.shields.io/badge/RemoveButton-Click-red)](../../actions/workflows/RemoveButton.yml)\n"
+          
+          # Añade el botón al final del README
+          echo -e "$BUTTON" >> README.md
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add README.md
+          git commit -m "Add temporary button"
+          git push

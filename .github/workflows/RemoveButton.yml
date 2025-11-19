@@ -1,0 +1,24 @@
+name: RemoveButton
+on:
+  workflow_dispatch:
+
+jobs:
+  remove-button:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Remove temporary button from README
+        run: |
+          # Elimina la sección añadida por TemporalButton
+          sed -i '/## 🔵 Botón temporal/,+2d' README.md
+
+      - name: Commit removal
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add README.md
+          git commit -m "Remove temporary button"
+          git push
