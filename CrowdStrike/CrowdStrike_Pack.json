@@ -119,8 +119,8 @@
 					"PlaybookName": {
 						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Block_Hash_Playbook')]"
 					},
-					"Auth_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+					"Block_IOC_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Block_IOC_Playbook')]"
 					}
 				}
 			}
