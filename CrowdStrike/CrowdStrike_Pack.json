@@ -3,11 +3,11 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"client_Name": {
-			"defaultValue": "Cliente",
+			"defaultValue": "PRUEBADESPLIEGUE",
 			"type": "string"
 		},
 		"keyvault_Name_Pack": {
-			"defaultValue": "PRUEBADESPLIEGUE-Crowdstrike",
+			"defaultValue": "Keyvault-name-Crowdstrike",
 			"type": "string"
 		},
 		"keyvault_ClientID_Pack": {
