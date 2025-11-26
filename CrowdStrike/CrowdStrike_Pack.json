@@ -100,6 +100,30 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_CrowdStrike_Block_Hash_Playbook",
+			"dependsOn": [
+				"Automation_CrowdStrike_Auth_Playbook",
+				"Automation_CrowdStrike_Block_IOC_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Block_Hash_Playbook')]"
+					},
+					"Auth_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+					}
+				}
+			}
 		}
 	],
 	"outputs": {
