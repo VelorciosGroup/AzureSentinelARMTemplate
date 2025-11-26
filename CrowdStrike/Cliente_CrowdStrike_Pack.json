@@ -1,0 +1,52 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"client_Name": {
+			"defaultValue": "Cliente",
+			"type": "string"
+		},
+		"PlaybookName": {
+			"defaultValue": "Cliente_Automation_CrowdStrike_Block_IOC_Playbook",
+			"type": "string"
+		},
+		"Auth_Playbook_Name": {
+			"defaultValue": "Cliente_Automation_CrowdStrike_Auth_Playbook",
+			"type": "string"
+		}
+	},
+	"variables": {},
+	"resources": [
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Automation_API_Parser_Playbook",
+			"dependsOn": [],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Automation_CrowdStrike_Block_IOC_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Block_IOC_Playbook')]"
+					},
+					"Auth_Playbook_Name": {
+						"defaultValue": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+					}
+				}
+			}
+		}
+	],
+	"outputs": {
+		"postDeployNote": {
+			"type": "string",
+			"value": "✅ Despliegue completado.\n⚠️ Ahora debes cambiar la conexión a la base de datos del playbook: \"Automation_API_Parser_Playbook\""
+		},
+		"postDeployApiTagInstructions": {
+			"type": "string",
+			"value": "✅ Despliegue completado.\n⚠️ Ahora se debe cambiar la petición a la API del cliente en el playbook \"Automation_API_Parser_Petition_Playbook\""
+		}
+	}
+}
