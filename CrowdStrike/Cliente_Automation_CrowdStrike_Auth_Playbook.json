@@ -85,7 +85,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('keyvault_ClientID/value"
+                "path": "/secrets/@{encodeURIComponent(variables('ClientID'))}/value"
               },
               "description": "This gets the secret Client Id from the keyvault",
               "runtimeConfiguration": {
@@ -111,7 +111,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('keyvault_Secret))}/value"
+                "path": "/secrets/@{encodeURIComponent(variables('ClientSecret'))}/value"
               },
               "description": "This gets the Clientsecret from the keyvault",
               "runtimeConfiguration": {
@@ -157,7 +157,7 @@
                   {
                     "name": "ClientID",
                     "type": "string",
-                    "value": "ClientID-Crowdstrike"
+                    "value": "[parameters('keyvault_ClientID')]"
                   }
                 ]
               }
@@ -174,7 +174,7 @@
                   {
                     "name": "ClientSecret",
                     "type": "string",
-                    "value": "Secret-Crowdstrike"
+                    "value": "[parameters('keyvault_Secret')]"
                   }
                 ]
               }
