@@ -10,18 +10,18 @@
 			"defaultValue": "Cliente-Desarrollo-SOC",
 			"type": "string"
 		},
-		"keyvault_ClientID_Pack": {
-			"defaultValue": "CrowdStrike-client-id",
-			"type": "string"
-		},
-		"keyvault_Secret_Pack": {
-			"defaultValue": "CrowdStrike-client-secret",
-			"type": "string"
-		},
-		"keyvault_BaseUrl_Pack": {
-			"defaultValue": "CrowdStrike-base-url",
-			"type": "string"
-		}
+    "keyvault_ClientID": {
+      "defaultValue": "ClientID-Crowdstrike",
+      "type": "string"
+    },
+    "keyvault_BaseUrl": {
+      "defaultValue": "BaseURL-Crowdstrike",
+      "type": "string"
+    },
+    "keyvault_Secret": {
+      "defaultValue": "Secret-Crowdstrike",
+      "type": "string"
+    }
 	},
 	"variables": {},
 	"resources": [
