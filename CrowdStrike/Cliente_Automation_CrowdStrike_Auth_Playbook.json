@@ -243,7 +243,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('keyvault_BaseUrl'))}/value"
+                "path": "/secrets/@{encodeURIComponent(variables('BaseUrl'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {
@@ -266,7 +266,7 @@
                   {
                     "name": "BaseUrl",
                     "type": "string",
-                    "value": "BaseURL-Crowdstrike"
+                    "value": "[parameters('keyvault_BaseUrl')]"
                   }
                 ]
               }
