@@ -6,8 +6,16 @@
 			"defaultValue": "Cliente",
 			"type": "string"
 		},
-		"PlaybookName": {
-			"defaultValue": "Cliente_Automation_CrowdStrike_Block_IOC_Playbook",
+		"keyvault_Name_Pack": {
+			"defaultValue": "Cliente-Desarrollo-SOC",
+			"type": "string"
+		},
+		"keyvault_ClientID_Pack": {
+			"defaultValue": "CrowdStrike-client-id",
+			"type": "string"
+		},
+		"keyvault_Secret_Pack": {
+			"defaultValue": "CrowdStrike-client-secret",
 			"type": "string"
 		}
 	},
@@ -27,6 +35,15 @@
 				"parameters": {
 					"PlaybookName": {
 						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+					},
+					"keyvault_Name": {
+						"value": "[parameters('keyvault_Name_Pack')]"
+					},
+					"keyvault_ClientID": {
+						"value": "[parameters('keyvault_ClientID_Pack')]"
+					},
+					"keyvault_Secret": {
+						"value": "[parameters('keyvault_Secret_Pack')]"
 					}
 				}
 			}
