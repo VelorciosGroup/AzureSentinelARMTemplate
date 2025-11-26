@@ -4,20 +4,25 @@
     "parameters": {
         "PlaybookName": {
             "defaultValue": "Cliente_Automation_CrowdStrike_Block_IOC_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "Auth_Playbook_Name": {
             "defaultValue": "Cliente_Automation_CrowdStrike_Auth_Playbook",
-            "type": "String"
+            "type": "string"
         }
     },
-    "variables": {"AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"},
+    "variables": {
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
             "name": "[parameters('PlaybookName')]",
             "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "properties": {
                 "state": "Enabled",
                 "definition": {
