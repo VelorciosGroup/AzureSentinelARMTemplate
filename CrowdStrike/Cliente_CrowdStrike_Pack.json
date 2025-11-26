@@ -9,10 +9,6 @@
 		"PlaybookName": {
 			"defaultValue": "Cliente_Automation_CrowdStrike_Block_IOC_Playbook",
 			"type": "string"
-		},
-		"Auth_Playbook_Name": {
-			"defaultValue": "Cliente_Automation_CrowdStrike_Auth_Playbook",
-			"type": "string"
 		}
 	},
 	"variables": {},
@@ -20,20 +16,17 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "Automation_CrowdStrike_Block_IOC_Playbook",
+			"name": "Automation_CrowdStrike_Auth_Playbook",
 			"dependsOn": [],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Automation_CrowdStrike_Block_IOC_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Automation_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
 					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Block_IOC_Playbook')]"
-					},
-					"Auth_Playbook_Name": {
-						"defaultValue": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
 					}
 				}
 			}
