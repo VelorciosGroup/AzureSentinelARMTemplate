@@ -11,11 +11,15 @@
       "type": "string"
     },
     "keyvault_ClientID": {
-      "defaultValue": "CrowdStrike-client-id",
+      "defaultValue": "ClientID-Crowdstrike",
+      "type": "string"
+    },
+    "keyvault_BaseUrl": {
+      "defaultValue": "BaseURL-Crowdstrike",
       "type": "string"
     },
     "keyvault_Secret": {
-      "defaultValue": "CrowdStrike-client-secret",
+      "defaultValue": "Secret-Crowdstrike",
       "type": "string"
     }
   },
@@ -54,6 +58,10 @@
             "keyvault_Secret": {
               "type": "String",
               "defaultValue": "[parameters('keyvault_Secret')]"
+            },
+            "keyvault_BaseUrl": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_BaseUrl')]"
             }
           },
           "triggers": {
@@ -235,7 +243,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('BaseUrl'))}/value"
+                "path": "/secrets/@{encodeURIComponent(variables('keyvault_BaseUrl'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {

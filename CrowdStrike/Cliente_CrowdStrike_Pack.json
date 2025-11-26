@@ -17,6 +17,10 @@
 		"keyvault_Secret_Pack": {
 			"defaultValue": "CrowdStrike-client-secret",
 			"type": "string"
+		},
+		"keyvault_BaseUrl_Pack": {
+			"defaultValue": "CrowdStrike-base-url",
+			"type": "string"
 		}
 	},
 	"variables": {},
@@ -44,6 +48,9 @@
 					},
 					"keyvault_Secret": {
 						"value": "[parameters('keyvault_Secret_Pack')]"
+					},
+					"keyvault_BaseUrl_Pack": {
+						"value": "[parameters('keyvault_BaseUrl_Pack')]"
 					}
 				}
 			}
