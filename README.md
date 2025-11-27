@@ -102,7 +102,7 @@
   <tr>
     <td colspan="2" style="text-align:center;">
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
-        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="1000px" />
+        <img src="./Button.png" alt="Deploy to Azure" width="1000px" />
       </a>
     </td>
   </tr>
