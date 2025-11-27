@@ -78,18 +78,12 @@
 <table>
   <tr>
     <th>Integración</th>
-    <th>Deploy</th>
     <th>Contenido</th>
   </tr>
 
   <!-- SOPHOS -->
   <tr>
-    <td><b>Sophos</b></td>
-    <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
-        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="1000px" />
-      </a>
-    </td>
+    <td><b>Sophos Client Integration for Azure Sentinel</b></td>
     <td>
       ⚡ Cliente_Action_Sophos_Block_Domain_Playbook.json<br>
       ⚡ Cliente_Action_Sophos_Block_Hash_Playbook.json<br>
@@ -105,15 +99,17 @@
       ✅ Deploy_Sophos.json
     </td>
   </tr>
+  <tr>
+    <td colspan="2" style="text-align:center;">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
+        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="1000px" />
+      </a>
+    </td>
+  </tr>
 
   <!-- API PARSER -->
   <tr>
-    <td><b>API Username Parser</b></td>
-    <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
-        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
-      </a>
-    </td>
+    <td><b>API Username Parser for Azure Sentinel</b></td>
     <td>
       ⚡ Cliente_Action_API_Parser_Account_Entity_Playbook.json<br>
       ⚡ Cliente_Action_API_Parser_Alert_Playbook.json<br>
@@ -123,15 +119,17 @@
       ✅ Deploy_API_Parser.json
     </td>
   </tr>
-
-  <!-- CROWDSTRIKE -->
   <tr>
-    <td><b>CrowdStrike Falcon</b></td>
-    <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
+    <td colspan="2" style="text-align:center;">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
+  </tr>
+
+  <!-- CROWDSTRIKE -->
+  <tr>
+    <td><b>CrowdStrike Falcon Integration for Azure Sentinel</b></td>
     <td>
       ⚡ Cliente_Action_CrowdStrike_Block_Hash_Playbook.json<br>
       ⚡ Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json<br>
@@ -141,6 +139,13 @@
       🧩 Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json<br>
       🧩 Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json<br>
       ✅ Deploy_CrowdStrike.json
+    </td>
+  </tr>
+  <tr>
+    <td colspan="2" style="text-align:center;">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
+        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
+      </a>
     </td>
   </tr>
 </table>
