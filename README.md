@@ -86,7 +86,7 @@
     <td><b>Sophos Client Integration for Azure Sentinel</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
-        <img src="./Button.png" alt="Deploy to Azure" width="140px" />
+        <img src="./Button.png" alt="Deploy to Azure" width="1000px" />
       </a>
     </td>
     <td>
@@ -128,7 +128,7 @@
     <td><b>CrowdStrike Falcon Integration for Azure Sentinel</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
-        <img src="./Button.png" alt="Deploy to Azure" width="140px" />
+        <img src="./Button.png" alt="Deploy to Azure" width="2000px" />
       </a>
     </td>
     <td>
