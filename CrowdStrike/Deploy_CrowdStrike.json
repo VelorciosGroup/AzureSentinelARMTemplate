@@ -28,17 +28,17 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "Automation_CrowdStrike_Auth_Playbook",
+			"name": "OrchestatorPart_CrowdStrike_Auth_Playbook",
 			"dependsOn": [],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Automation_CrowdStrike_Auth_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
 					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					},
 					"keyvault_Name": {
 						"value": "[parameters('keyvault_Name_Pack')]"
@@ -58,22 +58,22 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "Automation_CrowdStrike_Block_IOC_Playbook",
+			"name": "OrchestatorPart_CrowdStrike_Block_IOC_Playbook",
 			"dependsOn": [
-				"Automation_CrowdStrike_Auth_Playbook"
+				"OrchestatorPart_CrowdStrike_Auth_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Automation_CrowdStrike_Block_IOC_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
 					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Block_IOC_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
 					},
 					"Auth_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					}
 				}
 			}
@@ -83,7 +83,7 @@
 			"apiVersion": "2025-03-01",
 			"name": "Action_CrowdStrike_Device_Isolation_Playbook",
 			"dependsOn": [
-				"Automation_CrowdStrike_Auth_Playbook"
+				"OrchestatorPart_CrowdStrike_Auth_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -96,7 +96,7 @@
 						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Device_Isolation_Playbook')]"
 					},
 					"Auth_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					}
 				}
 			}
@@ -106,8 +106,8 @@
 			"apiVersion": "2025-03-01",
 			"name": "Action_CrowdStrike_Block_Hash_Playbook",
 			"dependsOn": [
-				"Automation_CrowdStrike_Auth_Playbook",
-				"Automation_CrowdStrike_Block_IOC_Playbook"
+				"OrchestatorPart_CrowdStrike_Auth_Playbook",
+				"OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -120,7 +120,7 @@
 						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Block_Hash_Playbook')]"
 					},
 					"Block_IOC_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Block_IOC_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
 					}
 				}
 			}
@@ -130,8 +130,8 @@
 			"apiVersion": "2025-03-01",
 			"name": "Action_CrowdStrike_Block_Incident_Hash_Playbook",
 			"dependsOn": [
-				"Automation_CrowdStrike_Auth_Playbook",
-				"Automation_CrowdStrike_Block_IOC_Playbook"
+				"OrchestatorPart_CrowdStrike_Auth_Playbook",
+				"OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -144,7 +144,7 @@
 						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Block_Incident_Hash_Playbook')]"
 					},
 					"Block_IOC_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Block_IOC_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
 					}
 				}
 			}
@@ -154,8 +154,8 @@
 			"apiVersion": "2025-03-01",
 			"name": "Enrich_CrowdStrike_Device_Info_Playbook",
 			"dependsOn": [
-				"Automation_CrowdStrike_Auth_Playbook",
-				"Automation_CrowdStrike_Block_IOC_Playbook"
+				"OrchestatorPart_CrowdStrike_Auth_Playbook",
+				"OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -168,7 +168,7 @@
 						"value": "[concat(parameters('client_Name'), '_Enrich_CrowdStrike_Device_Info_Playbook')]"
 					},
 					"Auth_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					}
 				}
 			}
@@ -178,8 +178,8 @@
 			"apiVersion": "2025-03-01",
 			"name": "Enrich_CrowdStrike_Recent_Alerts_Playbook",
 			"dependsOn": [
-				"Automation_CrowdStrike_Auth_Playbook",
-				"Automation_CrowdStrike_Block_IOC_Playbook"
+				"OrchestatorPart_CrowdStrike_Auth_Playbook",
+				"OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
@@ -192,7 +192,7 @@
 						"value": "[concat(parameters('client_Name'), '_Enrich_CrowdStrike_Recent_Alerts_Playbook')]"
 					},
 					"Auth_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_CrowdStrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					}
 				}
 			}
@@ -201,7 +201,7 @@
 	"outputs": {
 		"postDeployNote": {
 			"type": "string",
-			"value": "✅ Despliegue completado.\n⚠️ Ahora los playbooks tienen los siguientes permisos:\n- Lectura de KeyVault: Automation_CrowdStrike_Auth_Playbook\n- Escritura en comentarios: Enrich_CrowdStrike_Recent_Alerts_Playbook, Enrich_CrowdStrike_Device_Info_Playbook"
+			"value": "✅ Despliegue completado.\n⚠️ Ahora los playbooks tienen los siguientes permisos:\n- Lectura de KeyVault: OrchestatorPart_CrowdStrike_Auth_Playbook\n- Escritura en comentarios: Enrich_CrowdStrike_Recent_Alerts_Playbook, Enrich_CrowdStrike_Device_Info_Playbook"
 		},
 		"postDeployInstructions": {
 			"type": "string",

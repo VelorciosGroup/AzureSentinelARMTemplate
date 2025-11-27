@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "PlaybookName": {
-      "defaultValue": "Cliente_Automation_CrowdStrike_Auth_Playbook",
+      "defaultValue": "Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook",
       "type": "string"
     },
     "keyvault_Name": {
