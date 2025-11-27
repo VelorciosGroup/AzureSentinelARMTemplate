@@ -3,7 +3,7 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"PlaybookName": {
-			"defaultValue": "Cliente_Automation_API_Parser_Playbook",
+			"defaultValue": "Cliente_OrchestatorPart_API_Parser_Playbook",
 			"type": "string"
 		}
 	},
