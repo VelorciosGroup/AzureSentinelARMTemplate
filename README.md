@@ -1,6 +1,6 @@
 <table>
   <tr>
-    <th style="width: 250px;">Integración</th>
+    <th style="width: 100px;">Integración</th>
     <th>Deploy</th>
     <th>Contenido</th>
   </tr>
