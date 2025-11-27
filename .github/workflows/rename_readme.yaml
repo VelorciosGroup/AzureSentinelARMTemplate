@@ -1,0 +1,29 @@
+name: Update README
+
+on:
+  push:
+    branches:
+      - "**"
+
+jobs:
+  generate-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Generate README
+        run: python scripts/generate_readme.py
+
+      - name: Commit and push README
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add README.md
+          git commit -m "Update README [skip ci]" || echo "No changes to commit"
+          git push
