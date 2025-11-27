@@ -9,7 +9,7 @@
   <tr>
     <td><b>Sophos Client Integration for Azure Sentinel</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/Sophos/Deploy_Sophos.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/hhttps%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="1000px" />
       </a>
     </td>
@@ -35,7 +35,7 @@
   <tr>
     <td><b>API Username Parser for Azure Sentinel</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Deploy_API_Parser.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
@@ -55,7 +55,7 @@
   <tr>
     <td><b>CrowdStrike Falcon Integration for Azure Sentinel</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Deploy_CrowdStrike.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
