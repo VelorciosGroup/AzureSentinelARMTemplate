@@ -8,13 +8,11 @@
   <!-- SOPHOS -->
   <tr>
     <td><b>Sophos Client Integration for Azure Sentinel</b></td>
-
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/Sophos/Deploy_Sophos.json">
-        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="160px" />
+        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
-
     <td>
       <ul>
         <li>Cliente_Action_Sophos_Block_Domain_Playbook.json</li>
@@ -33,16 +31,14 @@
     </td>
   </tr>
 
-  <!-- API USERNAME PARSER -->
+  <!-- API PARSER -->
   <tr>
     <td><b>API Username Parser for Azure Sentinel</b></td>
-
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Deploy_API_Parser.json">
-        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="160px" />
+        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
-
     <td>
       <ul>
         <li>Cliente_Action_API_Parser_Account_Entity_Playbook.json</li>
@@ -58,13 +54,11 @@
   <!-- CROWDSTRIKE -->
   <tr>
     <td><b>CrowdStrike Falcon Integration for Azure Sentinel</b></td>
-
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Deploy_CrowdStrike.json">
-        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="160px" />
+        <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
-
     <td>
       <ul>
         <li>Cliente_Action_CrowdStrike_Block_Hash_Playbook.json</li>
@@ -78,4 +72,5 @@
       </ul>
     </td>
   </tr>
+
 </table>
