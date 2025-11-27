@@ -3,11 +3,11 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "PlaybookName": {
-            "defaultValue": "Cliente_Automation_CrowdStrike_Block_IOC_Playbook",
+            "defaultValue": "Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook",
             "type": "string"
         },
         "Auth_Playbook_Name": {
-            "defaultValue": "Cliente_Automation_CrowdStrike_Auth_Playbook",
+            "defaultValue": "Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook",
             "type": "string"
         }
     },
@@ -61,7 +61,7 @@
                         }
                     },
                     "actions": {
-                        "PRUEBA_Automation_CrowdStrike_Auth_Playbook": {
+                        "PRUEBA_OrchestatorPart_CrowdStrike_Auth_Playbook": {
                             "runAfter": {
                                 "Initialize_variables_indicators": [
                                     "Succeeded"
@@ -79,13 +79,13 @@
                         },
                         "Parse_JSON": {
                             "runAfter": {
-                                "PRUEBA_Automation_CrowdStrike_Auth_Playbook": [
+                                "PRUEBA_OrchestatorPart_CrowdStrike_Auth_Playbook": [
                                     "Succeeded"
                                 ]
                             },
                             "type": "ParseJson",
                             "inputs": {
-                                "content": "@body('PRUEBA_Automation_CrowdStrike_Auth_Playbook')",
+                                "content": "@body('PRUEBA_OrchestatorPart_CrowdStrike_Auth_Playbook')",
                                 "schema": {
                                     "type": "object",
                                     "properties": {

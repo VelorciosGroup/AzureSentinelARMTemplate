@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "PlaybookName": {
-            "defaultValue": "Cliente_Automation_Sophos_Block_IOC_Playbook",
+            "defaultValue": "Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook",
             "type": "string"
         },
         "keyvault_Name": {
