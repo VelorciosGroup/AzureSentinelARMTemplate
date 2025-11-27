@@ -73,7 +73,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('Auth_Playbook_Name)]"
+                                        "id": "[parameters('Auth_Playbook_Name')]"
                                     },
                                     "triggerName": "manual"
                                 }
