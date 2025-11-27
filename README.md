@@ -9,7 +9,7 @@
   <tr>
     <td><b>Sophos Client Integration for Azure Sentinel</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/hhttps%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy to Azure" width="1000px" />
       </a>
     </td>
