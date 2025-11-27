@@ -201,11 +201,11 @@
 	"outputs": {
 		"postDeployNote": {
 			"type": "string",
-			"value": "✅ Despliegue completado.\n⚠️ Ahora debes cambiar la conexión a la base de datos del playbook: \"Automation_API_Parser_Playbook\""
+			"value": "✅ Despliegue completado.\n⚠️ Ahora los playbooks tienen los siguientes permisos:\n- Lectura de KeyVault: Automation_CrowdStrike_Auth_Playbook\n- Escritura en comentarios: Enrich_CrowdStrike_Recent_Alerts_Playbook, Enrich_CrowdStrike_Device_Info_Playbook"
 		},
-		"postDeployApiTagInstructions": {
+		"postDeployInstructions": {
 			"type": "string",
-			"value": "✅ Despliegue completado.\n⚠️ Ahora se debe cambiar la petición a la API del cliente en el playbook \"Automation_API_Parser_Petition_Playbook\""
+			"value": "✅ Despliegue completado.\n⚠️ Revisa que los playbooks indicados tengan los permisos correctos antes de continuar con otras operaciones."
 		}
 	}
 }
