@@ -72,7 +72,6 @@
       </ul>
     </td>
   </tr>
-
 </table>
 
 
@@ -81,8 +80,6 @@
 
 Este repositorio contiene integraciones listas para desplegar en **Azure Sentinel**.  
 Cada integración incluye playbooks de distintos tipos: **Action**, **Enrich**, **Orchestrator**, y su archivo de deploy.
-
----
 
 | Integración | Deploy | Playbook | Tipo |
 |-------------|--------|----------|------|
@@ -135,3 +132,4 @@ Cada integración incluye playbooks de distintos tipos: **Action**, **Enrich**, 
 - ![Enrich](https://img.shields.io/badge/Enrich-JSON-green) = Enrich Playbook  
 - ![Orchestrator](https://img.shields.io/badge/Orchestrator-JSON-purple) = Orchestrator Playbook  
 - ✅ Deploy
+
