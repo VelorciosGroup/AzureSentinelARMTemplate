@@ -75,7 +75,6 @@
 </table>
 
 
-
 <table>
   <tr>
     <th>Integración</th>
@@ -92,52 +91,52 @@
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy" width="200px"/>
       </a>
     </td>
-    <td>Cliente_Action_Sophos_Block_Domain_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Block_Domain_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Block_Hash_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Block_Hash_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Block_Incident_Domains_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Block_Incident_Domains_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Block_Incident_IPs_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Block_Incident_IPs_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Block_IP_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Block_IP_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Device_Isolation_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Device_Isolation_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_Sophos_Launch_Antivirus_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_Sophos_Launch_Antivirus_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Orchestrator-JSON-purple" alt="Orchestrator"></td>
+    <td>🤖 Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook.json</td>
+    <td>Orchestrator</td>
   </tr>
   <tr>
-    <td>Cliente_Enrich_Sophos_Get_Device_Info_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Enrich-JSON-green" alt="Enrich"></td>
+    <td>🧩 Cliente_Enrich_Sophos_Get_Device_Info_Playbook.json</td>
+    <td>Enrich</td>
   </tr>
   <tr>
-    <td>Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Enrich-JSON-green" alt="Enrich"></td>
+    <td>🧩 Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json</td>
+    <td>Enrich</td>
   </tr>
   <tr>
-    <td>Deploy_Sophos.json</td>
-    <td>✅ Deploy</td>
+    <td>✅ Deploy_Sophos.json</td>
+    <td>Deploy</td>
   </tr>
 
   <!-- API PARSER -->
@@ -148,28 +147,28 @@
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy" width="200px"/>
       </a>
     </td>
-    <td>Cliente_Action_API_Parser_Account_Entity_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_API_Parser_Account_Entity_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_API_Parser_Alert_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_API_Parser_Alert_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_API_Parser_Incident_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_API_Parser_Incident_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_OrchestatorPart_API_Parser_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Orchestrator-JSON-purple" alt="Orchestrator"></td>
+    <td>🤖 Cliente_OrchestatorPart_API_Parser_Playbook.json</td>
+    <td>Orchestrator</td>
   </tr>
   <tr>
-    <td>Cliente_OrchestatorPart_API_Petition.json</td>
-    <td><img src="https://img.shields.io/badge/Orchestrator-JSON-purple" alt="Orchestrator"></td>
+    <td>🤖 Cliente_OrchestatorPart_API_Petition.json</td>
+    <td>Orchestrator</td>
   </tr>
   <tr>
-    <td>Deploy_API_Parser.json</td>
-    <td>✅ Deploy</td>
+    <td>✅ Deploy_API_Parser.json</td>
+    <td>Deploy</td>
   </tr>
 
   <!-- CROWDSTRIKE -->
@@ -180,35 +179,35 @@
         <img src="https://aka.ms/deploytoazurebutton" alt="Deploy" width="200px"/>
       </a>
     </td>
-    <td>Cliente_Action_CrowdStrike_Block_Hash_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_CrowdStrike_Block_Hash_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Action-JSON-blue" alt="Action"></td>
+    <td>⚡ Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json</td>
+    <td>Action</td>
   </tr>
   <tr>
-    <td>Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Orchestrator-JSON-purple" alt="Orchestrator"></td>
+    <td>🤖 Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json</td>
+    <td>Orchestrator</td>
   </tr>
   <tr>
-    <td>Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Orchestrator-JSON-purple" alt="Orchestrator"></td>
+    <td>🤖 Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json</td>
+    <td>Orchestrator</td>
   </tr>
   <tr>
-    <td>Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Enrich-JSON-green" alt="Enrich"></td>
+    <td>🧩 Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json</td>
+    <td>Enrich</td>
   </tr>
   <tr>
-    <td>Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json</td>
-    <td><img src="https://img.shields.io/badge/Enrich-JSON-green" alt="Enrich"></td>
+    <td>🧩 Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json</td>
+    <td>Enrich</td>
   </tr>
   <tr>
-    <td>Deploy_CrowdStrike.json</td>
-    <td>✅ Deploy</td>
+    <td>✅ Deploy_CrowdStrike.json</td>
+    <td>Deploy</td>
   </tr>
 </table>
