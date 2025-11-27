@@ -184,7 +184,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
