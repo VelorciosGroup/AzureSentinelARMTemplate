@@ -75,8 +75,6 @@
 </table>
 
 
-
-
 <table>
   <tr>
     <th>Integración</th>
@@ -93,20 +91,18 @@
       </a>
     </td>
     <td>
-      <ul>
-        <li>⚡ Cliente_Action_Sophos_Block_Domain_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Block_Hash_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Block_Incident_Domains_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Block_Incident_IPs_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Block_IP_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Device_Isolation_Playbook.json</li>
-        <li>⚡ Cliente_Action_Sophos_Launch_Antivirus_Playbook.json</li>
-        <li>🤖 Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook.json</li>
-        <li>🧩 Cliente_Enrich_Sophos_Get_Device_Info_Playbook.json</li>
-        <li>🧩 Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json</li>
-        <li>✅ Deploy_Sophos.json</li>
-      </ul>
+      ⚡ Cliente_Action_Sophos_Block_Domain_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Block_Hash_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Block_Incident_Domains_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Block_Incident_IPs_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Block_IP_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Device_Isolation_Playbook.json<br>
+      ⚡ Cliente_Action_Sophos_Launch_Antivirus_Playbook.json<br>
+      🤖 Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook.json<br>
+      🧩 Cliente_Enrich_Sophos_Get_Device_Info_Playbook.json<br>
+      🧩 Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json<br>
+      ✅ Deploy_Sophos.json
     </td>
   </tr>
 
@@ -119,14 +115,12 @@
       </a>
     </td>
     <td>
-      <ul>
-        <li>⚡ Cliente_Action_API_Parser_Account_Entity_Playbook.json</li>
-        <li>⚡ Cliente_Action_API_Parser_Alert_Playbook.json</li>
-        <li>⚡ Cliente_Action_API_Parser_Incident_Playbook.json</li>
-        <li>🤖 Cliente_OrchestatorPart_API_Parser_Playbook.json</li>
-        <li>🤖 Cliente_OrchestatorPart_API_Petition.json</li>
-        <li>✅ Deploy_API_Parser.json</li>
-      </ul>
+      ⚡ Cliente_Action_API_Parser_Account_Entity_Playbook.json<br>
+      ⚡ Cliente_Action_API_Parser_Alert_Playbook.json<br>
+      ⚡ Cliente_Action_API_Parser_Incident_Playbook.json<br>
+      🤖 Cliente_OrchestatorPart_API_Parser_Playbook.json<br>
+      🤖 Cliente_OrchestatorPart_API_Petition.json<br>
+      ✅ Deploy_API_Parser.json
     </td>
   </tr>
 
@@ -139,17 +133,14 @@
       </a>
     </td>
     <td>
-      <ul>
-        <li>⚡ Cliente_Action_CrowdStrike_Block_Hash_Playbook.json</li>
-        <li>⚡ Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json</li>
-        <li>⚡ Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json</li>
-        <li>🤖 Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json</li>
-        <li>🤖 Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json</li>
-        <li>🧩 Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json</li>
-        <li>🧩 Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json</li>
-        <li>✅ Deploy_CrowdStrike.json</li>
-      </ul>
+      ⚡ Cliente_Action_CrowdStrike_Block_Hash_Playbook.json<br>
+      ⚡ Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json<br>
+      ⚡ Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json<br>
+      🤖 Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json<br>
+      🤖 Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json<br>
+      🧩 Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json<br>
+      🧩 Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json<br>
+      ✅ Deploy_CrowdStrike.json
     </td>
   </tr>
 </table>
-
