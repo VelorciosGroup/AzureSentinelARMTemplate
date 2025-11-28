@@ -57,7 +57,7 @@
     </td>
     <td>
       • <a href="./CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json">Cliente_Action_CrowdStrike_Block_Hash_Playbook.json</a><br>
-      • <a href="./CrowdStrike/Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json">Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json</a><br>
+      • <a href="./CrowdStrike/Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json">Cliente_Action_CrowdStrike_Block_Incident_Hash_Playbook.json</a><br>
       • <a href="./CrowdStrike/Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json">Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json</a><br>
       • <a href="./CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json">Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json</a><br>
       • <a href="./CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json">Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json</a><br>
