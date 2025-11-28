@@ -7,7 +7,7 @@
 
   <!-- SOPHOS -->
   <tr>
-    <td style="width: 220px;"><b>Sophos Client Integration for Azure Sentinel</b></td>
+    <td><b>Sophos</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
@@ -31,7 +31,7 @@
 
   <!-- API PARSER -->
   <tr>
-    <td><b>API Username Parser for Azure Sentinel</b></td>
+    <td><b>API Username Parser</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
@@ -49,7 +49,7 @@
 
   <!-- CROWDSTRIKE -->
   <tr>
-    <td><b>CrowdStrike Falcon Integration for Azure Sentinel</b></td>
+    <td><b>CrowdStrike</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
