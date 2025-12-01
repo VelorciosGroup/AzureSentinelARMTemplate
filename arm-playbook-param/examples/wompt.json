@@ -1,22 +1,38 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
-            "defaultValue": "PRUEBA_Automation_CrowdStrike_Auth_Playbook",
-            "type": "String"
-        },
         "connections_keyvault_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault",
             "type": "String"
+        },
+        "CAMBIONOMBRE": {
+            "defaultValue": "PRUEBA_Automation_CrowdStrike_Auth_Playbook",
+            "type": "String"
+        },
+        "AAAA": {
+            "type": "String",
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault"
+        },
+        "BBBB": {
+            "type": "String",
+            "defaultValue": "ClientID-Crowdstrike"
+        },
+        "CCCC": {
+            "type": "String",
+            "defaultValue": "Secret-Crowdstrike"
+        },
+        "DDDD": {
+            "type": "String",
+            "defaultValue": "BaseURL-Crowdstrike"
         }
     },
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
     "variables": {},
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name')]",
+            "name": "[parameters('CAMBIONOMBRE')]",
             "location": "westeurope",
             "tags": {
                 "hidden-SentinelTemplateName": "Crowdstrike-Authentication",
@@ -130,7 +146,7 @@
                                     {
                                         "name": "ClientID",
                                         "type": "string",
-                                        "value": "ClientID-Crowdstrike"
+                                        "value": "[parameters('BBBB')]"
                                     }
                                 ]
                             }
@@ -147,7 +163,7 @@
                                     {
                                         "name": "ClientSecret",
                                         "type": "string",
-                                        "value": "Secret-Crowdstrike"
+                                        "value": "[parameters('CCCC')]"
                                     }
                                 ]
                             }
@@ -239,7 +255,7 @@
                                     {
                                         "name": "BaseUrl",
                                         "type": "string",
-                                        "value": "BaseURL-Crowdstrike"
+                                        "value": "[parameters('DDDD')]"
                                     }
                                 ]
                             }
