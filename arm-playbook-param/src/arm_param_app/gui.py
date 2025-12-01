@@ -96,9 +96,151 @@ def extract_literal_candidates_from_params_and_variables(
             pname = "param"
         if not pname[0].isalpha():
             pname = "p_" + pname
-        info["suggested_param"] = pname[:80]  # ← aumentado de 40 a 80
+        info["suggested_param"] = pname[:80]
 
     return candidates
+
+
+# ----------------- Detección uso de Key Vault ----------------- #
+
+def uses_keyvault_connection(template: Dict[str, Any]) -> bool:
+    """
+    Devuelve True si el template usa algo relacionado con Key Vault.
+    Heurística simple: buscamos 'keyvault' en el JSON entero.
+    Ajusta esta lógica si necesitas algo más fino.
+    """
+    try:
+        dumped = json.dumps(template).lower()
+    except TypeError:
+        return False
+    return "keyvault" in dumped
+
+
+# ----------------- Variables por defecto ----------------- #
+
+def ensure_default_variables(
+    template: Dict[str, Any],
+    playbook_param_name: str | None = None
+) -> None:
+    """
+    Asegura que en template['variables'] existan:
+      - AzureSentinelConnectionName
+      - keyvault_Connection_Name (solo si se detecta uso de Key Vault)
+
+    Usa el parámetro que represente el nombre del playbook:
+    [concat('azuresentinel-', parameters('<playbook_param_name>'))]
+
+    Si no se detecta, cae por defecto a 'PlaybookName'.
+    """
+    if not playbook_param_name:
+        playbook_param_name = "PlaybookName"
+
+    variables = template.setdefault("variables", {})
+
+    variables["AzureSentinelConnectionName"] = (
+        f"[concat('azuresentinel-', parameters('{playbook_param_name}'))]"
+    )
+
+    if uses_keyvault_connection(template):
+        variables["keyvault_Connection_Name"] = (
+            f"[concat('keyvault-', parameters('{playbook_param_name}'))]"
+        )
+
+
+# ----------------- Bloque $connections en el workflow ----------------- #
+
+def ensure_connections_blocks(template: Dict[str, Any]) -> None:
+    """
+    Asegura que en cada workflow (Microsoft.Logic/workflows) exista el bloque:
+
+      parameters.$connections.value.azuresentinel = { ... }
+
+    y, si se usa Key Vault, también:
+
+      parameters.$connections.value.keyvault = { ... }
+
+    Si NO se usa Key Vault, elimina el bloque 'keyvault' de $connections.value si existe.
+    """
+    keyvault_used = uses_keyvault_connection(template)
+
+    resources = template.get("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Logic/workflows":
+            continue
+
+        props = res.setdefault("properties", {})
+        wf_params = props.setdefault("parameters", {})
+        connections = wf_params.setdefault("$connections", {})
+        value = connections.setdefault("value", {})
+
+        # Bloque azuresentinel (siempre)
+        value["azuresentinel"] = {
+            "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+            "connectionName": "[variables('AzureSentinelConnectionName')]",
+            "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+            "connectionProperties": {
+                "authentication": {
+                    "type": "ManagedServiceIdentity"
+                }
+            }
+        }
+
+        # Bloque keyvault condicional
+        if keyvault_used:
+            value["keyvault"] = {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
+                "connectionName": "[variables('keyvault_Connection_Name')]",
+                "connectionProperties": {
+                    "authentication": {
+                        "type": "ManagedServiceIdentity"
+                    }
+                }
+            }
+        else:
+            # Si no se usa Key Vault, limpiamos el bloque por si estuviera
+            if "keyvault" in value:
+                del value["keyvault"]
+
+        connections["value"] = value
+
+        # Opcional: ajustar dependsOn del workflow para que solo incluya keyvault si se usa
+        depends_on = res.get("dependsOn")
+        if isinstance(depends_on, list):
+            # Siempre Azure Sentinel
+            az_dep = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+            kv_dep = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+
+            # Eliminamos posibles duplicados y limpiamos keyvault si no toca
+            new_depends = []
+
+            # Mantenemos los que no son de conexiones, y filtramos manualmente los de Sentinel/keyvault
+            for d in depends_on:
+                if not isinstance(d, str):
+                    new_depends.append(d)
+                    continue
+                if d == az_dep or d == kv_dep:
+                    # Los gestionamos abajo, no aquí
+                    continue
+                new_depends.append(d)
+
+            # Aseguramos AzureSentinel
+            if az_dep not in new_depends:
+                new_depends.append(az_dep)
+
+            # Aseguramos/quitamos keyvault según proceda
+            if keyvault_used and kv_dep not in new_depends:
+                new_depends.append(kv_dep)
+
+            res["dependsOn"] = new_depends
+
+
+# ------------------------------------------------------------------- #
 
 
 class ParamGUI:
@@ -110,6 +252,9 @@ class ParamGUI:
         self.checkbox_vars: Dict[str, tk.IntVar] = {}
         self.entry_vars: Dict[str, tk.StringVar] = {}
         self.candidates_meta: Dict[str, Dict[str, Any]] = {}
+
+        # referencia al botón toggle (se crea en build_candidates)
+        self.toggle_all_btn: tk.Button | None = None
 
         self.file_label = tk.Label(root, text="No file loaded")
         self.file_label.pack(pady=5)
@@ -172,6 +317,7 @@ class ParamGUI:
         self.checkbox_vars.clear()
         self.entry_vars.clear()
         self.candidates_meta.clear()
+        self.toggle_all_btn = None
 
         if not isinstance(self.template, dict):
             messagebox.showerror("Error", "Root JSON must be an object.")
@@ -193,6 +339,15 @@ class ParamGUI:
             text="Select literals (from parameters/variables) to parametrize and optionally edit parameter name:"
         ).pack(anchor="w", pady=2)
 
+        # --------- BOTÓN TOGGLE DE SELECCIÓN ---------- #
+        self.toggle_all_btn = tk.Button(
+            self.scroll_frame,
+            text="Deseleccionar todas",   # porque todas vienen marcadas por defecto
+            command=self.toggle_all_literals
+        )
+        self.toggle_all_btn.pack(anchor="w", pady=(0, 5))
+        # ------------------------------------------------ #
+
         for literal, info in self.candidates_meta.items():
             used_in = info.get("used_in", [])
             suggested = info.get("suggested_param", "")
@@ -201,7 +356,8 @@ class ParamGUI:
             frame = tk.Frame(self.scroll_frame, bd=1, relief=tk.GROOVE, padx=4, pady=2)
             frame.pack(fill="x", padx=2, pady=2)
 
-            var = tk.IntVar(value=0)
+            # ✅ Marcadas por defecto (value=1)
+            var = tk.IntVar(value=1)
             self.checkbox_vars[literal] = var
             tk.Checkbutton(frame, variable=var).grid(row=0, column=0, rowspan=3, sticky="nw")
 
@@ -210,7 +366,6 @@ class ParamGUI:
 
             tk.Label(frame, text=f"Literal (used in {count} place(s)):").grid(row=0, column=1, sticky="w")
 
-            # ←← literal COMPLETO, sin truncar y sin wrap
             tk.Label(
                 frame,
                 text=literal,
@@ -223,13 +378,42 @@ class ParamGUI:
                 tk.Label(
                     frame,
                     text=f"Used in: {where_text}",
-                    wraplength=0,         # ← sin wrap
+                    wraplength=0,
                     justify="left",
                     fg="gray20"
                 ).grid(row=1, column=1, columnspan=2, sticky="w")
 
             tk.Label(frame, text="Param name:").grid(row=2, column=1, sticky="e")
-            tk.Entry(frame, textvariable=pvar, width=80).grid(row=2, column=2, sticky="w")   # ← ancho 80
+            tk.Entry(frame, textvariable=pvar, width=80).grid(row=2, column=2, sticky="w")
+
+    # ---------------- TOGGLE seleccionar/deseleccionar todas ---------------- #
+
+    def toggle_all_literals(self) -> None:
+        """
+        Toggle:
+        - Si todas están activadas → desactiva todas
+        - Si alguna está desactivada → activa todas
+        Actualiza el texto del botón acorde.
+        """
+        vars_list = list(self.checkbox_vars.values())
+
+        if not vars_list:
+            return
+
+        all_checked = all(v.get() == 1 for v in vars_list)
+
+        if all_checked:
+            for v in vars_list:
+                v.set(0)
+            if self.toggle_all_btn is not None:
+                self.toggle_all_btn.config(text="Seleccionar todas")
+        else:
+            for v in vars_list:
+                v.set(1)
+            if self.toggle_all_btn is not None:
+                self.toggle_all_btn.config(text="Deseleccionar todas")
+
+    # ------------------------------------------------------------------------ #
 
     def parametrize_selected(self) -> None:
         if self.template is None:
@@ -239,6 +423,7 @@ class ParamGUI:
         import copy
         literal_to_param: Dict[str, str] = {}
         workflow_renames: Dict[str, str] = {}
+        playbook_param_name: str | None = None
 
         for literal, var in self.checkbox_vars.items():
             if not var.get():
@@ -246,7 +431,10 @@ class ParamGUI:
 
             new_param_name = self.entry_vars[literal].get().strip()
             if not new_param_name:
-                messagebox.showerror("Error", f"Parameter name for literal '{literal[:50]}' is empty.")
+                messagebox.showerror(
+                    "Error",
+                    f"Parameter name for literal '{literal[:50]}' is empty."
+                )
                 return
 
             literal_to_param[literal] = new_param_name
@@ -258,6 +446,11 @@ class ParamGUI:
             for u in used_in:
                 if u.startswith(prefix) and u.endswith("'"):
                     old_param_name = u[len(prefix):-1]
+
+                    # detectar el parámetro que corresponde al nombre del playbook
+                    if old_param_name.startswith("workflows_") and old_param_name.endswith("_name"):
+                        playbook_param_name = new_param_name
+
                     if old_param_name.startswith("workflows_") and old_param_name != new_param_name:
                         workflow_renames[old_param_name] = new_param_name
 
@@ -300,7 +493,14 @@ class ParamGUI:
         for k, v in body_without_params.items():
             final_template[k] = v
 
+        # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
+
+        # 6. Asegurar bloque "variables" usando el parámetro correcto del playbook
+        ensure_default_variables(final_template, playbook_param_name)
+
+        # 7. Asegurar bloque $connections (azuresentinel + keyvault condicional)
+        ensure_connections_blocks(final_template)
 
         out_path = filedialog.asksaveasfilename(
             title="Save parametrized template",
