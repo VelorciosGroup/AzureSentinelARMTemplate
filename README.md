@@ -9,14 +9,14 @@
   <tr>
     <td><b>Sophos</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fpruebas%2FSophos%2FDeploy_Sophos.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
     <td>
-      • <a href="./Sophos/Cliente_Action_Sophos_Block_Domain_Playbook.json">Cliente_Action_Sophos_Block_Domain_Playbook.json</a><br>
+      • <a href="./Sophos/Cliente_Action_Sophos_Block_Dopruebas_Playbook.json">Cliente_Action_Sophos_Block_Dopruebas_Playbook.json</a><br>
       • <a href="./Sophos/Cliente_Action_Sophos_Block_Hash_Playbook.json">Cliente_Action_Sophos_Block_Hash_Playbook.json</a><br>
-      • <a href="./Sophos/Cliente_Action_Sophos_Block_Incident_Domains_Playbook.json">Cliente_Action_Sophos_Block_Incident_Domains_Playbook.json</a><br>
+      • <a href="./Sophos/Cliente_Action_Sophos_Block_Incident_Dopruebass_Playbook.json">Cliente_Action_Sophos_Block_Incident_Dopruebass_Playbook.json</a><br>
       • <a href="./Sophos/Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json">Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json</a><br>
       • <a href="./Sophos/Cliente_Action_Sophos_Block_Incident_IPs_Playbook.json">Cliente_Action_Sophos_Block_Incident_IPs_Playbook.json</a><br>
       • <a href="./Sophos/Cliente_Action_Sophos_Block_IP_Playbook.json">Cliente_Action_Sophos_Block_IP_Playbook.json</a><br>
@@ -33,7 +33,7 @@
   <tr>
     <td><b>API Username Parser</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fpruebas%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
@@ -51,7 +51,7 @@
   <tr>
     <td><b>CrowdStrike</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fpruebas%2FCrowdStrike%2FDeploy_CrowdStrike.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
