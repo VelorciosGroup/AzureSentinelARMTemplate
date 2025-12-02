@@ -104,7 +104,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('Auth_Playbook_Name'))]"
+                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Logic/workflows/', parameters('PRUEBA_Automation_Crowdstrike_Auth_Playbook'))]"
                                     },
                                     "triggerName": "manual"
                                 }
