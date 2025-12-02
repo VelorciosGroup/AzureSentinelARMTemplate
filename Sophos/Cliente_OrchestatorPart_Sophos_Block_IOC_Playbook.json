@@ -10,7 +10,7 @@
             "defaultValue": "MSSP-Desarrollo-SOC",
             "type": "string"
         },
-		"keyvault_ClientID": {
+        "keyvault_ClientID": {
             "defaultValue": "sophos-velorcios-client-id",
             "type": "string"
         },
@@ -51,19 +51,26 @@
                             "defaultValue": {},
                             "type": "Object"
                         },
+                        "PlaybookName": {
+                            "defaultValue": "Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook",
+                            "type": "string"
+                        },
+                        "keyvault_Name": {
+                            "defaultValue": "MSSP-Desarrollo-SOC",
+                            "type": "string"
+                        },
                         "keyvault_ClientID": {
-                            "type": "String",
-                            "defaultValue": "[parameters('keyvault_ClientID')]"
+                            "defaultValue": "sophos-velorcios-client-id",
+                            "type": "string"
                         },
                         "keyvault_Secret": {
-                            "type": "String",
-                            "defaultValue": "[parameters('keyvault_Secret')]"
+                            "defaultValue": "sophos-velorcios-client-secret",
+                            "type": "string"
                         },
                         "api_block_tag": {
-                            "type": "string",
-                            "defaultValue": "[parameters('keyvault_Secret')]"
+                            "defaultValue": "Blocked by SOC",
+                            "type": "string"
                         }
-                        
                     },
                     "triggers": {
                         "manual": {
