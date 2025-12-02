@@ -6,12 +6,14 @@
             "defaultValue": "Cliente_Action_Sophos_Block_Incident_Hashes_Playbook",
             "type": "string"
         },
- 		"Block_IOC_Playbook_Name": {
+        "Block_IOC_Playbook_Name": {
             "defaultValue": "Cliente_Automation_Block_IOC_Playbook",
             "type": "string"
         }
     },
-    "variables": {"AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"},
+    "variables": {
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
@@ -30,6 +32,14 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "PlaybookName": {
+                            "defaultValue": "Cliente_Action_Sophos_Block_Incident_Hashes_Playbook",
+                            "type": "string"
+                        },
+                        "Block_IOC_Playbook_Name": {
+                            "defaultValue": "Cliente_Automation_Block_IOC_Playbook",
+                            "type": "string"
                         }
                     },
                     "triggers": {
