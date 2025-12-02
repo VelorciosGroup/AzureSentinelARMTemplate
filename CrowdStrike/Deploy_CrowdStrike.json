@@ -33,7 +33,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -65,7 +65,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -88,7 +88,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -112,7 +112,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -136,7 +136,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -160,7 +160,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -184,7 +184,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
