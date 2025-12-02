@@ -336,6 +336,32 @@ def overwrite_parameter_defaults_with_names(template: Dict[str, Any]) -> None:
             pdef["defaultValue"] = pname
 
 
+# ----------------- NUEVO: dejar solo parámetros seleccionados ------------- #
+
+def keep_only_selected_parameters(
+    template: Dict[str, Any],
+    literal_to_param: Dict[str, str]
+) -> None:
+    """
+    Deja en template['parameters'] SOLO los parámetros cuyos nombres
+    son los que el usuario ha definido en la GUI (literal_to_param.values()).
+
+    Es decir: vacía 'parameters' y mete únicamente los parámetros
+    que corresponden a los literales seleccionados.
+    """
+    params = template.get("parameters", {})
+    if not isinstance(params, dict):
+        return
+
+    allowed_names = set(literal_to_param.values())
+    new_params = {
+        pname: pdef
+        for pname, pdef in params.items()
+        if pname in allowed_names
+    }
+    template["parameters"] = new_params
+
+
 # ------------------------------------------------------------------- #
 
 
@@ -584,16 +610,19 @@ class ParamGUI:
         # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
 
-        # 6. Sobrescribir defaultValue = nombre del parámetro
+        # 6. QUEDARSE SOLO CON LOS PARÁMETROS SELECCIONADOS
+        keep_only_selected_parameters(final_template, literal_to_param)
+
+        # 7. Sobrescribir defaultValue = nombre del parámetro
         overwrite_parameter_defaults_with_names(final_template)
 
-        # 7. Variables por defecto (AzureSentinel + keyvault condicional)
+        # 8. Variables por defecto (AzureSentinel + keyvault condicional)
         ensure_default_variables(final_template, playbook_param_name)
 
-        # 8. Bloque $connections en workflows
+        # 9. Bloque $connections en workflows
         ensure_connections_blocks(final_template)
 
-        # 9. Recursos Microsoft.Web/connections
+        # 10. Recursos Microsoft.Web/connections
         ensure_connection_resources(final_template, keyvault_param_name)
 
         out_path = filedialog.asksaveasfilename(

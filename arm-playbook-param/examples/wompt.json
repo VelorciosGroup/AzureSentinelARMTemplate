@@ -1,16 +1,12 @@
 {
     "parameters": {
-        "connections_keyvault_externalid": {
-            "defaultValue": "connections_keyvault_externalid",
-            "type": "String"
-        },
         "PlaybookName": {
             "defaultValue": "PlaybookName",
             "type": "String"
         },
-        "keyvault_Name": {
+        "keyvault_name": {
             "type": "String",
-            "defaultValue": "keyvault_Name"
+            "defaultValue": "keyvault_name"
         },
         "keyvault_ClientID": {
             "type": "String",
