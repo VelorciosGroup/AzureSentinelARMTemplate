@@ -1,7 +1,7 @@
 import json
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from typing import Dict, Any
+from typing import Dict, Any, Set, Optional
 
 from .core import replace_literals, add_parameter_definitions
 
@@ -120,7 +120,7 @@ def uses_keyvault_connection(template: Dict[str, Any]) -> bool:
 
 def ensure_default_variables(
     template: Dict[str, Any],
-    playbook_param_name: str | None = None
+    playbook_param_name: Optional[str] = None
 ) -> None:
     """
     Asegura que en template['variables'] existan:
@@ -153,13 +153,11 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
     """
     Asegura que en cada workflow (Microsoft.Logic/workflows) exista el bloque:
 
-      parameters.$connections.value.azuresentinel = { ... }
+      properties.parameters.$connections.value.azuresentinel / keyvault
 
-    y, si se usa Key Vault, también:
-
-      parameters.$connections.value.keyvault = { ... }
-
-    Ajusta también el dependsOn del workflow para Azure Sentinel y Key Vault.
+    y ajusta/crea también el dependsOn del workflow para:
+      - Microsoft.Web/connections AzureSentinelConnectionName (siempre)
+      - Microsoft.Web/connections keyvault_Connection_Name (solo si se usa Key Vault)
     """
     keyvault_used = uses_keyvault_connection(template)
 
@@ -208,38 +206,40 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
 
         connections["value"] = value
 
-        # Ajustar dependsOn del workflow
+        # Crear/ajustar dependsOn siempre
+        az_dep = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+        kv_dep = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+
         depends_on = res.get("dependsOn")
-        if isinstance(depends_on, list):
-            az_dep = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
-            kv_dep = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+        if not isinstance(depends_on, list):
+            depends_on = []
 
-            new_depends = []
-            for d in depends_on:
-                if not isinstance(d, str):
-                    new_depends.append(d)
-                    continue
-                if d in (az_dep, kv_dep):
-                    continue
+        new_depends = []
+        for d in depends_on:
+            if not isinstance(d, str):
                 new_depends.append(d)
+                continue
+            # limpiamos posibles duplicados de estas dos entradas
+            if d in (az_dep, kv_dep):
+                continue
+            new_depends.append(d)
 
-            # Siempre AzureSentinel
-            if az_dep not in new_depends:
-                new_depends.append(az_dep)
+        # Siempre Azure Sentinel
+        if az_dep not in new_depends:
+            new_depends.append(az_dep)
 
-            # Keyvault condicional
-            if keyvault_used:
-                if kv_dep not in new_depends:
-                    new_depends.append(kv_dep)
+        # Key Vault solo si se usa
+        if keyvault_used and kv_dep not in new_depends:
+            new_depends.append(kv_dep)
 
-            res["dependsOn"] = new_depends
+        res["dependsOn"] = new_depends
 
 
 # ----------------- Recursos Microsoft.Web/connections ----------------- #
 
 def ensure_connection_resources(
     template: Dict[str, Any],
-    keyvault_param_name: str | None = None
+    keyvault_param_name: Optional[str] = None
 ) -> None:
     """
     Asegura que existan los recursos de tipo 'Microsoft.Web/connections'
@@ -336,7 +336,7 @@ def overwrite_parameter_defaults_with_names(template: Dict[str, Any]) -> None:
             pdef["defaultValue"] = pname
 
 
-# ----------------- NUEVO: dejar solo parámetros seleccionados ------------- #
+# ----------------- Dejar solo parámetros seleccionados ----------------- #
 
 def keep_only_selected_parameters(
     template: Dict[str, Any],
@@ -345,9 +345,6 @@ def keep_only_selected_parameters(
     """
     Deja en template['parameters'] SOLO los parámetros cuyos nombres
     son los que el usuario ha definido en la GUI (literal_to_param.values()).
-
-    Es decir: vacía 'parameters' y mete únicamente los parámetros
-    que corresponden a los literales seleccionados.
     """
     params = template.get("parameters", {})
     if not isinstance(params, dict):
@@ -360,6 +357,103 @@ def keep_only_selected_parameters(
         if pname in allowed_names
     }
     template["parameters"] = new_params
+
+
+# ------------- parameters dentro de properties.definition --------------- #
+
+def ensure_definition_parameters(template: Dict[str, Any]) -> None:
+    """
+    Para cada workflow Microsoft.Logic/workflows mete en
+    properties.definition.parameters todos los parámetros definidos en
+    template['parameters'].
+
+    Se referencian así:
+      "MiParametro": {
+        "type": "String",
+        "defaultValue": "[parameters('MiParametro')]"
+      }
+    """
+    params = template.get("parameters", {})
+    if not isinstance(params, dict) or not params:
+        return
+
+    resources = template.get("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Logic/workflows":
+            continue
+
+        props = res.setdefault("properties", {})
+        definition = props.setdefault("definition", {})
+        def_params = definition.setdefault("parameters", {})
+
+        for pname, pdef in params.items():
+            if not isinstance(pdef, dict):
+                continue
+            if pname in def_params:
+                continue
+
+            ptype = pdef.get("type", "String")
+            if not isinstance(ptype, str):
+                ptype = "String"
+
+            def_params[pname] = {
+                "type": ptype,
+                "defaultValue": f"[parameters('{pname}')]"
+            }
+
+
+# ------------- Lógica especial para parámetros *_externalid ------------- #
+
+def ensure_externalid_suffix(name: str) -> str:
+    """Garantiza que el nombre termine en _externalid (case-insensitive)."""
+    low = name.lower()
+    if low.endswith("_externalid"):
+        return name
+    if low.endswith("externalid"):
+        # ya lleva externalid sin guion bajo
+        return name
+    return f"{name}_externalid"
+
+
+def set_externalid_defaults(
+    template: Dict[str, Any],
+    externalid_param_names: Set[str],
+    playbook_param_name: Optional[str]
+) -> None:
+    """
+    Pone en cada parámetro <extid> el defaultValue con el concat(...) que
+    referencia al parámetro de nombre del playbook:
+
+    [concat('/subscriptions/', subscription().subscriptionId,
+            '/resourceGroups/', resourceGroup().name,
+            '/providers/Microsoft.Logic/workflows/',
+            parameters('<playbook_param_name>'))]
+    """
+    if not externalid_param_names:
+        return
+
+    if not playbook_param_name:
+        playbook_param_name = "PlaybookName"
+
+    params = template.get("parameters", {})
+    if not isinstance(params, dict):
+        return
+
+    concat_expr = (
+        f"[concat('/subscriptions/', subscription().subscriptionId, "
+        f"'/resourceGroups/', resourceGroup().name ,"
+        f"'/providers/Microsoft.Logic/workflows/', parameters('{playbook_param_name}'))]"
+    )
+
+    for pname, pdef in params.items():
+        if pname in externalid_param_names and isinstance(pdef, dict):
+            pdef["type"] = pdef.get("type", "String")
+            pdef["defaultValue"] = concat_expr
 
 
 # ------------------------------------------------------------------- #
@@ -375,7 +469,7 @@ class ParamGUI:
         self.entry_vars: Dict[str, tk.StringVar] = {}
         self.candidates_meta: Dict[str, Dict[str, Any]] = {}
 
-        self.toggle_all_btn: tk.Button | None = None
+        self.toggle_all_btn: Optional[tk.Button] = None
 
         self.file_label = tk.Label(root, text="No file loaded")
         self.file_label.pack(pady=5)
@@ -530,8 +624,9 @@ class ParamGUI:
         import copy
         literal_to_param: Dict[str, str] = {}
         workflow_renames: Dict[str, str] = {}
-        playbook_param_name: str | None = None
-        keyvault_param_name: str | None = None
+        playbook_param_name: Optional[str] = None
+        keyvault_param_name: Optional[str] = None
+        externalid_params: Set[str] = set()
 
         for literal, var in self.checkbox_vars.items():
             if not var.get():
@@ -545,18 +640,29 @@ class ParamGUI:
                 )
                 return
 
-            literal_to_param[literal] = new_param_name
-
             meta = self.candidates_meta.get(literal, {})
             used_in = meta.get("used_in", [])
 
+            # Encontrar nombres originales de parámetros ARM
+            original_param_names = []
             prefix = "ARM parameter '"
             for u in used_in:
-                if not u.startswith(prefix) or not u.endswith("'"):
-                    continue
+                if u.startswith(prefix) and u.endswith("'"):
+                    original_param_names.append(u[len(prefix):-1])
 
-                old_param_name = u[len(prefix):-1]
+            # Si alguno de los nombres originales termina en externalid,
+            # forzamos sufijo en el nuevo nombre y lo marcamos.
+            for old_param_name in original_param_names:
+                if old_param_name.lower().endswith("externalid"):
+                    new_param_name = ensure_externalid_suffix(new_param_name)
+                    externalid_params.add(new_param_name)
+                    break
 
+            # Guardamos el mapping literal → nombre de parámetro final
+            literal_to_param[literal] = new_param_name
+
+            # Detectar playbook_param_name, keyvault_param_name y renames
+            for old_param_name in original_param_names:
                 # detectar parámetro de nombre de playbook
                 if old_param_name.startswith("workflows_") and old_param_name.endswith("_name"):
                     playbook_param_name = new_param_name
@@ -588,7 +694,7 @@ class ParamGUI:
             k: v for k, v in new_template.items() if k != "parameters"
         }
 
-        # 3. Actualizar referencias
+        # 3. Actualizar referencias de parámetros (workflows_... -> nuevo nombre)
         from .core import replace_substrings
 
         rename_mapping = {}
@@ -599,7 +705,7 @@ class ParamGUI:
         if rename_mapping:
             body_without_params = replace_substrings(body_without_params, rename_mapping)
 
-        # 4. Reemplazar literales
+        # 4. Reemplazar literales (no toca expresiones ARM si has ajustado replace_literals en core.py)
         body_without_params = replace_literals(body_without_params, literal_to_param)
 
         final_template: Dict[str, Any] = {}
@@ -610,11 +716,14 @@ class ParamGUI:
         # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
 
-        # 6. QUEDARSE SOLO CON LOS PARÁMETROS SELECCIONADOS
+        # 6. Quedarse solo con los parámetros seleccionados
         keep_only_selected_parameters(final_template, literal_to_param)
 
-        # 7. Sobrescribir defaultValue = nombre del parámetro
+        # 7. defaultValue = nombre del parámetro
         overwrite_parameter_defaults_with_names(final_template)
+
+        # 7.1. Ajustar defaultValue de *_externalid al concat(...)
+        set_externalid_defaults(final_template, externalid_params, playbook_param_name)
 
         # 8. Variables por defecto (AzureSentinel + keyvault condicional)
         ensure_default_variables(final_template, playbook_param_name)
@@ -624,6 +733,9 @@ class ParamGUI:
 
         # 10. Recursos Microsoft.Web/connections
         ensure_connection_resources(final_template, keyvault_param_name)
+
+        # 11. Meter todos los parámetros en properties.definition.parameters
+        ensure_definition_parameters(final_template)
 
         out_path = filedialog.asksaveasfilename(
             title="Save parametrized template",
