@@ -153,13 +153,9 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
     """
     Asegura que en cada workflow (Microsoft.Logic/workflows) exista el bloque:
 
-      parameters.$connections.value.azuresentinel = { ... }
+      properties.parameters.$connections.value.azuresentinel / keyvault
 
-    y, si se usa Key Vault, también:
-
-      parameters.$connections.value.keyvault = { ... }
-
-    Ajusta también el dependsOn del workflow para Azure Sentinel y Key Vault.
+    y ajusta también el dependsOn del workflow para Azure Sentinel y Key Vault.
     """
     keyvault_used = uses_keyvault_connection(template)
 
@@ -228,9 +224,8 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
                 new_depends.append(az_dep)
 
             # Keyvault condicional
-            if keyvault_used:
-                if kv_dep not in new_depends:
-                    new_depends.append(kv_dep)
+            if keyvault_used and kv_dep not in new_depends:
+                new_depends.append(kv_dep)
 
             res["dependsOn"] = new_depends
 
@@ -334,6 +329,84 @@ def overwrite_parameter_defaults_with_names(template: Dict[str, Any]) -> None:
         ptype = pdef.get("type")
         if isinstance(ptype, str) and ptype.lower() == "string":
             pdef["defaultValue"] = pname
+
+
+# ----------------- Dejar solo parámetros seleccionados ----------------- #
+
+def keep_only_selected_parameters(
+    template: Dict[str, Any],
+    literal_to_param: Dict[str, str]
+) -> None:
+    """
+    Deja en template['parameters'] SOLO los parámetros cuyos nombres
+    son los que el usuario ha definido en la GUI (literal_to_param.values()).
+    """
+    params = template.get("parameters", {})
+    if not isinstance(params, dict):
+        return
+
+    allowed_names = set(literal_to_param.values())
+    new_params = {
+        pname: pdef
+        for pname, pdef in params.items()
+        if pname in allowed_names
+    }
+    template["parameters"] = new_params
+
+
+# ------------- NUEVO: parameters dentro de properties.definition ---------- #
+
+def ensure_definition_parameters(template: Dict[str, Any]) -> None:
+    """
+    Para cada workflow Microsoft.Logic/workflows mete en
+    properties.definition.parameters todos los parámetros definidos en
+    template['parameters'].
+
+    Ejemplo:
+      "properties": {
+        "definition": {
+          "parameters": {
+            "MiParametro": {
+              "type": "String",
+              "defaultValue": ""
+            },
+            ...
+          }
+        }
+      }
+    """
+    params = template.get("parameters", {})
+    if not isinstance(params, dict) or not params:
+        return
+
+    resources = template.get("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Logic/workflows":
+            continue
+
+        props = res.setdefault("properties", {})
+        definition = props.setdefault("definition", {})
+        def_params = definition.setdefault("parameters", {})
+
+        for pname, pdef in params.items():
+            if not isinstance(pdef, dict):
+                continue
+            if pname in def_params:
+                continue
+
+            ptype = pdef.get("type", "String")
+            if not isinstance(ptype, str):
+                ptype = "String"
+
+            def_params[pname] = {
+                "type": ptype,
+                "defaultValue": ""
+            }
 
 
 # ------------------------------------------------------------------- #
@@ -584,17 +657,23 @@ class ParamGUI:
         # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
 
-        # 6. Sobrescribir defaultValue = nombre del parámetro
+        # 6. QUEDARSE SOLO CON LOS PARÁMETROS SELECCIONADOS
+        keep_only_selected_parameters(final_template, literal_to_param)
+
+        # 7. Sobrescribir defaultValue = nombre del parámetro
         overwrite_parameter_defaults_with_names(final_template)
 
-        # 7. Variables por defecto (AzureSentinel + keyvault condicional)
+        # 8. Variables por defecto (AzureSentinel + keyvault condicional)
         ensure_default_variables(final_template, playbook_param_name)
 
-        # 8. Bloque $connections en workflows
+        # 9. Bloque $connections en workflows
         ensure_connections_blocks(final_template)
 
-        # 9. Recursos Microsoft.Web/connections
+        # 10. Recursos Microsoft.Web/connections
         ensure_connection_resources(final_template, keyvault_param_name)
+
+        # 11. NUEVO: meter todos los parámetros en properties.definition.parameters
+        ensure_definition_parameters(final_template)
 
         out_path = filedialog.asksaveasfilename(
             title="Save parametrized template",
