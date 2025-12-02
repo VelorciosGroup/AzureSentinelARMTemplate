@@ -1,139 +1,24 @@
 import json
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from tkinter import ttk
 from typing import Dict, Any, Set, Optional
 
-from .core import replace_literals, add_parameter_definitions, replace_substrings
+from .core import replace_literals, add_parameter_definitions
 
 
-# ===================== ESTILO ===================== #
-
-
-def setup_style(root: tk.Tk) -> ttk.Style:
-    """
-    Configura un estilo moderno tipo Windows 11 usando ttk.
-    No es Fluent real, pero se aproxima: colores suaves, Segoe UI,
-    botones planos, bordes sutiles, etc.
-    """
-    root.title("ARM Playbook Parametrizer")
-    root.configure(bg="#f3f3f3")  # gris claro típico de apps Win11
-
-    style = ttk.Style(root)
-
-    # Usar un theme "moderno" si está disponible
-    # (vista, xpnative, clam, default... depende del sistema)
-    preferred_themes = ["vista", "xpnative", "clam", "default"]
-    for th in preferred_themes:
-        try:
-            style.theme_use(th)
-            break
-        except tk.TclError:
-            continue
-
-    # Fuente base tipo Segoe UI (la de Windows)
-    base_font = ("Segoe UI", 9)
-    title_font = ("Segoe UI Semibold", 11)
-    small_font = ("Segoe UI", 8)
-
-    root.option_add("*Font", base_font)
-
-    # Colores base
-    bg_main = "#f3f3f3"
-    bg_panel = "#ffffff"
-    fg_text = "#202020"
-    fg_muted = "#6e6e6e"
-    accent = "#2563eb"  # azul similar al de Windows 11
-
-    # FRAME
-    style.configure(
-        "Win11.TFrame",
-        background=bg_panel,
-    )
-
-    style.configure(
-        "Win11.Main.TFrame",
-        background=bg_main,
-    )
-
-    # LABEL
-    style.configure(
-        "Win11.TLabel",
-        background=bg_panel,
-        foreground=fg_text,
-        font=base_font,
-    )
-
-    style.configure(
-        "Win11.Title.TLabel",
-        background=bg_main,
-        foreground=fg_text,
-        font=title_font,
-    )
-
-    style.configure(
-        "Win11.Muted.TLabel",
-        background=bg_panel,
-        foreground=fg_muted,
-        font=small_font,
-    )
-
-    # BUTTON
-    style.configure(
-        "Win11.TButton",
-        font=base_font,
-        padding=(10, 4),
-    )
-    style.map(
-        "Win11.TButton",
-        foreground=[("disabled", "#a0a0a0")],
-        background=[("active", "#e0e7ff")],
-    )
-
-    # PRIMARY BUTTON (azul)
-    style.configure(
-        "Win11.Primary.TButton",
-        font=base_font,
-        padding=(14, 6),
-        background=accent,
-        foreground="#ffffff",
-    )
-    style.map(
-        "Win11.Primary.TButton",
-        background=[("active", "#1d4ed8")],
-        foreground=[("disabled", "#d0d0d0")],
-    )
-
-    # CHECKBUTTON
-    style.configure(
-        "Win11.TCheckbutton",
-        background=bg_panel,
-        foreground=fg_text,
-        font=base_font,
-    )
-
-    # ENTRY
-    style.configure(
-        "Win11.TEntry",
-        padding=(6, 3),
-    )
-
-    # SCROLLBAR
-    style.configure(
-        "Win11.Vertical.TScrollbar",
-        gripcount=0,
-        background="#e5e5e5",
-        darkcolor="#cfcfcf",
-        lightcolor="#ffffff",
-        troughcolor="#f3f3f3",
-        bordercolor="#f3f3f3",
-        arrowcolor="#555555",
-    )
-
-    return style
-
-
-# ================= LÓGICA EXISTENTE (sin cambios funcionales) ================= #
+# Paleta de colores estilo Azure / VS Code Dark
+WINDOW_BG = "#1e1e1e"      # fondo ventana
+PANEL_BG = "#252526"       # fondo panel principal (scroll)
+CARD_BG = "#1e1e1e"        # tarjetas de cada literal
+TEXT_FG = "#f3f3f3"        # texto principal
+MUTED_FG = "#c5c5c5"       # texto secundario
+ACCENT_BG = "#0078d4"      # azul Azure
+ACCENT_HOVER_BG = "#106ebe"
+ACCENT_TEXT = "#ffffff"
+BORDER_COLOR = "#3c3c3c"
+ENTRY_BG = "#333333"
+ENTRY_FG = "#f3f3f3"
+CHECK_FG = "#f3f3f3"
 
 
 def extract_literal_candidates_from_params_and_variables(
@@ -141,6 +26,7 @@ def extract_literal_candidates_from_params_and_variables(
 ) -> Dict[str, Dict[str, Any]]:
     """
     Escanea el template ARM y devuelve un diccionario:
+
         {
           "<literal>": {
               "used_in": [ "ARM parameter 'X'", "Variable 'Y' (action 'Z')" ],
@@ -232,7 +118,6 @@ def extract_literal_candidates_from_params_and_variables(
 
 # ----------------- Detección uso de Key Vault ----------------- #
 
-
 def uses_keyvault_connection(template: Dict[str, Any]) -> bool:
     """
     Devuelve True si el template usa algo relacionado con Key Vault.
@@ -248,7 +133,6 @@ def uses_keyvault_connection(template: Dict[str, Any]) -> bool:
 
 # ----------------- Variables por defecto ----------------- #
 
-
 def ensure_default_variables(
     template: Dict[str, Any],
     playbook_param_name: Optional[str] = None
@@ -257,14 +141,17 @@ def ensure_default_variables(
     Asegura que en template['variables'] existan:
       - AzureSentinelConnectionName
       - keyvault_Connection_Name (solo si se detecta uso de Key Vault)
+
     Usa el parámetro que represente el nombre del playbook:
     [concat('azuresentinel-', parameters('<playbook_param_name>'))]
+
     Si no se detecta, cae por defecto a 'PlaybookName'.
     """
     if not playbook_param_name:
         playbook_param_name = "PlaybookName"
 
     variables = template.setdefault("variables", {})
+
     variables["AzureSentinelConnectionName"] = (
         f"[concat('azuresentinel-', parameters('{playbook_param_name}'))]"
     )
@@ -277,11 +164,12 @@ def ensure_default_variables(
 
 # ----------------- Bloque $connections en el workflow ----------------- #
 
-
 def ensure_connections_blocks(template: Dict[str, Any]) -> None:
     """
     Asegura que en cada workflow (Microsoft.Logic/workflows) exista el bloque:
+
       properties.parameters.$connections.value.azuresentinel / keyvault
+
     y ajusta/crea también el dependsOn del workflow para:
       - Microsoft.Web/connections AzureSentinelConnectionName (siempre)
       - Microsoft.Web/connections keyvault_Connection_Name (solo si se usa Key Vault)
@@ -354,6 +242,7 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
         # Siempre Azure Sentinel
         if az_dep not in new_depends:
             new_depends.append(az_dep)
+
         # Key Vault solo si se usa
         if keyvault_used and kv_dep not in new_depends:
             new_depends.append(kv_dep)
@@ -362,7 +251,6 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
 
 
 # ----------------- Recursos Microsoft.Web/connections ----------------- #
-
 
 def ensure_connection_resources(
     template: Dict[str, Any],
@@ -373,6 +261,7 @@ def ensure_connection_resources(
     para:
       - AzureSentinelConnectionName (siempre)
       - keyvault_Connection_Name (solo si se usa Key Vault)
+
     En el de Key Vault, 'vaultName' usará el parámetro real pasado en
     keyvault_param_name (si existe), o 'keyvault_Name' por defecto.
     """
@@ -445,7 +334,6 @@ def ensure_connection_resources(
 
 # ----------------- Sobrescribir defaultValue de parámetros ----------------- #
 
-
 def overwrite_parameter_defaults_with_names(template: Dict[str, Any]) -> None:
     """
     Hace que todos los parámetros de tipo String tengan:
@@ -464,7 +352,6 @@ def overwrite_parameter_defaults_with_names(template: Dict[str, Any]) -> None:
 
 
 # ----------------- Dejar solo parámetros seleccionados ----------------- #
-
 
 def keep_only_selected_parameters(
     template: Dict[str, Any],
@@ -489,12 +376,12 @@ def keep_only_selected_parameters(
 
 # ------------- parameters dentro de properties.definition --------------- #
 
-
 def ensure_definition_parameters(template: Dict[str, Any]) -> None:
     """
     Para cada workflow Microsoft.Logic/workflows mete en
     properties.definition.parameters todos los parámetros definidos en
     template['parameters'].
+
     Se referencian así:
       "MiParametro": {
         "type": "String",
@@ -537,7 +424,6 @@ def ensure_definition_parameters(template: Dict[str, Any]) -> None:
 
 # ------------- Lógica especial para parámetros *_externalid ------------- #
 
-
 def ensure_externalid_suffix(name: str) -> str:
     """Garantiza que el nombre termine en _externalid (case-insensitive)."""
     low = name.lower()
@@ -557,6 +443,7 @@ def set_externalid_defaults(
     """
     Pone en cada parámetro <extid> el defaultValue con el concat(...) que
     referencia al parámetro de nombre del playbook:
+
     [concat('/subscriptions/', subscription().subscriptionId,
             '/resourceGroups/', resourceGroup().name,
             '/providers/Microsoft.Logic/workflows/',
@@ -584,75 +471,65 @@ def set_externalid_defaults(
             pdef["defaultValue"] = concat_expr
 
 
-# ========================= CLASE DE LA GUI ========================= #
+# ------------------------------------------------------------------- #
 
 
 class ParamGUI:
     def __init__(self, root: tk.Tk):
-        # Estilo Win11
-        self.style = setup_style(root)
-
         self.root = root
+        self.root.title("ARM Playbook Parametrizer")
+        self.root.configure(bg=WINDOW_BG)
 
         self.template = None
         self.checkbox_vars: Dict[str, tk.IntVar] = {}
         self.entry_vars: Dict[str, tk.StringVar] = {}
         self.candidates_meta: Dict[str, Dict[str, Any]] = {}
-        self.toggle_all_btn: Optional[ttk.Button] = None
 
-        # ---- Layout principal ----
-        main_frame = ttk.Frame(root, style="Win11.Main.TFrame", padding=(10, 10, 10, 10))
-        main_frame.pack(fill=tk.BOTH, expand=True)
+        self.toggle_all_btn: Optional[tk.Button] = None
 
-        # Header
-        header = ttk.Frame(main_frame, style="Win11.Main.TFrame")
-        header.pack(fill=tk.X, pady=(0, 8))
+        self.file_label = tk.Label(root, text="No file loaded", bg=WINDOW_BG, fg=MUTED_FG)
+        self.file_label.pack(pady=5)
 
-        title_label = ttk.Label(
-            header,
-            text="ARM Playbook Parametrizer",
-            style="Win11.Title.TLabel",
-        )
-        title_label.pack(side=tk.LEFT, padx=(0, 8))
-
-        self.file_label = ttk.Label(
-            header,
-            text="No file loaded",
-            style="Win11.Muted.TLabel",
-        )
-        self.file_label.pack(side=tk.LEFT, padx=(8, 0))
-
-        self.load_button = ttk.Button(
-            header,
+        self.load_button = tk.Button(
+            root,
             text="Load ARM template JSON",
-            style="Win11.TButton",
             command=self.load_file,
+            bg=ACCENT_BG,
+            fg=ACCENT_TEXT,
+            activebackground=ACCENT_HOVER_BG,
+            activeforeground=ACCENT_TEXT,
+            bd=0,
+            relief="flat",
+            padx=12,
+            pady=6,
+            highlightthickness=0
         )
-        self.load_button.pack(side=tk.RIGHT)
+        self.load_button.pack(pady=5)
 
-        # Frame con scroll vertical para los candidatos
-        container = ttk.Frame(main_frame, style="Win11.Main.TFrame")
-        container.pack(fill=tk.BOTH, expand=True)
-
-        self.candidates_frame = ttk.Frame(container, style="Win11.Main.TFrame")
+        self.candidates_frame = tk.Frame(root, bg=WINDOW_BG)
         self.candidates_frame.pack(fill=tk.BOTH, expand=True)
 
         self.canvas = tk.Canvas(
             self.candidates_frame,
+            bg=WINDOW_BG,
             highlightthickness=0,
-            bg="#f3f3f3",
+            bd=0
         )
-        self.scrollbar = ttk.Scrollbar(
+        self.scrollbar = tk.Scrollbar(
             self.candidates_frame,
             orient="vertical",
-            style="Win11.Vertical.TScrollbar",
             command=self.canvas.yview,
+            bg=WINDOW_BG,
+            troughcolor=WINDOW_BG,
+            activebackground=WINDOW_BG,
+            highlightthickness=0,
+            bd=0
         )
-        self.scroll_frame = ttk.Frame(self.canvas, style="Win11.TFrame")
+        self.scroll_frame = tk.Frame(self.canvas, bg=PANEL_BG)
 
         self.scroll_frame.bind(
             "<Configure>",
-            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")),
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
 
         self.canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
@@ -661,24 +538,26 @@ class ParamGUI:
         self.canvas.pack(side="left", fill="both", expand=True)
         self.scrollbar.pack(side="right", fill="y")
 
-        # Botón principal
-        footer = ttk.Frame(main_frame, style="Win11.Main.TFrame")
-        footer.pack(fill=tk.X, pady=(8, 0))
-
-        self.param_button = ttk.Button(
-            footer,
+        self.param_button = tk.Button(
+            root,
             text="Parametrize selected",
-            style="Win11.Primary.TButton",
             command=self.parametrize_selected,
+            bg=ACCENT_BG,
+            fg=ACCENT_TEXT,
+            activebackground=ACCENT_HOVER_BG,
+            activeforeground=ACCENT_TEXT,
+            bd=0,
+            relief="flat",
+            padx=12,
+            pady=6,
+            highlightthickness=0
         )
-        self.param_button.pack(side=tk.RIGHT)
-
-    # -------------------- LÓGICA GUI -------------------- #
+        self.param_button.pack(pady=5)
 
     def load_file(self) -> None:
         path = filedialog.askopenfilename(
             title="Select ARM template JSON",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
         )
         if not path:
             return
@@ -709,88 +588,115 @@ class ParamGUI:
         )
 
         if not self.candidates_meta:
-            ttk.Label(
+            tk.Label(
                 self.scroll_frame,
                 text="No parameters/variables with string values found.",
-                style="Win11.Muted.TLabel",
-            ).pack(anchor="w", pady=4, padx=4)
+                bg=PANEL_BG,
+                fg=MUTED_FG
+            ).pack()
             return
 
-        ttk.Label(
+        tk.Label(
             self.scroll_frame,
-            text="Select literals to parametrize and optionally edit parameter name:",
-            style="Win11.TLabel",
-        ).pack(anchor="w", pady=(2, 6), padx=2)
+            text="Select literals (from parameters/variables) to parametrize and optionally edit parameter name:",
+            bg=PANEL_BG,
+            fg=TEXT_FG
+        ).pack(anchor="w", pady=2)
 
         # Botón toggle seleccionar/deseleccionar todas
-        self.toggle_all_btn = ttk.Button(
+        self.toggle_all_btn = tk.Button(
             self.scroll_frame,
-            text="Deselect all",
-            style="Win11.TButton",
+            text="Deseleccionar todas",
             command=self.toggle_all_literals,
+            bg=ACCENT_BG,
+            fg=ACCENT_TEXT,
+            activebackground=ACCENT_HOVER_BG,
+            activeforeground=ACCENT_TEXT,
+            bd=0,
+            relief="flat",
+            padx=10,
+            pady=4,
+            highlightthickness=0
         )
-        self.toggle_all_btn.pack(anchor="w", pady=(0, 6), padx=2)
+        self.toggle_all_btn.pack(anchor="w", pady=(0, 5))
 
         for literal, info in self.candidates_meta.items():
             used_in = info.get("used_in", [])
             suggested = info.get("suggested_param", "")
             count = len(used_in)
 
-            card = ttk.Frame(
+            frame = tk.Frame(
                 self.scroll_frame,
-                style="Win11.TFrame",
-                padding=(8, 6, 8, 6),
+                bd=0,
+                relief=tk.FLAT,
+                padx=8,
+                pady=6,
+                bg=CARD_BG,
+                highlightthickness=1,
+                highlightbackground=BORDER_COLOR
             )
-            card.pack(fill="x", padx=2, pady=3)
-
-            # Borde visual tipo "card"
-            card.configure(relief=tk.GROOVE)
+            frame.pack(fill="x", padx=2, pady=4)
 
             var = tk.IntVar(value=1)
             self.checkbox_vars[literal] = var
-            chk = ttk.Checkbutton(
-                card,
+            tk.Checkbutton(
+                frame,
                 variable=var,
-                style="Win11.TCheckbutton",
-            )
-            chk.grid(row=0, column=0, rowspan=3, sticky="nw", padx=(0, 6))
+                bg=CARD_BG,
+                fg=CHECK_FG,
+                activebackground=CARD_BG,
+                activeforeground=CHECK_FG,
+                selectcolor=CARD_BG
+            ).grid(row=0, column=0, rowspan=3, sticky="nw")
 
             pvar = tk.StringVar(value=suggested)
             self.entry_vars[literal] = pvar
 
-            ttk.Label(
-                card,
+            tk.Label(
+                frame,
                 text=f"Literal (used in {count} place(s)):",
-                style="Win11.TLabel",
+                bg=CARD_BG,
+                fg=TEXT_FG
             ).grid(row=0, column=1, sticky="w")
 
-            ttk.Label(
-                card,
+            tk.Label(
+                frame,
                 text=literal,
-                style="Win11.Muted.TLabel",
-            ).grid(row=1, column=1, columnspan=2, sticky="w")
+                wraplength=0,
+                justify="left",
+                bg=CARD_BG,
+                fg=MUTED_FG
+            ).grid(row=0, column=2, sticky="w")
 
             if used_in:
                 where_text = "; ".join(used_in)
-                ttk.Label(
-                    card,
+                tk.Label(
+                    frame,
                     text=f"Used in: {where_text}",
-                    style="Win11.Muted.TLabel",
-                ).grid(row=2, column=1, columnspan=2, sticky="w", pady=(2, 0))
+                    wraplength=0,
+                    justify="left",
+                    bg=CARD_BG,
+                    fg=MUTED_FG
+                ).grid(row=1, column=1, columnspan=2, sticky="w")
 
-            ttk.Label(
-                card,
+            tk.Label(
+                frame,
                 text="Param name:",
-                style="Win11.TLabel",
-            ).grid(row=3, column=1, sticky="e", pady=(4, 0))
-
-            entry = ttk.Entry(
-                card,
+                bg=CARD_BG,
+                fg=TEXT_FG
+            ).grid(row=2, column=1, sticky="e")
+            tk.Entry(
+                frame,
                 textvariable=pvar,
-                width=60,
-                style="Win11.TEntry",
-            )
-            entry.grid(row=3, column=2, sticky="w", padx=(4, 0), pady=(4, 0))
+                width=80,
+                bg=ENTRY_BG,
+                fg=ENTRY_FG,
+                insertbackground=ENTRY_FG,
+                bd=1,
+                relief="flat",
+                highlightthickness=1,
+                highlightbackground=BORDER_COLOR
+            ).grid(row=2, column=2, sticky="w")
 
     def toggle_all_literals(self) -> None:
         vars_list = list(self.checkbox_vars.values())
@@ -798,16 +704,17 @@ class ParamGUI:
             return
 
         all_checked = all(v.get() == 1 for v in vars_list)
+
         if all_checked:
             for v in vars_list:
                 v.set(0)
             if self.toggle_all_btn is not None:
-                self.toggle_all_btn.config(text="Select all")
+                self.toggle_all_btn.config(text="Seleccionar todas")
         else:
             for v in vars_list:
                 v.set(1)
             if self.toggle_all_btn is not None:
-                self.toggle_all_btn.config(text="Deselect all")
+                self.toggle_all_btn.config(text="Deseleccionar todas")
 
     def parametrize_selected(self) -> None:
         if self.template is None:
@@ -815,7 +722,6 @@ class ParamGUI:
             return
 
         import copy
-
         literal_to_param: Dict[str, str] = {}
         workflow_renames: Dict[str, str] = {}
         playbook_param_name: Optional[str] = None
@@ -830,7 +736,7 @@ class ParamGUI:
             if not new_param_name:
                 messagebox.showerror(
                     "Error",
-                    f"Parameter name for literal '{literal[:50]}' is empty.",
+                    f"Parameter name for literal '{literal[:50]}' is empty."
                 )
                 return
 
@@ -841,10 +747,11 @@ class ParamGUI:
             original_param_names = []
             prefix = "ARM parameter '"
             for u in used_in:
-                if isinstance(u, str) and u.startswith(prefix) and u.endswith("'"):
+                if u.startswith(prefix) and u.endswith("'"):
                     original_param_names.append(u[len(prefix):-1])
 
-            # Si alguno termina en externalid, forzamos sufijo en el nuevo nombre
+            # Si alguno de los nombres originales termina en externalid,
+            # forzamos sufijo en el nuevo nombre y lo marcamos.
             for old_param_name in original_param_names:
                 if old_param_name.lower().endswith("externalid"):
                     new_param_name = ensure_externalid_suffix(new_param_name)
@@ -856,13 +763,11 @@ class ParamGUI:
 
             # Detectar playbook_param_name, keyvault_param_name y renames
             for old_param_name in original_param_names:
-                # parámetro de nombre de playbook
-                if old_param_name.startswith("workflows_") and old_param_name.endswith(
-                    "_name"
-                ):
+                # detectar parámetro de nombre de playbook
+                if old_param_name.startswith("workflows_") and old_param_name.endswith("_name"):
                     playbook_param_name = new_param_name
 
-                # parámetro de nombre de Key Vault
+                # detectar parámetro de nombre de Key Vault (ej. keyvault_Name)
                 if "keyvault" in old_param_name.lower() and "name" in old_param_name.lower():
                     keyvault_param_name = new_param_name
 
@@ -885,9 +790,13 @@ class ParamGUI:
             new_template["parameters"] = params_block
 
         # 2. Separar bloque parameters
-        body_without_params = {k: v for k, v in new_template.items() if k != "parameters"}
+        body_without_params = {
+            k: v for k, v in new_template.items() if k != "parameters"
+        }
 
-        # 3. Actualizar referencias de parámetros
+        # 3. Actualizar referencias de parámetros (workflows_... -> nuevo nombre)
+        from .core import replace_substrings
+
         rename_mapping = {}
         for old_name, new_name in workflow_renames.items():
             rename_mapping[f"parameters('{old_name}')"] = f"parameters('{new_name}')"
@@ -896,7 +805,7 @@ class ParamGUI:
         if rename_mapping:
             body_without_params = replace_substrings(body_without_params, rename_mapping)
 
-        # 4. Reemplazar literales
+        # 4. Reemplazar literales (no toca expresiones ARM si has ajustado replace_literals en core.py)
         body_without_params = replace_literals(body_without_params, literal_to_param)
 
         final_template: Dict[str, Any] = {}
@@ -904,7 +813,7 @@ class ParamGUI:
         for k, v in body_without_params.items():
             final_template[k] = v
 
-        # 5. Añadir definiciones de parámetros
+        # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
 
         # 6. Quedarse solo con los parámetros seleccionados
@@ -916,7 +825,7 @@ class ParamGUI:
         # 7.1. Ajustar defaultValue de *_externalid al concat(...)
         set_externalid_defaults(final_template, externalid_params, playbook_param_name)
 
-        # 8. Variables por defecto
+        # 8. Variables por defecto (AzureSentinel + keyvault condicional)
         ensure_default_variables(final_template, playbook_param_name)
 
         # 9. Bloque $connections en workflows
@@ -931,7 +840,7 @@ class ParamGUI:
         out_path = filedialog.asksaveasfilename(
             title="Save parametrized template",
             defaultextension=".json",
-            filetypes=[("JSON files", "*.json"), ("All files", "*.*")],
+            filetypes=[("JSON files", "*.json"), ("All files", "*.*")]
         )
         if not out_path:
             return
@@ -949,8 +858,7 @@ class ParamGUI:
 def main():
     root = tk.Tk()
     app = ParamGUI(root)
-    root.geometry("1100x720")
-    root.minsize(900, 600)
+    root.geometry("1000x700")
     root.mainloop()
 
 
