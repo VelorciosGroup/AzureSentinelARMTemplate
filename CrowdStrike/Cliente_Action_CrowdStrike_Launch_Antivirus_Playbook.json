@@ -52,7 +52,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')[azuresentinel]['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
                                 "body": {
