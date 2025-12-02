@@ -196,7 +196,31 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_CrowdStrike_Launch_Antivirus_Playbook",
+			"dependsOn": [
+				"OrchestatorPart_CrowdStrike_Auth_Playbook",
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Action_CrowdStrike_Launch_Antivirus_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"PlaybookName": {
+						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Launch_Antivirus_Playbook')]"
+					},
+					"Auth_Playbook_Name": {
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
+					}
+				}
+			}
 		}
+
 	],
 	"outputs": {
 		"postDeployNote": {
