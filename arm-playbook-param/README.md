@@ -1,5 +1,8 @@
 Para ejecutar:
+Para la gui 
+$ PYTHONPATH=src python3 -m arm_param_app.gui
 
+Para el cli
 PYTHONPATH=src python3 -m arm_param_app.cli   -f examples/enrich_raw.json   -o examples/wompt.json   --name Enrich_Playbook_Name  --externalid Enrich_Playbook_ExternalID
 
 Otro ejemplo 
