@@ -7,7 +7,7 @@ from .core import replace_literals, replace_substrings, add_parameter_definition
 
 
 # ---------------------------------------------------------------------
-# Extracción de candidatos como en la GUI
+# Extracción de candidatos (igual que la GUI)
 # ---------------------------------------------------------------------
 
 
@@ -233,12 +233,25 @@ def ensure_connection_resources(
     Asegura que existan los recursos 'Microsoft.Web/connections' para:
       - AzureSentinelConnectionName
       - keyvault_Connection_Name (solo si se usa Key Vault)
+
+    Y que AlternativeParameterValues.vaultName apunte al parámetro de Key Vault correcto.
     """
     resources = template.setdefault("resources", [])
     if not isinstance(resources, list):
         return
 
     keyvault_used = uses_keyvault_connection(template)
+
+    # Inferir nombre del parámetro de Key Vault si no viene dado
+    if not keyvault_param_name:
+        params = template.get("parameters", {})
+        if isinstance(params, dict):
+            for pname in params.keys():
+                lname = pname.lower()
+                if "keyvault" in lname and "name" in lname:
+                    keyvault_param_name = pname
+                    break
+
     if not keyvault_param_name:
         keyvault_param_name = "keyvault_Name"
 
@@ -258,6 +271,10 @@ def ensure_connection_resources(
             az_exists = True
         if name == kv_name_expr:
             kv_exists = True
+            # Actualizar también vaultName aquí por si ya existía
+            props = res.setdefault("properties", {})
+            alt = props.setdefault("AlternativeParameterValues", {})
+            alt["vaultName"] = f"[parameters('{keyvault_param_name}')]"
 
     # Azure Sentinel
     if not az_exists:
@@ -376,18 +393,6 @@ def ensure_definition_parameters(template: Dict[str, Any]) -> None:
             }
 
 
-def ensure_externalid_suffix(name: str) -> str:
-    """
-    Garantiza que el nombre termine en _externalid (case-insensitive).
-    """
-    low = name.lower()
-    if low.endswith("_externalid"):
-        return name
-    if low.endswith("externalid"):
-        return name
-    return f"{name}_externalid"
-
-
 def set_externalid_defaults(
     template: Dict[str, Any],
     externalid_param_names: Set[str],
@@ -420,249 +425,218 @@ def set_externalid_defaults(
 
 
 # ---------------------------------------------------------------------
-# Parametrización guiada por TIPOS, usando candidatos GUI + nombres
+# Parametrización guiada por CLI (mismo modelo que GUI, pero automático)
 # ---------------------------------------------------------------------
 
 
-def parametrize_by_kinds(
+def parametrize_from_cli(
     template: Dict[str, Any],
-    workflow_name_base: Optional[str],
-    workflow_externalid_bases: Optional[List[str]],
-    keyvault_name_base: Optional[str],
+    playbook_name_param: Optional[str],
+    externalid_names: Optional[List[str]],
+    keyvault_names: Optional[List[str]],
 ) -> Dict[str, Any]:
     """
-    Aplica TODA la lógica, usando:
-      - los mismos candidatos que la GUI (por literal)
-      - y además los nombres de parámetros del bloque root.parameters.
+    Hace lo mismo que la GUI, pero:
 
-      --workflow-name X
-        → todos los workflows_*_name pasan a llamarse X
+    - Identifica candidatos (literales) igual que la GUI.
+    - En vez de preguntarte, asigna nombres según la CLI:
 
-      --workflow-externalid Y --workflow-externalid Z ...
-        → los parámetros workflows_*externalid se renombrarán en orden:
-             1º → Y(_externalid)
-             2º → Z(_externalid)
-             ...
+      --name X
+        → workflows_*_name  → X
 
-      --keyvault-name K
-        → cualquier parámetro keyvault*name* pasa a llamarse K
+      --externalid A --externalid B ...
+        → workflows_*externalid  → A, B, ...
+
+      --keyvault KV_NAME KV_CLIENTID KV_SECRET KV_BASEURL
+        → primer nombre para el vault (vaultName)
+        → los demás se asignan en orden a ClientID, ClientSecret, BaseUrl
     """
     import copy
 
-    # Candidatos como en la GUI
     candidates = extract_literal_candidates_from_params_and_variables(template)
 
+    # Mapeos que vamos a construir
     literal_to_param: Dict[str, str] = {}
-    param_renames: Dict[str, str] = {}   # old_param_name -> new_param_name
-    externalid_params: Set[str] = set()
+    workflow_renames: Dict[str, str] = {}  # old_param_name -> new_param_name
     selected_param_names: Set[str] = set()
+    externalid_param_names: Set[str] = set()
 
     playbook_param_name: Optional[str] = None
-    keyvault_param_name: Optional[str] = None
-
-    # Cola para los externalid (aplicados en orden)
-    extid_queue: List[str] = []
-    if workflow_externalid_bases:
-        for base in workflow_externalid_bases:
-            if base:
-                extid_queue.append(ensure_externalid_suffix(base))
+    keyvault_param_name: Optional[str] = None  # nombre del parámetro de vault
 
     # ------------------------------------------------------------------
-    # 1) Usar candidatos (igual que la GUI) para mapear literal -> parámetro
+    # 1) Clasificar candidatos: workflow name, externalid, keyvault secrets
     # ------------------------------------------------------------------
+    workflow_name_literals: List[tuple[str, str]] = []      # (literal, old_param_name)
+    externalid_literals: List[tuple[str, str]] = []         # (literal, old_param_name)
+    keyvault_secret_literals: List[tuple[str, str]] = []    # (literal, var_role)
+
     for literal, info in candidates.items():
         used_in = info.get("used_in", []) or []
 
-        # Extraer nombres de parámetros ARM donde aparece ese literal
-        original_param_names: List[str] = []
-        prefix = "ARM parameter '"
+        param_names: List[str] = []
+        var_names: List[str] = []
+
         for u in used_in:
-            if isinstance(u, str) and u.startswith(prefix) and u.endswith("'"):
-                original_param_names.append(u[len(prefix):-1])
-
-        if not original_param_names:
-            continue
-
-        for old_param_name in original_param_names:
-            new_name: Optional[str] = None
-            lname = old_param_name.lower()
-
-            # 1) workflows_*_name
-            if (
-                workflow_name_base
-                and old_param_name.startswith("workflows_")
-                and old_param_name.endswith("_name")
-            ):
-                new_name = workflow_name_base
-                playbook_param_name = new_name
-
-            # 2) workflows_*externalid (con la cola en orden)
-            elif (
-                extid_queue
-                and old_param_name.startswith("workflows_")
-                and "externalid" in lname
-            ):
-                new_name = extid_queue.pop(0)
-                externalid_params.add(new_name)
-
-            # 3) keyvault_*name*
-            elif (
-                keyvault_name_base
-                and "keyvault" in lname
-                and "name" in lname
-            ):
-                new_name = keyvault_name_base
-                keyvault_param_name = new_name
-
-            if new_name is None:
+            if not isinstance(u, str):
                 continue
 
-            # Literal -> nuevo param (igual que en la GUI)
+            # ARM parameter 'X'
+            if u.startswith("ARM parameter '") and u.endswith("'"):
+                pname = u[len("ARM parameter '"):-1]
+                param_names.append(pname)
+
+            # Variable 'Y' (action 'Z')
+            if u.startswith("Variable '"):
+                # Variable 'ClientID' (action 'Initialize_variable_ClientID')
+                try:
+                    after = u[len("Variable '"):]
+                    vname = after.split("'", 1)[0]
+                    var_names.append(vname)
+                except Exception:
+                    pass
+
+        # Detectar workflow name y externalid por nombres de parámetro
+        for pname in param_names:
+            lname = pname.lower()
+            if pname.startswith("workflows_") and pname.endswith("_name"):
+                workflow_name_literals.append((literal, pname))
+            elif pname.startswith("workflows_") and "externalid" in lname:
+                externalid_literals.append((literal, pname))
+
+        # Detectar keyvault secrets por nombre de variable (ClientID, ClientSecret, BaseUrl)
+        for vname in var_names:
+            vn_low = vname.lower()
+            if vn_low == "clientid":
+                keyvault_secret_literals.append((literal, "ClientID"))
+            elif vn_low == "clientsecret":
+                keyvault_secret_literals.append((literal, "ClientSecret"))
+            elif vn_low in ("baseurl", "base_url", "baseurl"):
+                keyvault_secret_literals.append((literal, "BaseUrl"))
+
+    # Orden estable para externalid (por nombre de parámetro)
+    externalid_literals.sort(key=lambda x: x[1])
+    # Orden para keyvault secrets según rol conocido
+    role_order = {"ClientID": 0, "ClientSecret": 1, "BaseUrl": 2}
+    keyvault_secret_literals.sort(key=lambda x: role_order.get(x[1], 99))
+
+    # ------------------------------------------------------------------
+    # 2) Asignar nombres según CLI
+    # ------------------------------------------------------------------
+
+    # 2.1. Playbook Name
+    if playbook_name_param:
+        for literal, old_pname in workflow_name_literals:
+            literal_to_param[literal] = playbook_name_param
+            workflow_renames[old_pname] = playbook_name_param
+            selected_param_names.add(playbook_name_param)
+            playbook_param_name = playbook_name_param
+
+    # 2.2. External IDs
+    if externalid_names:
+        ext_queue = list(externalid_names)
+        for (literal, old_pname), new_name in zip(externalid_literals, ext_queue):
             literal_to_param[literal] = new_name
+            workflow_renames[old_pname] = new_name
             selected_param_names.add(new_name)
+            externalid_param_names.add(new_name)
 
-            # Registrar renombre de parámetro si cambia
-            if old_param_name != new_name:
-                param_renames[old_param_name] = new_name
+    # 2.3. KeyVault
+    keyvault_secret_param_names: List[str] = []
+    if keyvault_names and len(keyvault_names) >= 1:
+        keyvault_param_name = keyvault_names[0]
+        selected_param_names.add(keyvault_param_name)
 
-    # ------------------------------------------------------------------
-    # 2) EXTRA: escanear TODOS los parámetros del bloque root.parameters
-    #    para detectar workflows_* y keyvault_* aunque no tengan literal.
-    # ------------------------------------------------------------------
-    params_block = template.get("parameters", {})
-    if isinstance(params_block, dict):
-        for old_name in params_block.keys():
-            if old_name in param_renames:
-                continue  # ya procesado por candidatos
+        if len(keyvault_names) > 1:
+            keyvault_secret_param_names = keyvault_names[1:]
 
-            new_name: Optional[str] = None
-            lname = old_name.lower()
+        for (literal, _role), pname in zip(
+            keyvault_secret_literals, keyvault_secret_param_names
+        ):
+            literal_to_param[literal] = pname
+            selected_param_names.add(pname)
 
-            # workflows_*_name
-            if (
-                workflow_name_base
-                and old_name.startswith("workflows_")
-                and old_name.endswith("_name")
-            ):
-                new_name = workflow_name_base
-                playbook_param_name = new_name
-
-            # workflows_*externalid
-            elif (
-                extid_queue
-                and old_name.startswith("workflows_")
-                and "externalid" in lname
-            ):
-                new_name = extid_queue.pop(0)
-                externalid_params.add(new_name)
-
-            # keyvault_*name*
-            elif (
-                keyvault_name_base
-                and "keyvault" in lname
-                and "name" in lname
-            ):
-                new_name = keyvault_name_base
-                keyvault_param_name = new_name
-
-            if new_name is None:
-                continue
-
-            param_renames[old_name] = new_name
-            selected_param_names.add(new_name)
-
-    if not param_renames and not literal_to_param:
+    # Si no hay nada que hacer, error
+    if not literal_to_param and not workflow_renames and not keyvault_param_name:
         print(
-            "[ERROR] No se ha encontrado ningún parámetro que coincida con los patrones indicados.",
+            "[ERROR] No se ha encontrado ningún candidato que coincida con lo pedido "
+            "en --name / --externalid / --keyvault.",
             file=sys.stderr,
         )
         sys.exit(1)
 
+    # ------------------------------------------------------------------
+    # 3) Aplicar la transformación (igual filosofía que la GUI)
+    # ------------------------------------------------------------------
     new_template = copy.deepcopy(template)
 
-    # ------------------------------------------------------------------
-    # 3) Renombrar parámetros en el bloque root.parameters
-    # ------------------------------------------------------------------
-    params_block_new = new_template.get("parameters", {})
-    if not isinstance(params_block_new, dict):
-        params_block_new = {}
-        new_template["parameters"] = params_block_new
+    # 3.1. Renombrar parámetros root de workflows_* (name y externalid)
+    params_block = new_template.get("parameters", {})
+    if not isinstance(params_block, dict):
+        params_block = {}
+        new_template["parameters"] = params_block
 
-    updated_params: Dict[str, Any] = {}
-    for old_name, pdef in params_block_new.items():
-        if old_name in param_renames:
-            new_name = param_renames[old_name]
-            updated_params[new_name] = pdef
-        else:
-            updated_params[old_name] = pdef
+    for old_name, new_name in list(workflow_renames.items()):
+        if old_name in params_block:
+            definition = params_block.pop(old_name)
+            params_block[new_name] = definition
+    new_template["parameters"] = params_block
 
-    # Crear definiciones vacías para parámetros seleccionados que no existían antes
-    for pname in selected_param_names:
-        if pname not in updated_params:
-            updated_params[pname] = {
-                "type": "String"
-            }
-
-    new_template["parameters"] = updated_params
-
-    # ------------------------------------------------------------------
-    # 4) Actualizar referencias en el cuerpo (parameters('old') → parameters('new'))
-    # ------------------------------------------------------------------
-    body_without_params = {
-        k: v for k, v in new_template.items() if k != "parameters"
-    }
+    # 3.2. Actualizar referencias parameters('old') → parameters('new') en el cuerpo
+    body_without_params = {k: v for k, v in new_template.items() if k != "parameters"}
 
     rename_mapping = {}
-    for old_name, new_name in param_renames.items():
+    for old_name, new_name in workflow_renames.items():
         rename_mapping[f"parameters('{old_name}')"] = f"parameters('{new_name}')"
         rename_mapping[f"[parameters('{old_name}')"] = f"[parameters('{new_name}')"
 
     if rename_mapping:
         body_without_params = replace_substrings(body_without_params, rename_mapping)
 
-    # ------------------------------------------------------------------
-    # 5) Reemplazar literales por parámetros (solo para los que tienen literal)
-    # ------------------------------------------------------------------
+    # 3.3. Reemplazar literales por parámetros (como en GUI)
     if literal_to_param:
         body_without_params = replace_literals(body_without_params, literal_to_param)
 
-    # Reconstruir template completo
+    # 3.4. Reconstruir template y añadir definiciones de parámetros nuevos
     final_template: Dict[str, Any] = {}
     final_template["parameters"] = new_template.get("parameters", {})
     for k, v in body_without_params.items():
         final_template[k] = v
 
-    # ------------------------------------------------------------------
-    # 6) Añadir definiciones de parámetros (en caso de que falten)
-    # ------------------------------------------------------------------
     if literal_to_param:
         add_parameter_definitions(final_template, literal_to_param)
 
-    # ------------------------------------------------------------------
-    # 7) Quedarse SOLO con los parámetros seleccionados
-    # ------------------------------------------------------------------
-    keep_only_selected_parameters(final_template, selected_param_names)
+    # 3.5. Asegurar que el parámetro de KeyVault (vaultName) exista aunque no venga de literal
+    if keyvault_param_name:
+        params = final_template.setdefault("parameters", {})
+        if keyvault_param_name not in params:
+            params[keyvault_param_name] = {"type": "String"}
+        selected_param_names.add(keyvault_param_name)
+
+    # 3.6. Nos quedamos solo con los parámetros que hemos seleccionado
+    if selected_param_names:
+        keep_only_selected_parameters(final_template, selected_param_names)
 
     # ------------------------------------------------------------------
-    # 8) Ajustar defaults, externalid, variables, conexiones, etc.
+    # 4) Ajustes extra (igual que habíamos ido pidiendo en la GUI)
     # ------------------------------------------------------------------
-
-    # 8.1. defaultValue = nombre del parámetro
+    # 4.1. defaultValue = nombre del parámetro
     overwrite_parameter_defaults_with_names(final_template)
 
-    # 8.2. Default especial para *_externalid (concat(...) al workflow del playbook)
-    set_externalid_defaults(final_template, externalid_params, playbook_param_name)
+    # 4.2. Default especial para externalid (concat() al workflow del playbook)
+    if externalid_param_names:
+        set_externalid_defaults(final_template, externalid_param_names, playbook_param_name)
 
-    # 8.3. variables (AzureSentinel + keyvault condicional)
+    # 4.3. variables (AzureSentinel + keyvault condicional)
     ensure_default_variables(final_template, playbook_param_name)
 
-    # 8.4. $connections en workflows
+    # 4.4. $connections en workflows + dependsOn
     ensure_connections_blocks(final_template)
 
-    # 8.5. Recursos Microsoft.Web/connections
+    # 4.5. Recursos Microsoft.Web/connections (incluido vaultName → parámetro correcto)
     ensure_connection_resources(final_template, keyvault_param_name)
 
-    # 8.6. definition.parameters con referencias a parameters('X')
+    # 4.6. definition.parameters con referencias a parameters('X')
     ensure_definition_parameters(final_template)
 
     return final_template
@@ -676,12 +650,12 @@ def parametrize_by_kinds(
 def main():
     parser = argparse.ArgumentParser(
         description=(
-            "Parametriza un ARM template de Sentinel/Logic Apps renombrando "
-            "parámetros por TIPO (workflows_*_name, workflows_*externalid, "
-            "keyvault_*name*, etc.), usando los mismos candidatos que la GUI "
-            "y además los nombres del bloque parameters."
+            "Parametriza un ARM template de Sentinel/Logic Apps igual que la GUI, "
+            "pero escogiendo los nombres de parámetros por línea de comandos "
+            "(playbook name, externalid, keyvault...)."
         )
     )
+
     parser.add_argument(
         "-f", "--file", "--input",
         dest="input",
@@ -694,32 +668,62 @@ def main():
         required=True,
         help="Archivo JSON de salida (parametrizado)"
     )
+
+    # Nombre del parámetro del playbook (workflows_*_name)
     parser.add_argument(
-        "--workflow-name",
-        help="Nombre base para TODOS los parámetros workflows_*_name"
+        "--name",
+        dest="playbook_name_param",
+        help="Nombre base para TODOS los parámetros workflows_*_name (PlaybookName)."
     )
+
+    # External IDs (para workflows_*externalid). Se puede repetir.
     parser.add_argument(
-        "--workflow-externalid",
+        "--externalid",
         action="append",
-        dest="workflow_externalid_bases",
+        dest="externalid_names",
         help=(
-            "Nombre base para los parámetros workflows_*externalid. "
-            "Se aplica en orden de aparición. "
-            "Se puede repetir varias veces. "
-            "Se añadirá sufijo _externalid si no lo tiene."
+            "Nombre de parámetro para workflows_*externalid. "
+            "Se aplica en orden de aparición; puede repetirse varias veces."
         )
     )
+
+    # KeyVault: primer nombre → parámetro de vaultName; el resto → secrets (ClientID, Secret, BaseUrl)
     parser.add_argument(
-        "--keyvault-name",
-        help="Nombre para el parámetro de tipo keyvault_*name* (normalmente el vaultName)."
+        "--keyvault",
+        nargs="+",
+        dest="keyvault_names",
+        help=(
+            "Nombres relacionados con Key Vault. "
+            "El primer nombre se usa para el parámetro del vault (vaultName); "
+            "los siguientes se aplican en orden a ClientID, ClientSecret, BaseUrl. "
+            "Ej: --keyvault keyvault_Name keyvault_ClientID keyvault_Secret keyvault_BaseUrl"
+        )
     )
 
     args = parser.parse_args()
 
-    if not (args.workflow_name or args.workflow_externalid_bases or args.keyvault_name):
+    # Normalizar keyvault_names (porque con action='append' es una lista de listas/strings)
+    keyvault_names_flat: Optional[List[str]] = None
+    if args.keyvault_names:
+        # Puedes pasar varios --keyvault, aquí lo aplanamos
+        flat: List[str] = []
+        for item in args.keyvault_names:
+            # Permitimos que el usuario ponga una sola cadena con espacios
+            # o una lista de valores; argparse nos lo da como string.
+            if isinstance(item, str):
+                # Split por espacios / comas si quiere
+                parts = [p for p in item.replace(",", " ").split() if p]
+                flat.extend(parts)
+            else:
+                # Por si acaso, aunque en la práctica deberían ser strings
+                flat.extend(list(item))
+        if flat:
+            keyvault_names_flat = flat
+
+    if not (args.playbook_name_param or args.externalid_names or keyvault_names_flat):
         print(
             "[ERROR] Debes indicar al menos una de las opciones: "
-            "--workflow-name, --workflow-externalid, --keyvault-name.",
+            "--name, --externalid o --keyvault.",
             file=sys.stderr,
         )
         sys.exit(1)
@@ -727,11 +731,11 @@ def main():
     with open(args.input, "r", encoding="utf-8") as f:
         template = json.load(f)
 
-    new_template = parametrize_by_kinds(
+    new_template = parametrize_from_cli(
         template=template,
-        workflow_name_base=args.workflow_name,
-        workflow_externalid_bases=args.workflow_externalid_bases,
-        keyvault_name_base=args.keyvault_name,
+        playbook_name_param=args.playbook_name_param,
+        externalid_names=args.externalid_names,
+        keyvault_names=keyvault_names_flat,
     )
 
     with open(args.output, "w", encoding="utf-8") as f:
