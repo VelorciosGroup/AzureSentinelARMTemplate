@@ -1,0 +1,70 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Parametrizar AUTH (examples/auth_raw.json)",
+      "type": "debugpy",
+      "request": "launch",
+
+      "module": "arm_param_app.cli",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+
+      "args": [
+        "-f", "${workspaceFolder}/examples/auth_raw.json",
+        "-o", "${workspaceFolder}/examples/Examples post parametrized/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+
+        "--workflow-name", "Auth_Playbook_Name",
+        "--workflow-externalid", "Auth_Playbook_ExternalID",
+        "--keyvault-name", "keyvault_name"
+      ]
+    },
+
+    {
+      "name": "Parametrizar ENRICH (examples/enrich_raw.json)",
+      "type": "debugpy",
+      "request": "launch",
+
+      "module": "arm_param_app.cli",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+
+      "args": [
+        "-f", "${workspaceFolder}/examples/enrich_raw.json",
+        "-o", "${workspaceFolder}/examples/Examples post parametrized/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
+
+        "--workflow-name", "Enrich_Playbook_Name",
+        "--workflow-externalid", "Enrich_Playbook_ExternalID",
+        "--keyvault-name", "keyvault_name"
+      ]
+    },
+
+    {
+      "name": "Parametrizar SOPHOS BLOCK IP (examples/sophos_block_ip_raw.json)",
+      "type": "debugpy",
+      "request": "launch",
+
+      "module": "arm_param_app.cli",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/src"
+      },
+
+      "args": [
+        "-f", "${workspaceFolder}/examples/sophos_block_ip_raw.json",
+        "-o", "${workspaceFolder}/examples/Examples post parametrized/Cliente_Action_Sophos_Block_IP_Playbook.json",
+
+        "--workflow-name", "Sophos_Block_IP_Playbook_Name",
+        "--workflow-externalid", "Sophos_Block_IP_ExternalID",
+        "--keyvault-name", "keyvault_name"
+      ]
+    }
+  ]
+}

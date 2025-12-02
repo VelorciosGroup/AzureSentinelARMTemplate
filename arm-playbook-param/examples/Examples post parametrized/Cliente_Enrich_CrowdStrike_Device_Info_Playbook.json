@@ -1,24 +1,24 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
     "parameters": {
-        "PlaybookName": {
-            "defaultValue": "PRUEBA_Enrich_CrowdStike_Device_Info",
-            "type": "string"
+        "Enrich_Playbook_Name": {
+            "defaultValue": "Enrich_Playbook_Name",
+            "type": "String"
         },
-        "Auth_Playbook_Name": {
-            "defaultValue": "Cliente_Automation_CrowdStrike_Auth_Playbook",
-            "type": "string"
+        "Enrich_Playbook_ExternalID": {
+            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('Enrich_Playbook_Name'))]",
+            "type": "String"
         }
     },
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
     "variables": {
-        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('Enrich_Playbook_Name'))]"
     },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('PlaybookName')]",
+            "name": "[parameters('Enrich_Playbook_Name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -32,6 +32,14 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "Enrich_Playbook_Name": {
+                            "type": "String",
+                            "defaultValue": "[parameters('Enrich_Playbook_Name')]"
+                        },
+                        "Enrich_Playbook_ExternalID": {
+                            "type": "String",
+                            "defaultValue": "[parameters('Enrich_Playbook_ExternalID')]"
                         }
                     },
                     "triggers": {
@@ -61,7 +69,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('Auth_Playbook_Name'))]"
+                                        "id": "[parameters('Enrich_Playbook_ExternalID')]"
                                     },
                                     "triggerName": "manual"
                                 }
