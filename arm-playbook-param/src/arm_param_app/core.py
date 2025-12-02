@@ -1,107 +1,110 @@
-import json
 from typing import Any, Dict
+
+
+def replace_literals(obj: Any, literal_to_param: Dict[str, str]) -> Any:
+    """
+    Recorre el JSON (dict/list/str/...) y sustituye valores de tipo string que
+    coincidan EXACTAMENTE con alguna clave de literal_to_param por la expresión:
+
+        "[parameters('<nombre_param>')]"
+
+    PERO:
+    - Si la cadena parece una expresión ARM (empieza por "[" y termina en "]"),
+      NO la tocamos. Así evitamos casos como:
+
+        "[concat(..., parameters('Auth_Playbook_Name'))]"
+
+      que antes se convertían erróneamente en:
+
+        "[parameters('Auth_Playbook_Name')]"
+
+    El cambio de nombres dentro de expresiones ARM lo hace replace_substrings.
+    """
+    # Diccionario
+    if isinstance(obj, dict):
+        return {k: replace_literals(v, literal_to_param) for k, v in obj.items()}
+
+    # Lista
+    if isinstance(obj, list):
+        return [replace_literals(v, literal_to_param) for v in obj]
+
+    # Cadena
+    if isinstance(obj, str):
+        # Si no es un literal que queramos parametrizar, lo dejamos tal cual
+        if obj not in literal_to_param:
+            return obj
+
+        # Si parece una expresión ARM, no la tocamos aquí
+        # (ejemplo: "[concat(...)]", "[parameters('X')]", etc.)
+        if obj.startswith("[") and obj.endswith("]"):
+            return obj
+
+        param_name = literal_to_param[obj]
+        return f"[parameters('{param_name}')]"
+
+    # Cualquier otro tipo (int, bool, None, ...)
+    return obj
+
 
 def replace_substrings(obj: Any, mapping: Dict[str, str]) -> Any:
     """
-    Reemplaza substrings en cualquier string del árbol JSON.
+    Recorre el JSON y, para cada string, aplica reemplazos de subcadenas
+    según el diccionario mapping: { "viejo": "nuevo", ... }.
 
-    mapping: { "parameters('viejo')" : "parameters('nuevo')", ... }
+    Esto es lo que se usa, por ejemplo, para:
+      parameters('workflows_X_name') -> parameters('PlaybookName')
+    dentro de expresiones ARM como:
 
-    Se usa para actualizar referencias a parámetros ya existentes,
-    por ejemplo cuando renombramos 'workflows_...' -> 'CambioDeNombre'.
+      "[concat(..., parameters('workflows_X_name'))]"
     """
+    # Diccionario
     if isinstance(obj, dict):
         return {k: replace_substrings(v, mapping) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [replace_substrings(item, mapping) for item in obj]
-    elif isinstance(obj, str):
+
+    # Lista
+    if isinstance(obj, list):
+        return [replace_substrings(v, mapping) for v in obj]
+
+    # Cadena
+    if isinstance(obj, str):
         new_s = obj
         for old, new in mapping.items():
             if old in new_s:
                 new_s = new_s.replace(old, new)
         return new_s
-    else:
-        return obj
 
-def collect_string_literals(obj: Any, counts: Dict[str, int]) -> None:
+    # Otros tipos
+    return obj
+
+
+def add_parameter_definitions(template: Dict[str, Any],
+                              literal_to_param: Dict[str, str]) -> None:
     """
-    Recorre recursivamente el JSON y cuenta cuántas veces aparece cada string.
+    A partir de literal_to_param = { "<literal>": "NombreParametro", ... },
+    asegura que en template["parameters"] exista una definición para cada
+    "NombreParametro" (si no existe ya).
+
+    - type: "String"
+    - defaultValue: valor literal original (se sobreescribirá luego por
+      overwrite_parameter_defaults_with_names en el flujo principal, pero
+      aquí mantenemos la traza del literal original por si es útil).
+
+    No elimina nada, solo añade los que falten.
     """
-    if isinstance(obj, dict):
-        for v in obj.values():
-            collect_string_literals(v, counts)
-    elif isinstance(obj, list):
-        for item in obj:
-            collect_string_literals(item, counts)
-    elif isinstance(obj, str):
-        counts[obj] = counts.get(obj, 0) + 1
-
-
-def replace_literals(obj: Any, literal_to_param: Dict[str, str]) -> Any:
-    """
-    Reemplaza en todo el árbol JSON los literales seleccionados por
-    [parameters('<nombre_param>')].
-    """
-    if isinstance(obj, dict):
-        return {k: replace_literals(v, literal_to_param) for k, v in obj.items()}
-    elif isinstance(obj, list):
-        return [replace_literals(item, literal_to_param) for item in obj]
-    elif isinstance(obj, str):
-        param = literal_to_param.get(obj)
-        if param:
-            return f"[parameters('{param}')]"
-        return obj
-    else:
-        return obj
-
-
-def ensure_parameters_block(template: Dict[str, Any]) -> None:
-    """
-    Asegura que el template tiene un bloque 'parameters' dict en la raíz.
-    """
-    if "parameters" not in template or not isinstance(template["parameters"], dict):
-        template["parameters"] = {}
-
-
-def add_parameter_definitions(
-    template: Dict[str, Any],
-    literal_to_param: Dict[str, str]
-) -> None:
-    """
-    Añade definiciones de parámetros en template['parameters'] para cada
-    literal -> nombre_param.
-
-    Comportamiento especial:
-      - Si el parámetro YA existe y su nombre empieza por 'workflow' o
-        'workflows', NO se crea uno nuevo, sino que se ACTUALIZA su
-        defaultValue con el literal original.
-
-      - Si el parámetro NO existe, se crea normalmente:
-        {
-          "type": "String",
-          "defaultValue": "<literal>"
-        }
-    """
-    ensure_parameters_block(template)
-    params_block = template["parameters"]
+    params = template.setdefault("parameters", {})
+    if not isinstance(params, dict):
+        # Si por lo que sea no es un dict, no hacemos nada
+        return
 
     for literal, pname in literal_to_param.items():
-        # Si ya existe un parámetro con ese nombre
-        if pname in params_block:
-            # Caso especial: parámetros de workflows (playbooks de Sentinel)
-            if pname.startswith("workflow"):
-                # Aseguramos que es un dict
-                if not isinstance(params_block[pname], dict):
-                    params_block[pname] = {}
-                # Actualizamos defaultValue al literal original
-                params_block[pname]["defaultValue"] = literal
-            # Si existe pero no empieza por workflow*, lo dejamos tal cual
+        if not pname:
+            continue
+        if pname in params and isinstance(params[pname], dict):
+            # Ya existe, no lo pisamos
             continue
 
-        # Si NO existe, lo creamos normalmente
-        params_block[pname] = {
+        # Creamos una definición básica de parámetro
+        params[pname] = {
             "type": "String",
             "defaultValue": literal
         }
-
-    template["parameters"] = params_block

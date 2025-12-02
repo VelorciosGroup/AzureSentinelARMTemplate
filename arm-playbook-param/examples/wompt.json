@@ -4,17 +4,17 @@
             "defaultValue": "PlaybookName",
             "type": "String"
         },
-        "keyvault_name": {
+        "keyvault_Name_externalid": {
             "type": "String",
-            "defaultValue": "keyvault_name"
+            "defaultValue": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('PlaybookName'))]"
         },
         "keyvault_ClientID": {
             "type": "String",
             "defaultValue": "keyvault_ClientID"
         },
-        "keyvault_ClientSecret": {
+        "keyvault_Secret": {
             "type": "String",
-            "defaultValue": "keyvault_ClientSecret"
+            "defaultValue": "keyvault_Secret"
         },
         "keyvault_BaseUrl": {
             "type": "String",
@@ -50,6 +50,26 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
+                        },
+                        "PlaybookName": {
+                            "type": "String",
+                            "defaultValue": "[parameters('PlaybookName')]"
+                        },
+                        "keyvault_Name_externalid": {
+                            "type": "String",
+                            "defaultValue": "[parameters('keyvault_Name_externalid')]"
+                        },
+                        "keyvault_ClientID": {
+                            "type": "String",
+                            "defaultValue": "[parameters('keyvault_ClientID')]"
+                        },
+                        "keyvault_Secret": {
+                            "type": "String",
+                            "defaultValue": "[parameters('keyvault_Secret')]"
+                        },
+                        "keyvault_BaseUrl": {
+                            "type": "String",
+                            "defaultValue": "[parameters('keyvault_BaseUrl')]"
                         }
                     },
                     "triggers": {
@@ -162,7 +182,7 @@
                                     {
                                         "name": "ClientSecret",
                                         "type": "string",
-                                        "value": "[parameters('keyvault_ClientSecret')]"
+                                        "value": "[parameters('keyvault_Secret')]"
                                     }
                                 ]
                             }
@@ -287,7 +307,11 @@
                         }
                     }
                 }
-            }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+            ]
         },
         {
             "type": "Microsoft.Web/connections",
