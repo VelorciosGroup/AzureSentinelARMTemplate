@@ -1,0 +1,340 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "PlaybookName": {
+      "defaultValue": "Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook",
+      "type": "string"
+    },
+    "keyvault_Name": {
+      "defaultValue": "Cliente-Desarrollo-SOC",
+      "type": "string"
+    },
+    "keyvault_ClientID": {
+      "defaultValue": "ClientID-Crowdstrike",
+      "type": "string"
+    },
+    "keyvault_BaseUrl": {
+      "defaultValue": "BaseURL-Crowdstrike",
+      "type": "string"
+    },
+    "keyvault_Secret": {
+      "defaultValue": "Secret-Crowdstrike",
+      "type": "string"
+    }
+  },
+  "variables": {
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]",
+    "keyvault_Connection_Name": "[concat('keyvault-', parameters('PlaybookName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('PlaybookName')]",
+      "location": "westeurope",
+      "tags": {
+        "hidden-SentinelTemplateName": "Crowdstrike-Authentication",
+        "hidden-SentinelTemplateVersion": "1.0",
+        "hidden-SentinelWorkspaceId": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/microsoft.OperationalInsights/Workspaces/mssp-sentinel-desarollo-resourcegroup"
+      },
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            },
+            "keyvault_ClientID": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_ClientID')]"
+            },
+            "keyvault_Secret": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_Secret')]"
+            },
+            "keyvault_BaseUrl": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_BaseUrl')]"
+            }
+          },
+          "triggers": {
+            "manual": {
+              "type": "Request",
+              "kind": "Http"
+            }
+          },
+          "actions": {
+            "Get_secret_-_Client_ID": {
+              "runAfter": {
+                "Initialize_variables_BaseUrl": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/secrets/@{encodeURIComponent(variables('ClientID'))}/value"
+              },
+              "description": "This gets the secret Client Id from the keyvault",
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            },
+            "Get_secret_-_Client_Secret": {
+              "runAfter": {
+                "Get_secret_-_Client_ID": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/secrets/@{encodeURIComponent(variables('ClientSecret'))}/value"
+              },
+              "description": "This gets the Clientsecret from the keyvault",
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            },
+            "HTTP_-_Get_Access_Token": {
+              "runAfter": {
+                "Obtener_secreto_-_BaseURL": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Http",
+              "inputs": {
+                "uri": "@{body('Obtener_secreto_-_BaseURL')?['value']}/oauth2/token",
+                "method": "POST",
+                "headers": {
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "accept": "application/json"
+                },
+                "body": "client_id=@{body('Get_secret_-_Client_ID')?['value']}&client_secret=@{body('Get_secret_-_Client_Secret')?['value']}"
+              },
+              "description": "This calls the crowdstrike to generate the access token",
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            },
+            "Initialize_variable_ClientID": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "ClientID",
+                    "type": "string",
+                    "value": "[parameters('keyvault_ClientID')]"
+                  }
+                ]
+              }
+            },
+            "Initialize_variable_ClientSecret": {
+              "runAfter": {
+                "Initialize_variable_ClientID": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "ClientSecret",
+                    "type": "string",
+                    "value": "[parameters('keyvault_Secret')]"
+                  }
+                ]
+              }
+            },
+            "Parse_JSON_-_Access_Token_Response": {
+              "runAfter": {
+                "HTTP_-_Get_Access_Token": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP_-_Get_Access_Token')",
+                "schema": {
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "token_type": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "description": "prepare json format for get access token response",
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs"
+                  ]
+                }
+              }
+            },
+            "Response": {
+              "runAfter": {
+                "Parse_JSON_-_Access_Token_Response": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "AccessToken": "Bearer @{body('Parse_JSON_-_Access_Token_Response')?['access_token']}",
+                  "FalconHost": "@{body('Obtener_secreto_-_BaseURL')?['value']}"
+                }
+              },
+              "description": "This holds the access token and falcon host URL"
+            },
+            "Obtener_secreto_-_BaseURL": {
+              "runAfter": {
+                "Get_secret_-_Client_Secret": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/secrets/@{encodeURIComponent(variables('BaseUrl'))}/value"
+              },
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            },
+            "Initialize_variables_BaseUrl": {
+              "runAfter": {
+                "Initialize_variable_ClientSecret": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "BaseUrl",
+                    "type": "string",
+                    "value": "[parameters('keyvault_BaseUrl')]"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azuresentinel": {
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              },
+              "keyvault": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
+                "connectionName": "[variables('keyvault_Connection_Name')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+        "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('AzureSentinelConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[variables('AzureSentinelConnectionName')]",
+        "customParameterValues": {},
+        "parameterValueType": "Alternative",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('keyvault_Connection_Name')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]"
+        },
+        "displayName": "[variables('keyvault_Connection_Name')]",
+        "parameterValueType": "Alternative",
+        "AlternativeParameterValues": {
+          "vaultName": "[parameters('keyvault_Name')]"
+        }
+      }
+    }
+  ]
+}

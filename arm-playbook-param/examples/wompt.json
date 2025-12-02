@@ -1,41 +1,41 @@
 {
     "parameters": {
         "connections_keyvault_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault",
+            "defaultValue": "connections_keyvault_externalid",
             "type": "String"
         },
-        "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA": {
-            "defaultValue": "PRUEBA_Automation_CrowdStrike_Auth_Playbook",
+        "PlaybookName": {
+            "defaultValue": "PlaybookName",
             "type": "String"
         },
-        "BBBBBBBBBBBBBBBBBBBBBBBBBBBB": {
+        "keyvault_Name": {
             "type": "String",
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault"
+            "defaultValue": "keyvault_Name"
         },
-        "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC": {
+        "keyvault_ClientID": {
             "type": "String",
-            "defaultValue": "ClientID-Crowdstrike"
+            "defaultValue": "keyvault_ClientID"
         },
-        "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDdd": {
+        "keyvault_ClientSecret": {
             "type": "String",
-            "defaultValue": "Secret-Crowdstrike"
+            "defaultValue": "keyvault_ClientSecret"
         },
-        "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE": {
+        "keyvault_BaseUrl": {
             "type": "String",
-            "defaultValue": "BaseURL-Crowdstrike"
+            "defaultValue": "keyvault_BaseUrl"
         }
     },
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "variables": {
-        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'))]",
-        "keyvault_Connection_Name": "[concat('keyvault-', parameters('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'))]"
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]",
+        "keyvault_Connection_Name": "[concat('keyvault-', parameters('PlaybookName'))]"
     },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')]",
+            "name": "[parameters('PlaybookName')]",
             "location": "westeurope",
             "tags": {
                 "hidden-SentinelTemplateName": "Crowdstrike-Authentication",
@@ -149,7 +149,7 @@
                                     {
                                         "name": "ClientID",
                                         "type": "string",
-                                        "value": "[parameters('CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC')]"
+                                        "value": "[parameters('keyvault_ClientID')]"
                                     }
                                 ]
                             }
@@ -166,7 +166,7 @@
                                     {
                                         "name": "ClientSecret",
                                         "type": "string",
-                                        "value": "[parameters('DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDdd')]"
+                                        "value": "[parameters('keyvault_ClientSecret')]"
                                     }
                                 ]
                             }
@@ -258,7 +258,7 @@
                                     {
                                         "name": "BaseUrl",
                                         "type": "string",
-                                        "value": "[parameters('EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE')]"
+                                        "value": "[parameters('keyvault_BaseUrl')]"
                                     }
                                 ]
                             }
@@ -290,6 +290,37 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('AzureSentinelConnectionName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "V1",
+            "properties": {
+                "displayName": "[variables('AzureSentinelConnectionName')]",
+                "customParameterValues": {},
+                "parameterValueType": "Alternative",
+                "api": {
+                    "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": "[variables('keyvault_Connection_Name')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "api": {
+                    "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]"
+                },
+                "displayName": "[variables('keyvault_Connection_Name')]",
+                "parameterValueType": "Alternative",
+                "AlternativeParameterValues": {
+                    "vaultName": "[parameters('keyvault_Name')]"
                 }
             }
         }

@@ -159,7 +159,7 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
 
       parameters.$connections.value.keyvault = { ... }
 
-    Si NO se usa Key Vault, elimina el bloque 'keyvault' de $connections.value si existe.
+    Ajusta también el dependsOn del workflow para Azure Sentinel y Key Vault.
     """
     keyvault_used = uses_keyvault_connection(template)
 
@@ -203,41 +203,137 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
                 }
             }
         else:
-            # Si no se usa Key Vault, limpiamos el bloque por si estuviera
             if "keyvault" in value:
                 del value["keyvault"]
 
         connections["value"] = value
 
-        # Opcional: ajustar dependsOn del workflow para que solo incluya keyvault si se usa
+        # Ajustar dependsOn del workflow
         depends_on = res.get("dependsOn")
         if isinstance(depends_on, list):
-            # Siempre Azure Sentinel
             az_dep = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
             kv_dep = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
 
-            # Eliminamos posibles duplicados y limpiamos keyvault si no toca
             new_depends = []
-
-            # Mantenemos los que no son de conexiones, y filtramos manualmente los de Sentinel/keyvault
             for d in depends_on:
                 if not isinstance(d, str):
                     new_depends.append(d)
                     continue
-                if d == az_dep or d == kv_dep:
-                    # Los gestionamos abajo, no aquí
+                if d in (az_dep, kv_dep):
                     continue
                 new_depends.append(d)
 
-            # Aseguramos AzureSentinel
+            # Siempre AzureSentinel
             if az_dep not in new_depends:
                 new_depends.append(az_dep)
 
-            # Aseguramos/quitamos keyvault según proceda
-            if keyvault_used and kv_dep not in new_depends:
-                new_depends.append(kv_dep)
+            # Keyvault condicional
+            if keyvault_used:
+                if kv_dep not in new_depends:
+                    new_depends.append(kv_dep)
 
             res["dependsOn"] = new_depends
+
+
+# ----------------- Recursos Microsoft.Web/connections ----------------- #
+
+def ensure_connection_resources(
+    template: Dict[str, Any],
+    keyvault_param_name: str | None = None
+) -> None:
+    """
+    Asegura que existan los recursos de tipo 'Microsoft.Web/connections'
+    para:
+      - AzureSentinelConnectionName (siempre)
+      - keyvault_Connection_Name (solo si se usa Key Vault)
+
+    En el de Key Vault, 'vaultName' usará el parámetro real pasado en
+    keyvault_param_name (si existe), o 'keyvault_Name' por defecto.
+    """
+    resources = template.setdefault("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    keyvault_used = uses_keyvault_connection(template)
+    if not keyvault_param_name:
+        keyvault_param_name = "keyvault_Name"
+
+    az_name_expr = "[variables('AzureSentinelConnectionName')]"
+    kv_name_expr = "[variables('keyvault_Connection_Name')]"
+
+    az_exists = False
+    kv_exists = False
+
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Web/connections":
+            continue
+        name = res.get("name")
+        if name == az_name_expr:
+            az_exists = True
+        if name == kv_name_expr:
+            kv_exists = True
+
+    # Recurso Azure Sentinel (siempre)
+    if not az_exists:
+        resources.append(
+            {
+                "type": "Microsoft.Web/connections",
+                "apiVersion": "2016-06-01",
+                "name": az_name_expr,
+                "location": "[resourceGroup().location]",
+                "kind": "V1",
+                "properties": {
+                    "displayName": az_name_expr,
+                    "customParameterValues": {},
+                    "parameterValueType": "Alternative",
+                    "api": {
+                        "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+                    }
+                }
+            }
+        )
+
+    # Recurso Key Vault (solo si se usa)
+    if keyvault_used and not kv_exists:
+        resources.append(
+            {
+                "type": "Microsoft.Web/connections",
+                "apiVersion": "2016-06-01",
+                "name": kv_name_expr,
+                "location": "[resourceGroup().location]",
+                "properties": {
+                    "api": {
+                        "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]"
+                    },
+                    "displayName": kv_name_expr,
+                    "parameterValueType": "Alternative",
+                    "AlternativeParameterValues": {
+                        "vaultName": f"[parameters('{keyvault_param_name}')]"
+                    }
+                }
+            }
+        )
+
+
+# ----------------- Sobrescribir defaultValue de parámetros ----------------- #
+
+def overwrite_parameter_defaults_with_names(template: Dict[str, Any]) -> None:
+    """
+    Hace que todos los parámetros de tipo String tengan:
+      defaultValue = "<nombre_del_parametro>"
+    """
+    params = template.get("parameters", {})
+    if not isinstance(params, dict):
+        return
+
+    for pname, pdef in params.items():
+        if not isinstance(pdef, dict):
+            continue
+        ptype = pdef.get("type")
+        if isinstance(ptype, str) and ptype.lower() == "string":
+            pdef["defaultValue"] = pname
 
 
 # ------------------------------------------------------------------- #
@@ -253,7 +349,6 @@ class ParamGUI:
         self.entry_vars: Dict[str, tk.StringVar] = {}
         self.candidates_meta: Dict[str, Dict[str, Any]] = {}
 
-        # referencia al botón toggle (se crea en build_candidates)
         self.toggle_all_btn: tk.Button | None = None
 
         self.file_label = tk.Label(root, text="No file loaded")
@@ -266,7 +361,6 @@ class ParamGUI:
         )
         self.load_button.pack(pady=5)
 
-        # Frame con scroll vertical
         self.candidates_frame = tk.Frame(root)
         self.candidates_frame.pack(fill=tk.BOTH, expand=True)
 
@@ -339,14 +433,13 @@ class ParamGUI:
             text="Select literals (from parameters/variables) to parametrize and optionally edit parameter name:"
         ).pack(anchor="w", pady=2)
 
-        # --------- BOTÓN TOGGLE DE SELECCIÓN ---------- #
+        # Botón toggle seleccionar/deseleccionar todas
         self.toggle_all_btn = tk.Button(
             self.scroll_frame,
-            text="Deseleccionar todas",   # porque todas vienen marcadas por defecto
+            text="Deseleccionar todas",
             command=self.toggle_all_literals
         )
         self.toggle_all_btn.pack(anchor="w", pady=(0, 5))
-        # ------------------------------------------------ #
 
         for literal, info in self.candidates_meta.items():
             used_in = info.get("used_in", [])
@@ -356,7 +449,6 @@ class ParamGUI:
             frame = tk.Frame(self.scroll_frame, bd=1, relief=tk.GROOVE, padx=4, pady=2)
             frame.pack(fill="x", padx=2, pady=2)
 
-            # ✅ Marcadas por defecto (value=1)
             var = tk.IntVar(value=1)
             self.checkbox_vars[literal] = var
             tk.Checkbutton(frame, variable=var).grid(row=0, column=0, rowspan=3, sticky="nw")
@@ -386,17 +478,8 @@ class ParamGUI:
             tk.Label(frame, text="Param name:").grid(row=2, column=1, sticky="e")
             tk.Entry(frame, textvariable=pvar, width=80).grid(row=2, column=2, sticky="w")
 
-    # ---------------- TOGGLE seleccionar/deseleccionar todas ---------------- #
-
     def toggle_all_literals(self) -> None:
-        """
-        Toggle:
-        - Si todas están activadas → desactiva todas
-        - Si alguna está desactivada → activa todas
-        Actualiza el texto del botón acorde.
-        """
         vars_list = list(self.checkbox_vars.values())
-
         if not vars_list:
             return
 
@@ -413,8 +496,6 @@ class ParamGUI:
             if self.toggle_all_btn is not None:
                 self.toggle_all_btn.config(text="Deseleccionar todas")
 
-    # ------------------------------------------------------------------------ #
-
     def parametrize_selected(self) -> None:
         if self.template is None:
             messagebox.showerror("Error", "No template loaded.")
@@ -424,6 +505,7 @@ class ParamGUI:
         literal_to_param: Dict[str, str] = {}
         workflow_renames: Dict[str, str] = {}
         playbook_param_name: str | None = None
+        keyvault_param_name: str | None = None
 
         for literal, var in self.checkbox_vars.items():
             if not var.get():
@@ -444,15 +526,21 @@ class ParamGUI:
 
             prefix = "ARM parameter '"
             for u in used_in:
-                if u.startswith(prefix) and u.endswith("'"):
-                    old_param_name = u[len(prefix):-1]
+                if not u.startswith(prefix) or not u.endswith("'"):
+                    continue
 
-                    # detectar el parámetro que corresponde al nombre del playbook
-                    if old_param_name.startswith("workflows_") and old_param_name.endswith("_name"):
-                        playbook_param_name = new_param_name
+                old_param_name = u[len(prefix):-1]
 
-                    if old_param_name.startswith("workflows_") and old_param_name != new_param_name:
-                        workflow_renames[old_param_name] = new_param_name
+                # detectar parámetro de nombre de playbook
+                if old_param_name.startswith("workflows_") and old_param_name.endswith("_name"):
+                    playbook_param_name = new_param_name
+
+                # detectar parámetro de nombre de Key Vault (ej. keyvault_Name)
+                if "keyvault" in old_param_name.lower() and "name" in old_param_name.lower():
+                    keyvault_param_name = new_param_name
+
+                if old_param_name.startswith("workflows_") and old_param_name != new_param_name:
+                    workflow_renames[old_param_name] = new_param_name
 
         if not literal_to_param:
             messagebox.showinfo("Info", "No literals selected.")
@@ -496,11 +584,17 @@ class ParamGUI:
         # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
 
-        # 6. Asegurar bloque "variables" usando el parámetro correcto del playbook
+        # 6. Sobrescribir defaultValue = nombre del parámetro
+        overwrite_parameter_defaults_with_names(final_template)
+
+        # 7. Variables por defecto (AzureSentinel + keyvault condicional)
         ensure_default_variables(final_template, playbook_param_name)
 
-        # 7. Asegurar bloque $connections (azuresentinel + keyvault condicional)
+        # 8. Bloque $connections en workflows
         ensure_connections_blocks(final_template)
+
+        # 9. Recursos Microsoft.Web/connections
+        ensure_connection_resources(final_template, keyvault_param_name)
 
         out_path = filedialog.asksaveasfilename(
             title="Save parametrized template",
