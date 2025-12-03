@@ -230,7 +230,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_Action_CrowdStrike_Launch_Antivirus_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_Orchestator_CrowdStrike_Sync_Incidents_Playbooks.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
