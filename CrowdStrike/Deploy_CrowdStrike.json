@@ -33,7 +33,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/template_automation/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -58,42 +58,17 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "OrchestatorPart_CrowdStrike_Block_IOC_Playbook",
-			"dependsOn": [
-				"OrchestatorPart_CrowdStrike_Auth_Playbook"
-			],
+			"name": "OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook",
+			"dependsOn": [],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
 					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
-					},
-					"Auth_Playbook_Name": {
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
-			"name": "Orchestator_CrowdStrike_Sync_Incidents_Playbook",
-			"dependsOn": [
-				"OrchestatorPart_CrowdStrike_Auth_Playbook"
-			],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Sync_Incidents_Playbooks.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Launch_Antivirus_Playbook')]"
 					},
 					"Auth_Playbook_Name_externalid": {
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
