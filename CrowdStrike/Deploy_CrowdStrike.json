@@ -200,29 +200,6 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "Action_CrowdStrike_Launch_Antivirus_Playbook",
-			"dependsOn": [
-				"OrchestatorPart_CrowdStrike_Auth_Playbook"
-			],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_Action_CrowdStrike_Launch_Antivirus_Playbook.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Launch_Antivirus_Playbook')]"
-					},
-					"PRUEBA_Automation_Crowdstrike_Auth_Playbook": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
 			"name": "Orchestator_CrowdStrike_Sync_Incidents_Playbook",
 			"dependsOn": [
 				"OrchestatorPart_CrowdStrike_Auth_Playbook"
@@ -230,7 +207,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_Orchestator_CrowdStrike_Sync_Incidents_Playbooks.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/pruebas/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Sync_Incidents_Playbooks.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
