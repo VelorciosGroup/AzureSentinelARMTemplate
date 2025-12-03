@@ -237,7 +237,7 @@
 					"PlaybookName": {
 						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Launch_Antivirus_Playbook')]"
 					},
-					"PRUEBA_Automation_Crowdstrike_Auth_Playbook": {
+					"Auth_Playbook_Name_externalid": {
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					}
 				}
