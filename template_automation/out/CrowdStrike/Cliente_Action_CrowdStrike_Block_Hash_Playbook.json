@@ -15,7 +15,9 @@
       "type": "String"
     }
   },
-  "variables": {},
+  "variables": {
+    "var_workflows_PRUEBA_Automation_Block_IOC_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_PRUEBA_Automation_Block_IOC_externalid'))]"
+  },
   "resources": [
     {
       "type": "Microsoft.Logic/workflows",
@@ -59,7 +61,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[parameters('workflows_PRUEBA_Automation_Block_IOC_externalid')]"
+                    "id": "[variables('var_workflows_PRUEBA_Automation_Block_IOC_externalid')]"
                   },
                   "triggerName": "Manual"
                 },

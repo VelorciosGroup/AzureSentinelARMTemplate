@@ -1,0 +1,201 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_API_parser_name": {
+            "defaultValue": "API_parser",
+            "type": "String"
+        },
+        "connections_azuremonitorlogs_2_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuremonitorlogs-2",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_API_parser_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Manual": {
+                            "type": "Request",
+                            "kind": "Http"
+                        }
+                    },
+                    "actions": {
+                        "Ejecutar_consulta_y_enumerar_resultados": {
+                            "runAfter": {},
+                            "limit": {
+                                "timeout": "PT5M"
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuremonitorlogs-1']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": "let Usernames = datatable(Username:string) @{triggerBody()};\nUsernames\n| extend CleanUsername = \n    case(\n        Username matches regex @\"^[^\\s@]+@[^@]+$\", extract(@\"^([^\\s@]+)@\", 1, Username),   // correo\n        Username matches regex @\"^[^\\\\\\s@]+\\\\[^\\s@]+$\", extract(@\"[^\\\\]+$\", 0, Username),   // NTDomain\n        Username matches regex @\"^[^\\s@]+$\", Username,                                     // nombre simple\n        \"\"                                                                                 // inválido\n    )\n| where CleanUsername != \"\"\n| distinct CleanUsername",
+                                "path": "/queryData",
+                                "queries": {
+                                    "subscriptions": "a7be9652-e6e6-4284-b1b2-14b4079f777d",
+                                    "resourcegroups": "mssp_sentinel_desarollo_resourcegroup",
+                                    "resourcetype": "Log Analytics Workspace",
+                                    "resourcename": "MSSP-Sentinel-Desarollo-ResourceGroup",
+                                    "timerange": "1d"
+                                }
+                            }
+                        },
+                        "ParsedUsernames": {
+                            "runAfter": {
+                                "Ejecutar_consulta_y_enumerar_resultados": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "ParsedUsernames",
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each": {
+                            "foreach": "@body('Ejecutar_consulta_y_enumerar_resultados')?['value']",
+                            "actions": {
+                                "Append_to_ParsedUsernames": {
+                                    "runAfter": {
+                                        "Parse_JSON": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "ParsedUsernames",
+                                        "value": "@body('Parse_JSON')?['CleanUsername']"
+                                    }
+                                },
+                                "Parse_JSON": {
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@items('For_each')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "CleanUsername": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "ParsedUsernames": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Condition": {
+                            "actions": {
+                                "Response": {
+                                    "type": "Response",
+                                    "kind": "Http",
+                                    "inputs": {
+                                        "statusCode": 200,
+                                        "body": "@variables('ParsedUsernames')"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "else": {
+                                "actions": {
+                                    "Bad_Response": {
+                                        "type": "Response",
+                                        "kind": "Http",
+                                        "inputs": {
+                                            "statusCode": 400,
+                                            "body": {
+                                                "error": "InvalidName",
+                                                "message": "Invalid username/s."
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "equals": [
+                                                "@length(variables('ParsedUsernames'))",
+                                                0
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "InternalServerError": {
+                            "runAfter": {
+                                "Condition": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 500,
+                                "body": {
+                                    "error": "InternalSeverError"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azuremonitorlogs-1": {
+                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuremonitorlogs",
+                                "connectionId": "[parameters('connections_azuremonitorlogs_2_externalid')]",
+                                "connectionName": "azuremonitorlogs-2",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

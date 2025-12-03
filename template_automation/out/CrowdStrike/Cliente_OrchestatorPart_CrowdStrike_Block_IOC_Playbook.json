@@ -9,9 +9,16 @@
     "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
       "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
       "type": "String"
+    },
+    "workflows_wuttuutututu_externalid": {
+      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_Block_IOC",
+      "type": "String"
     }
   },
-  "variables": {},
+  "variables": {
+    "var_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid'))]",
+    "var_workflows_wuttuutututu_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_wuttuutututu_externalid'))]"
+  },
   "resources": [
     {
       "type": "Microsoft.Logic/workflows",
@@ -69,7 +76,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
+                    "id": "[variables('var_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
                   },
                   "triggerName": "manual"
                 }

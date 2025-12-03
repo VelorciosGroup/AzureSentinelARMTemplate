@@ -15,7 +15,8 @@
             "type": "String"
         }
     },
-    "variables": {},
+    "variables": {
+    },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
