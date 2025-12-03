@@ -33,24 +33,27 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
+					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
+						"value": "PRUEBA_Automation_CrowdStrike_Auth_Playbook"
+					},
+					"connections_keyvault_externalid": {
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault"
 					},
 					"keyvault_Name": {
-						"value": "[parameters('keyvault_Name_Pack')]"
+						"value": "KEYVAULTNAME"
 					},
 					"keyvault_ClientID": {
-						"value": "[parameters('keyvault_ClientID_Pack')]"
+						"value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
 					},
-					"keyvault_Secret": {
-						"value": "[parameters('keyvault_Secret_Pack')]"
+					"keyvault_ClientSecret": {
+						"value": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
 					},
 					"keyvault_BaseUrl": {
-						"value": "[parameters('keyvault_BaseUrl_Pack')]"
+						"value": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
 					}
 				}
 			}
@@ -65,7 +68,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -88,7 +91,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_Action_CrowdStrike_Device_Isolation_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -112,15 +115,18 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Block_Hash_Playbook')]"
+					"workflows_PRUEBA_Action_Crowdstrike_Block_Hash_name": {
+						"value": "PRUEBA_Action_Crowdstrike_Block_Hash"
 					},
-					"Block_IOC_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
+					"workflows_PRUEBA_Automation_Block_IOC_externalid": {
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_Block_IOC"
+					},
+					"connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Action_Crowdstrike_Block_Hash"
 					}
 				}
 			}
@@ -136,7 +142,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_Action_CrowdStrike_Block_Incident_Hashes_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -160,7 +166,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
@@ -184,7 +190,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {

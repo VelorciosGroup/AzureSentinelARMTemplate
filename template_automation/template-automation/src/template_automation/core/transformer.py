@@ -14,19 +14,23 @@ Flujo actual:
    - Transforma:
        * workflows_*_externalid
        * connections_azure*_externalid
+       * connections_keyvault*_externalid
      Para cada uno:
        * Crea una variable var_<nombre_param>:
          - workflows_*_externalid  → concat con Microsoft.Logic/workflows
          - connections_azure*_externalid → concat('<connector>-', parameters('<workflow_name_param>'))
-           donde <workflow_name_param> es el workflows_..._name correspondiente
+         - connections_keyvault*_externalid → [variables('keyvault_Connection_Name')]
+           y además crea/ajusta:
+             keyvault_Connection_Name = "[concat('keyvault-', parameters('keyvault_Name'))]"
        * Sustituye todas las ocurrencias de "[parameters('<nombre_param>')]" por
          "[variables('var_<nombre_param>')]".
-     Además, para cada connections_azure*_externalid:
-       * Inserta en el workflow:
-           - parameters.$connections.value.<connector>
-           - dependsOn al recurso Microsoft.Web/connections correspondiente
-       * Añade (si no existe) el recurso Microsoft.Web/connections para ese conector,
-         con name/displayName = "[variables('var_<nombre_param>')]"
+     Además:
+       * Para connections_azure*_externalid:
+           - Inserta en el workflow el bloque $connections del conector
+           - Añade dependsOn y recurso Microsoft.Web/connections (<connector>)
+       * Para connections_keyvault*_externalid:
+           - Inserta en el workflow el bloque $connections de keyvault
+           - Añade dependsOn y recurso Microsoft.Web/connections (estructura especial)
    - Lo guarda en dir_out.
 """
 
@@ -43,18 +47,14 @@ from .writer import write_playbook
 
 logger = logging.getLogger(__name__)
 
-# Patrones regex para parámetros workflows
+# Patrones regex
 RE_WORKFLOW_NAME = re.compile(r"workflows_.*_name")
 RE_WORKFLOW_EXTERNALID = re.compile(r"workflows_.*_externalid")
-# Patrones regex para parámetros connections_azure*_externalid
 RE_CONNECTION_AZURE_EXTERNALID = re.compile(r"connections_azure.*_externalid")
+RE_CONNECTION_KEYVAULT_EXTERNALID = re.compile(r"connections_keyvault.*_externalid")
 
 
 def get_deployment_names_from_master(master_template: Dict[str, Any]) -> List[str]:
-    """
-    Extrae de la master template los nombres de los recursos de tipo
-    'Microsoft.Resources/deployments'.
-    """
     resources = master_template.get("resources", [])
     if not isinstance(resources, list):
         logger.warning("La master template no tiene un array 'resources' válido.")
@@ -79,14 +79,6 @@ def get_deployment_names_from_master(master_template: Dict[str, Any]) -> List[st
 
 
 def inspect_workflow_parameters(playbook: Dict[str, Any], source_name: str) -> None:
-    """
-    Inspecciona los parámetros del ARM template de un playbook y muestra por pantalla
-    los parámetros que:
-      - cumplen workflows_.*_name
-      - o workflows_.*_externalid
-
-    Solo los muestra, no modifica nada.
-    """
     params = playbook.get("parameters", {})
 
     if not isinstance(params, dict):
@@ -116,22 +108,13 @@ def inspect_workflow_parameters(playbook: Dict[str, Any], source_name: str) -> N
 
     if not found_any:
         print("No se han encontrado parámetros workflows_ con sufijo _name o _externalid.")
-    print()  # línea en blanco final
+    print()
 
 
 # ---------------------------------------------------------------------------
-# Crear variables para workflows_*_externalid
+# workflows_*_externalid → variables
 # ---------------------------------------------------------------------------
 def _add_workflow_externalid_variables(playbook: Dict[str, Any]) -> List[str]:
-    """
-    Para cada parámetro workflows_.*_externalid crea una variable:
-
-      var_<nombre_param> =
-        "[concat('/subscriptions/', subscription().subscriptionId,
-                 '/resourceGroups/', resourceGroup().name ,
-                 '/providers/Microsoft.Logic/workflows/',
-                 parameters('<nombre_param>'))]"
-    """
     params = playbook.get("parameters", {})
     if not isinstance(params, dict):
         return []
@@ -177,28 +160,9 @@ def _add_workflow_externalid_variables(playbook: Dict[str, Any]) -> List[str]:
 
 
 # ---------------------------------------------------------------------------
-# Crear variables para connections_azure*_externalid
+# connections_azure*_externalid → variables
 # ---------------------------------------------------------------------------
 def _add_connection_azure_externalid_variables(playbook: Dict[str, Any]) -> List[str]:
-    """
-    Para cada parámetro connections_azure.*_externalid crea una variable:
-
-      var_<nombre_param> =
-        "[concat('<connector>-', parameters('<workflow_name_param>'))]"
-
-    donde:
-      - <connector> es la parte entre 'connections_' y el primer '_' posterior,
-        por ejemplo:
-          connections_azuresentinel_PRUEBA_..._externalid → connector = 'azuresentinel'
-          connections_azuremonitorlogs_2_externalid      → connector = 'azuremonitorlogs'
-      - <workflow_name_param> se construye como:
-          workflows_<resto>_name
-        donde <resto> son las partes entre el connector y el sufijo _externalid.
-        Ejemplo:
-          connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid
-          → resto = "PRUEBA_Action_Crowdstrike_Block_Hash"
-          → workflow_name_param = "workflows_PRUEBA_Action_Crowdstrike_Block_Hash_name"
-    """
     params = playbook.get("parameters", {})
     if not isinstance(params, dict):
         return []
@@ -223,12 +187,8 @@ def _add_connection_azure_externalid_variables(playbook: Dict[str, Any]) -> List
     for param_name in externalid_params:
         var_name = f"var_{param_name}"
 
-        # Ejemplo param_name:
-        #   connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid
+        # connections_<connector>_<resto>_externalid
         parts = param_name.split("_")
-        # parts[0] = "connections"
-        # parts[1] = "<connector>"
-        # parts[2:-1] = resto
         connector = parts[1] if len(parts) > 1 else "azuresentinel"
         middle_parts = parts[2:-1] if len(parts) > 3 else []
         middle = "_".join(middle_parts) if middle_parts else ""
@@ -236,7 +196,6 @@ def _add_connection_azure_externalid_variables(playbook: Dict[str, Any]) -> List
         if middle:
             workflow_param_name = f"workflows_{middle}_name"
         else:
-            # Fallback muy raro, pero por si acaso
             workflow_param_name = "PlaybookName"
 
         if workflow_param_name not in params:
@@ -270,23 +229,76 @@ def _add_connection_azure_externalid_variables(playbook: Dict[str, Any]) -> List
 
 
 # ---------------------------------------------------------------------------
-# Reemplazar referencias [parameters()] → [variables()]
+# connections_keyvault*_externalid → variables
+# ---------------------------------------------------------------------------
+def _add_connection_keyvault_externalid_variables(playbook: Dict[str, Any]) -> List[str]:
+    """
+    Para cada parámetro connections_keyvault.*_externalid:
+      - Crea (si no existe) la variable:
+          keyvault_Connection_Name =
+            "[concat('keyvault-', parameters('keyvault_Name'))]"
+      - Crea una variable:
+          var_<param_name> = "[variables('keyvault_Connection_Name')]"
+    """
+    params = playbook.get("parameters", {})
+    if not isinstance(params, dict):
+        return []
+
+    externalid_params: List[str] = []
+
+    for key, definition in params.items():
+        if not isinstance(key, str) or not isinstance(definition, dict):
+            continue
+        if not RE_CONNECTION_KEYVAULT_EXTERNALID.fullmatch(key):
+            continue
+        externalid_params.append(key)
+
+    if not externalid_params:
+        return []
+
+    variables = playbook.get("variables")
+    if not isinstance(variables, dict):
+        variables = {}
+        playbook["variables"] = variables
+
+    # Aseguramos keyvault_Connection_Name
+    if "keyvault_Connection_Name" not in variables:
+        if "keyvault_Name" in params:
+            variables["keyvault_Connection_Name"] = (
+                "[concat('keyvault-', parameters('keyvault_Name'))]"
+            )
+        else:
+            logger.warning(
+                "No se encontró parámetro 'keyvault_Name'. "
+                "Se creará keyvault_Connection_Name con un valor fijo."
+            )
+            variables["keyvault_Connection_Name"] = "'keyvault-connection'"
+
+    for param_name in externalid_params:
+        var_name = f"var_{param_name}"
+        expression = "[variables('keyvault_Connection_Name')]"
+
+        if var_name in variables:
+            logger.info(
+                "La variable %s ya existe, no se sobrescribe (valor actual: %r).",
+                var_name,
+                variables[var_name],
+            )
+            continue
+
+        variables[var_name] = expression
+        logger.debug("Creada variable %s = %s", var_name, expression)
+
+    return externalid_params
+
+
+# ---------------------------------------------------------------------------
+# Reemplazar [parameters()] → [variables()]
 # ---------------------------------------------------------------------------
 def _replace_parameters_with_variables(
     playbook: Dict[str, Any],
     param_names: List[str],
 ) -> None:
-    """
-    Recorre todo el playbook y reemplaza:
-
-      "[parameters('<nombre_param>')]"
-
-    por:
-
-      "[variables('var_<nombre_param>')]"
-
-    para cada nombre de parámetro en param_names.
-    """
     if not param_names:
         return
 
@@ -300,50 +312,28 @@ def _replace_parameters_with_variables(
             for k, v in obj.items():
                 obj[k] = _walk(v)
             return obj
-
         if isinstance(obj, list):
             for i, v in enumerate(obj):
                 obj[i] = _walk(v)
             return obj
-
         if isinstance(obj, str):
             s = obj
             for old, new in replacements.items():
                 if old in s:
                     s = s.replace(old, new)
             return s
-
         return obj
 
     _walk(playbook)
 
 
 # ---------------------------------------------------------------------------
-# Añadir bloque $connections y recurso Microsoft.Web/connections
+# Bloques de conexiones Azure (azuresentinel, azuremonitorlogs, ...)
 # ---------------------------------------------------------------------------
 def _ensure_azure_connections_blocks(
     playbook: Dict[str, Any],
     connection_param_names: List[str],
 ) -> None:
-    """
-    Para cada parámetro connections_azure.*_externalid:
-      - Añade/ajusta en cada workflow:
-          properties.parameters.$connections.value.<connector> = {
-              "connectionId": "[resourceId('Microsoft.Web/connections', variables('var_<param>'))]",
-              "connectionName": "[variables('var_<param>')]",
-              "id": "[concat('/subscriptions/', subscription().subscriptionId, "
-                     "'/providers/Microsoft.Web/locations/', resourceGroup().location, "
-                     "'/managedApis/<connector>')]",
-              "connectionProperties": { "authentication": { "type": "ManagedServiceIdentity" } }
-          }
-        y añade en dependsOn:
-          "[resourceId('Microsoft.Web/connections', variables('var_<param>'))]"
-      - Añade (si no existe ya) un recurso Microsoft.Web/connections con:
-          type: Microsoft.Web/connections
-          name: "[variables('var_<param>')]"
-          displayName: "[variables('var_<param>')]"
-          api.id: .../managedApis/<connector>
-    """
     if not connection_param_names:
         return
 
@@ -351,7 +341,6 @@ def _ensure_azure_connections_blocks(
     if not isinstance(resources, list):
         return
 
-    # Pre-calculamos info por parámetro
     conn_info = {}
     for param_name in connection_param_names:
         parts = param_name.split("_")
@@ -370,26 +359,23 @@ def _ensure_azure_connections_blocks(
             "api_id_expr": api_id_expr,
         }
 
-    # 1) Ajustar todos los workflows
+    # Ajustar workflows
     for res in resources:
         if not isinstance(res, dict):
             continue
         if res.get("type") != "Microsoft.Logic/workflows":
             continue
 
-        # properties
         props = res.get("properties")
         if not isinstance(props, dict):
             props = {}
             res["properties"] = props
 
-        # parameters
         parameters = props.get("parameters")
         if not isinstance(parameters, dict):
             parameters = {}
             props["parameters"] = parameters
 
-        # $connections
         connections = parameters.get("$connections")
         if not isinstance(connections, dict):
             connections = {}
@@ -400,14 +386,12 @@ def _ensure_azure_connections_blocks(
             value = {}
             connections["value"] = value
 
-        # dependsOn
         depends_on = res.get("dependsOn")
         if not isinstance(depends_on, list):
             depends_on = []
             res["dependsOn"] = depends_on
 
-        # Por cada parámetro de conexión, añadimos bloque y dependsOn
-        for param_name, info in conn_info.items():
+        for _, info in conn_info.items():
             connector = info["connector"]
             var_name = info["var_name"]
             depends_expr = info["depends_expr"]
@@ -429,13 +413,12 @@ def _ensure_azure_connections_blocks(
             if depends_expr not in depends_on:
                 depends_on.append(depends_expr)
 
-    # 2) Añadir recursos Microsoft.Web/connections
-    for param_name, info in conn_info.items():
+    # Recursos Microsoft.Web/connections
+    for _, info in conn_info.items():
         connector = info["connector"]
         var_name = info["var_name"]
         api_id_expr = info["api_id_expr"]
 
-        # ¿Existe ya un recurso de conexión con este nombre?
         exists = False
         for res in resources:
             if (
@@ -469,21 +452,124 @@ def _ensure_azure_connections_blocks(
 
 
 # ---------------------------------------------------------------------------
+# Bloques de conexión Key Vault (estructura especial)
+# ---------------------------------------------------------------------------
+def _ensure_keyvault_connections_blocks(
+    playbook: Dict[str, Any],
+    connection_param_names: List[str],
+) -> None:
+    if not connection_param_names:
+        return
+
+    resources = playbook.get("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    # Datos fijos para keyvault
+    var_conn_name = "keyvault_Connection_Name"
+    conn_name_expr = f"[variables('{var_conn_name}')]"
+    api_id_expr = (
+        "[concat(subscription().id, '/providers/Microsoft.Web/locations/', "
+        "resourceGroup().location, '/managedApis/', 'keyvault')]"
+    )
+    depends_expr = (
+        "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+    )
+
+    # 1) Ajustar workflows
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Logic/workflows":
+            continue
+
+        props = res.get("properties")
+        if not isinstance(props, dict):
+            props = {}
+            res["properties"] = props
+
+        parameters = props.get("parameters")
+        if not isinstance(parameters, dict):
+            parameters = {}
+            props["parameters"] = parameters
+
+        connections = parameters.get("$connections")
+        if not isinstance(connections, dict):
+            connections = {}
+            parameters["$connections"] = connections
+
+        value = connections.get("value")
+        if not isinstance(value, dict):
+            value = {}
+            connections["value"] = value
+
+        depends_on = res.get("dependsOn")
+        if not isinstance(depends_on, list):
+            depends_on = []
+            res["dependsOn"] = depends_on
+
+        # Bloque keyvault en $connections
+        value["keyvault"] = {
+            "connectionId": (
+                "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+            ),
+            "connectionName": conn_name_expr,
+            "id": api_id_expr,
+            "connectionProperties": {
+                "authentication": {
+                    "type": "ManagedServiceIdentity",
+                }
+            },
+        }
+
+        if depends_expr not in depends_on:
+            depends_on.append(depends_expr)
+
+    # 2) Recurso Microsoft.Web/connections para keyvault
+    exists = False
+    for res in resources:
+        if (
+            isinstance(res, dict)
+            and res.get("type") == "Microsoft.Web/connections"
+            and res.get("name") == conn_name_expr
+        ):
+            exists = True
+            break
+
+    if not exists:
+        conn_resource = {
+            "type": "Microsoft.Web/connections",
+            "apiVersion": "2016-06-01",
+            "name": conn_name_expr,
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "api": {
+                    "id": api_id_expr,
+                },
+                "displayName": conn_name_expr,
+                "parameterValueType": "Alternative",
+                "AlternativeParameterValues": {
+                    "vaultName": "[parameters('keyvault_Name')]",
+                },
+            },
+        }
+        resources.append(conn_resource)
+
+
+# ---------------------------------------------------------------------------
 # Transformación principal
 # ---------------------------------------------------------------------------
 def transform_playbook(
     playbook: Dict[str, Any],
     master_template: Dict[str, Any],  # noqa: ARG001
 ) -> Dict[str, Any]:
-    """
-    Aplica la lógica de transformación sobre el playbook.
-    """
     logger.debug("Iniciando transformación de playbook (externalid).")
 
     wf_params = _add_workflow_externalid_variables(playbook)
-    conn_params = _add_connection_azure_externalid_variables(playbook)
+    conn_azure_params = _add_connection_azure_externalid_variables(playbook)
+    conn_kv_params = _add_connection_keyvault_externalid_variables(playbook)
 
-    all_params = wf_params + conn_params
+    all_params = wf_params + conn_azure_params + conn_kv_params
 
     if all_params:
         logger.info("Variables creadas para parámetros *_externalid: %s", all_params)
@@ -491,7 +577,8 @@ def transform_playbook(
     else:
         logger.debug("No se encontraron parámetros *_externalid relevantes en este playbook.")
 
-    _ensure_azure_connections_blocks(playbook, conn_params)
+    _ensure_azure_connections_blocks(playbook, conn_azure_params)
+    _ensure_keyvault_connections_blocks(playbook, conn_kv_params)
 
     logger.debug("Transformación de *_externalid completada.")
     return playbook
@@ -502,9 +589,6 @@ def run_automation(
     dir_in: Path,
     dir_out: Path,
 ) -> None:
-    """
-    Orquesta la ejecución completa.
-    """
     logger.info("Cargando master template desde %s", master_path)
     master_template = load_master_template(master_path)
 

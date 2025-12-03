@@ -11,7 +11,10 @@
       "type": "String"
     }
   },
-  "variables": {},
+  "variables": {
+    "keyvault_Connection_Name": "'keyvault-connection'",
+    "var_connections_keyvault_externalid": "[variables('keyvault_Connection_Name')]"
+  },
   "resources": [
     {
       "type": "Microsoft.Logic/workflows",
@@ -250,9 +253,9 @@
           "$connections": {
             "value": {
               "keyvault": {
-                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault",
-                "connectionId": "[parameters('connections_keyvault_externalid')]",
-                "connectionName": "keyvault",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
+                "connectionName": "[variables('keyvault_Connection_Name')]",
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
                 "connectionProperties": {
                   "authentication": {
                     "type": "ManagedServiceIdentity"
@@ -261,6 +264,25 @@
               }
             }
           }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('keyvault_Connection_Name')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]"
+        },
+        "displayName": "[variables('keyvault_Connection_Name')]",
+        "parameterValueType": "Alternative",
+        "AlternativeParameterValues": {
+          "vaultName": "[parameters('keyvault_Name')]"
         }
       }
     }
