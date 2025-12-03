@@ -17,6 +17,7 @@ from typing import Any, Dict, List
 
 from .master_loader import load_master_template
 from .playbook_loader import load_playbook
+from .writer import write_playbook
 
 logger = logging.getLogger(__name__)
 
@@ -75,17 +76,13 @@ def transform_playbook(
 def run_automation(
     master_path: Path,
     dir_in: Path,
-    dir_out: Path,  # ahora mismo no se usa, pero lo dejamos para el futuro
+    dir_out: Path,
 ) -> None:
     """
-    Flujo actual:
-
-    1. Carga la master template.
-    2. Extrae los nombres de los deployments (playbooks) de la master.
-    3. Para cada nombre N busca en `dir_in` el fichero `Cliente_N.json`.
-    4. Si lo encuentra:
-        - Lo carga.
-        - Muestra su contenido por pantalla (JSON pretty).
+    1. Carga master template
+    2. Extrae nombres de deployments
+    3. Por cada nombre busca Cliente_<name>.json en dir_in
+    4. Si existe, lo carga y lo guarda en dir_out usando writer.py
     """
 
     logger.info("Cargando master template desde %s", master_path)
@@ -108,12 +105,12 @@ def run_automation(
             logger.warning("No se encontró el playbook esperado: %s", playbook_path)
             continue
 
+        # Leer playbook
         logger.info("Leyendo playbook: %s", playbook_path)
         playbook_data = load_playbook(playbook_path)
 
-        # Mostrar por pantalla el contenido del archivo
-        print("=" * 80)
-        print(f"Playbook: {file_name}")
-        print("=" * 80)
-        print(json.dumps(playbook_data, indent=2, ensure_ascii=False))
-        print()  # línea en blanco al final para separar
+        # Guardar en dir_out usando writer
+        logger.info("Guardando playbook en el directorio de salida...")
+        saved_path = write_playbook(dir_out, playbook_path, playbook_data)
+
+        logger.info("Playbook guardado correctamente en: %s", saved_path)
