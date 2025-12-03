@@ -1,9 +1,24 @@
 import json
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from typing import Dict, Any
+from typing import Dict, Any, Set, Optional
 
 from .core import replace_literals, add_parameter_definitions
+
+
+# Paleta de colores estilo Azure / VS Code Dark
+WINDOW_BG = "#1e1e1e"      # fondo ventana
+PANEL_BG = "#252526"       # fondo panel principal (scroll)
+CARD_BG = "#1e1e1e"        # tarjetas de cada literal
+TEXT_FG = "#f3f3f3"        # texto principal
+MUTED_FG = "#c5c5c5"       # texto secundario
+ACCENT_BG = "#0078d4"      # azul Azure
+ACCENT_HOVER_BG = "#106ebe"
+ACCENT_TEXT = "#ffffff"
+BORDER_COLOR = "#3c3c3c"
+ENTRY_BG = "#333333"
+ENTRY_FG = "#f3f3f3"
+CHECK_FG = "#f3f3f3"
 
 
 def extract_literal_candidates_from_params_and_variables(
@@ -120,7 +135,7 @@ def uses_keyvault_connection(template: Dict[str, Any]) -> bool:
 
 def ensure_default_variables(
     template: Dict[str, Any],
-    playbook_param_name: str | None = None
+    playbook_param_name: Optional[str] = None
 ) -> None:
     """
     Asegura que en template['variables'] existan:
@@ -155,7 +170,9 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
 
       properties.parameters.$connections.value.azuresentinel / keyvault
 
-    y ajusta también el dependsOn del workflow para Azure Sentinel y Key Vault.
+    y ajusta/crea también el dependsOn del workflow para:
+      - Microsoft.Web/connections AzureSentinelConnectionName (siempre)
+      - Microsoft.Web/connections keyvault_Connection_Name (solo si se usa Key Vault)
     """
     keyvault_used = uses_keyvault_connection(template)
 
@@ -204,37 +221,40 @@ def ensure_connections_blocks(template: Dict[str, Any]) -> None:
 
         connections["value"] = value
 
-        # Ajustar dependsOn del workflow
+        # Crear/ajustar dependsOn siempre
+        az_dep = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+        kv_dep = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+
         depends_on = res.get("dependsOn")
-        if isinstance(depends_on, list):
-            az_dep = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
-            kv_dep = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+        if not isinstance(depends_on, list):
+            depends_on = []
 
-            new_depends = []
-            for d in depends_on:
-                if not isinstance(d, str):
-                    new_depends.append(d)
-                    continue
-                if d in (az_dep, kv_dep):
-                    continue
+        new_depends = []
+        for d in depends_on:
+            if not isinstance(d, str):
                 new_depends.append(d)
+                continue
+            # limpiamos posibles duplicados de estas dos entradas
+            if d in (az_dep, kv_dep):
+                continue
+            new_depends.append(d)
 
-            # Siempre AzureSentinel
-            if az_dep not in new_depends:
-                new_depends.append(az_dep)
+        # Siempre Azure Sentinel
+        if az_dep not in new_depends:
+            new_depends.append(az_dep)
 
-            # Keyvault condicional
-            if keyvault_used and kv_dep not in new_depends:
-                new_depends.append(kv_dep)
+        # Key Vault solo si se usa
+        if keyvault_used and kv_dep not in new_depends:
+            new_depends.append(kv_dep)
 
-            res["dependsOn"] = new_depends
+        res["dependsOn"] = new_depends
 
 
 # ----------------- Recursos Microsoft.Web/connections ----------------- #
 
 def ensure_connection_resources(
     template: Dict[str, Any],
-    keyvault_param_name: str | None = None
+    keyvault_param_name: Optional[str] = None
 ) -> None:
     """
     Asegura que existan los recursos de tipo 'Microsoft.Web/connections'
@@ -354,7 +374,7 @@ def keep_only_selected_parameters(
     template["parameters"] = new_params
 
 
-# ------------- NUEVO: parameters dentro de properties.definition ---------- #
+# ------------- parameters dentro de properties.definition --------------- #
 
 def ensure_definition_parameters(template: Dict[str, Any]) -> None:
     """
@@ -362,17 +382,10 @@ def ensure_definition_parameters(template: Dict[str, Any]) -> None:
     properties.definition.parameters todos los parámetros definidos en
     template['parameters'].
 
-    Ejemplo:
-      "properties": {
-        "definition": {
-          "parameters": {
-            "MiParametro": {
-              "type": "String",
-              "defaultValue": ""
-            },
-            ...
-          }
-        }
+    Se referencian así:
+      "MiParametro": {
+        "type": "String",
+        "defaultValue": "[parameters('MiParametro')]"
       }
     """
     params = template.get("parameters", {})
@@ -405,8 +418,57 @@ def ensure_definition_parameters(template: Dict[str, Any]) -> None:
 
             def_params[pname] = {
                 "type": ptype,
-                "defaultValue": ""
+                "defaultValue": f"[parameters('{pname}')]"
             }
+
+
+# ------------- Lógica especial para parámetros *_externalid ------------- #
+
+def ensure_externalid_suffix(name: str) -> str:
+    """Garantiza que el nombre termine en _externalid (case-insensitive)."""
+    low = name.lower()
+    if low.endswith("_externalid"):
+        return name
+    if low.endswith("externalid"):
+        # ya lleva externalid sin guion bajo
+        return name
+    return f"{name}_externalid"
+
+
+def set_externalid_defaults(
+    template: Dict[str, Any],
+    externalid_param_names: Set[str],
+    playbook_param_name: Optional[str]
+) -> None:
+    """
+    Pone en cada parámetro <extid> el defaultValue con el concat(...) que
+    referencia al parámetro de nombre del playbook:
+
+    [concat('/subscriptions/', subscription().subscriptionId,
+            '/resourceGroups/', resourceGroup().name,
+            '/providers/Microsoft.Logic/workflows/',
+            parameters('<playbook_param_name>'))]
+    """
+    if not externalid_param_names:
+        return
+
+    if not playbook_param_name:
+        playbook_param_name = "PlaybookName"
+
+    params = template.get("parameters", {})
+    if not isinstance(params, dict):
+        return
+
+    concat_expr = (
+        f"[concat('/subscriptions/', subscription().subscriptionId, "
+        f"'/resourceGroups/', resourceGroup().name ,"
+        f"'/providers/Microsoft.Logic/workflows/', parameters('{playbook_param_name}'))]"
+    )
+
+    for pname, pdef in params.items():
+        if pname in externalid_param_names and isinstance(pdef, dict):
+            pdef["type"] = pdef.get("type", "String")
+            pdef["defaultValue"] = concat_expr
 
 
 # ------------------------------------------------------------------- #
@@ -416,32 +478,54 @@ class ParamGUI:
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("ARM Playbook Parametrizer")
+        self.root.configure(bg=WINDOW_BG)
 
         self.template = None
         self.checkbox_vars: Dict[str, tk.IntVar] = {}
         self.entry_vars: Dict[str, tk.StringVar] = {}
         self.candidates_meta: Dict[str, Dict[str, Any]] = {}
 
-        self.toggle_all_btn: tk.Button | None = None
+        self.toggle_all_btn: Optional[tk.Button] = None
 
-        self.file_label = tk.Label(root, text="No file loaded")
+        self.file_label = tk.Label(root, text="No file loaded", bg=WINDOW_BG, fg=MUTED_FG)
         self.file_label.pack(pady=5)
 
         self.load_button = tk.Button(
             root,
             text="Load ARM template JSON",
-            command=self.load_file
+            command=self.load_file,
+            bg=ACCENT_BG,
+            fg=ACCENT_TEXT,
+            activebackground=ACCENT_HOVER_BG,
+            activeforeground=ACCENT_TEXT,
+            bd=0,
+            relief="flat",
+            padx=12,
+            pady=6,
+            highlightthickness=0
         )
         self.load_button.pack(pady=5)
 
-        self.candidates_frame = tk.Frame(root)
+        self.candidates_frame = tk.Frame(root, bg=WINDOW_BG)
         self.candidates_frame.pack(fill=tk.BOTH, expand=True)
 
-        self.canvas = tk.Canvas(self.candidates_frame)
-        self.scrollbar = tk.Scrollbar(
-            self.candidates_frame, orient="vertical", command=self.canvas.yview
+        self.canvas = tk.Canvas(
+            self.candidates_frame,
+            bg=WINDOW_BG,
+            highlightthickness=0,
+            bd=0
         )
-        self.scroll_frame = tk.Frame(self.canvas)
+        self.scrollbar = tk.Scrollbar(
+            self.candidates_frame,
+            orient="vertical",
+            command=self.canvas.yview,
+            bg=WINDOW_BG,
+            troughcolor=WINDOW_BG,
+            activebackground=WINDOW_BG,
+            highlightthickness=0,
+            bd=0
+        )
+        self.scroll_frame = tk.Frame(self.canvas, bg=PANEL_BG)
 
         self.scroll_frame.bind(
             "<Configure>",
@@ -457,7 +541,16 @@ class ParamGUI:
         self.param_button = tk.Button(
             root,
             text="Parametrize selected",
-            command=self.parametrize_selected
+            command=self.parametrize_selected,
+            bg=ACCENT_BG,
+            fg=ACCENT_TEXT,
+            activebackground=ACCENT_HOVER_BG,
+            activeforeground=ACCENT_TEXT,
+            bd=0,
+            relief="flat",
+            padx=12,
+            pady=6,
+            highlightthickness=0
         )
         self.param_button.pack(pady=5)
 
@@ -497,20 +590,33 @@ class ParamGUI:
         if not self.candidates_meta:
             tk.Label(
                 self.scroll_frame,
-                text="No parameters/variables with string values found."
+                text="No parameters/variables with string values found.",
+                bg=PANEL_BG,
+                fg=MUTED_FG
             ).pack()
             return
 
         tk.Label(
             self.scroll_frame,
-            text="Select literals (from parameters/variables) to parametrize and optionally edit parameter name:"
+            text="Select literals (from parameters/variables) to parametrize and optionally edit parameter name:",
+            bg=PANEL_BG,
+            fg=TEXT_FG
         ).pack(anchor="w", pady=2)
 
         # Botón toggle seleccionar/deseleccionar todas
         self.toggle_all_btn = tk.Button(
             self.scroll_frame,
             text="Deseleccionar todas",
-            command=self.toggle_all_literals
+            command=self.toggle_all_literals,
+            bg=ACCENT_BG,
+            fg=ACCENT_TEXT,
+            activebackground=ACCENT_HOVER_BG,
+            activeforeground=ACCENT_TEXT,
+            bd=0,
+            relief="flat",
+            padx=10,
+            pady=4,
+            highlightthickness=0
         )
         self.toggle_all_btn.pack(anchor="w", pady=(0, 5))
 
@@ -519,23 +625,47 @@ class ParamGUI:
             suggested = info.get("suggested_param", "")
             count = len(used_in)
 
-            frame = tk.Frame(self.scroll_frame, bd=1, relief=tk.GROOVE, padx=4, pady=2)
-            frame.pack(fill="x", padx=2, pady=2)
+            frame = tk.Frame(
+                self.scroll_frame,
+                bd=0,
+                relief=tk.FLAT,
+                padx=8,
+                pady=6,
+                bg=CARD_BG,
+                highlightthickness=1,
+                highlightbackground=BORDER_COLOR
+            )
+            frame.pack(fill="x", padx=2, pady=4)
 
             var = tk.IntVar(value=1)
             self.checkbox_vars[literal] = var
-            tk.Checkbutton(frame, variable=var).grid(row=0, column=0, rowspan=3, sticky="nw")
+            tk.Checkbutton(
+                frame,
+                variable=var,
+                bg=CARD_BG,
+                fg=CHECK_FG,
+                activebackground=CARD_BG,
+                activeforeground=CHECK_FG,
+                selectcolor=CARD_BG
+            ).grid(row=0, column=0, rowspan=3, sticky="nw")
 
             pvar = tk.StringVar(value=suggested)
             self.entry_vars[literal] = pvar
 
-            tk.Label(frame, text=f"Literal (used in {count} place(s)):").grid(row=0, column=1, sticky="w")
+            tk.Label(
+                frame,
+                text=f"Literal (used in {count} place(s)):",
+                bg=CARD_BG,
+                fg=TEXT_FG
+            ).grid(row=0, column=1, sticky="w")
 
             tk.Label(
                 frame,
                 text=literal,
                 wraplength=0,
-                justify="left"
+                justify="left",
+                bg=CARD_BG,
+                fg=MUTED_FG
             ).grid(row=0, column=2, sticky="w")
 
             if used_in:
@@ -545,11 +675,28 @@ class ParamGUI:
                     text=f"Used in: {where_text}",
                     wraplength=0,
                     justify="left",
-                    fg="gray20"
+                    bg=CARD_BG,
+                    fg=MUTED_FG
                 ).grid(row=1, column=1, columnspan=2, sticky="w")
 
-            tk.Label(frame, text="Param name:").grid(row=2, column=1, sticky="e")
-            tk.Entry(frame, textvariable=pvar, width=80).grid(row=2, column=2, sticky="w")
+            tk.Label(
+                frame,
+                text="Param name:",
+                bg=CARD_BG,
+                fg=TEXT_FG
+            ).grid(row=2, column=1, sticky="e")
+            tk.Entry(
+                frame,
+                textvariable=pvar,
+                width=80,
+                bg=ENTRY_BG,
+                fg=ENTRY_FG,
+                insertbackground=ENTRY_FG,
+                bd=1,
+                relief="flat",
+                highlightthickness=1,
+                highlightbackground=BORDER_COLOR
+            ).grid(row=2, column=2, sticky="w")
 
     def toggle_all_literals(self) -> None:
         vars_list = list(self.checkbox_vars.values())
@@ -577,8 +724,9 @@ class ParamGUI:
         import copy
         literal_to_param: Dict[str, str] = {}
         workflow_renames: Dict[str, str] = {}
-        playbook_param_name: str | None = None
-        keyvault_param_name: str | None = None
+        playbook_param_name: Optional[str] = None
+        keyvault_param_name: Optional[str] = None
+        externalid_params: Set[str] = set()
 
         for literal, var in self.checkbox_vars.items():
             if not var.get():
@@ -592,18 +740,29 @@ class ParamGUI:
                 )
                 return
 
-            literal_to_param[literal] = new_param_name
-
             meta = self.candidates_meta.get(literal, {})
             used_in = meta.get("used_in", [])
 
+            # Encontrar nombres originales de parámetros ARM
+            original_param_names = []
             prefix = "ARM parameter '"
             for u in used_in:
-                if not u.startswith(prefix) or not u.endswith("'"):
-                    continue
+                if u.startswith(prefix) and u.endswith("'"):
+                    original_param_names.append(u[len(prefix):-1])
 
-                old_param_name = u[len(prefix):-1]
+            # Si alguno de los nombres originales termina en externalid,
+            # forzamos sufijo en el nuevo nombre y lo marcamos.
+            for old_param_name in original_param_names:
+                if old_param_name.lower().endswith("externalid"):
+                    new_param_name = ensure_externalid_suffix(new_param_name)
+                    externalid_params.add(new_param_name)
+                    break
 
+            # Guardamos el mapping literal → nombre de parámetro final
+            literal_to_param[literal] = new_param_name
+
+            # Detectar playbook_param_name, keyvault_param_name y renames
+            for old_param_name in original_param_names:
                 # detectar parámetro de nombre de playbook
                 if old_param_name.startswith("workflows_") and old_param_name.endswith("_name"):
                     playbook_param_name = new_param_name
@@ -635,7 +794,7 @@ class ParamGUI:
             k: v for k, v in new_template.items() if k != "parameters"
         }
 
-        # 3. Actualizar referencias
+        # 3. Actualizar referencias de parámetros (workflows_... -> nuevo nombre)
         from .core import replace_substrings
 
         rename_mapping = {}
@@ -646,7 +805,7 @@ class ParamGUI:
         if rename_mapping:
             body_without_params = replace_substrings(body_without_params, rename_mapping)
 
-        # 4. Reemplazar literales
+        # 4. Reemplazar literales (no toca expresiones ARM si has ajustado replace_literals en core.py)
         body_without_params = replace_literals(body_without_params, literal_to_param)
 
         final_template: Dict[str, Any] = {}
@@ -657,11 +816,14 @@ class ParamGUI:
         # 5. Añadir definiciones de parámetros (core)
         add_parameter_definitions(final_template, literal_to_param)
 
-        # 6. QUEDARSE SOLO CON LOS PARÁMETROS SELECCIONADOS
+        # 6. Quedarse solo con los parámetros seleccionados
         keep_only_selected_parameters(final_template, literal_to_param)
 
-        # 7. Sobrescribir defaultValue = nombre del parámetro
+        # 7. defaultValue = nombre del parámetro
         overwrite_parameter_defaults_with_names(final_template)
+
+        # 7.1. Ajustar defaultValue de *_externalid al concat(...)
+        set_externalid_defaults(final_template, externalid_params, playbook_param_name)
 
         # 8. Variables por defecto (AzureSentinel + keyvault condicional)
         ensure_default_variables(final_template, playbook_param_name)
@@ -672,7 +834,7 @@ class ParamGUI:
         # 10. Recursos Microsoft.Web/connections
         ensure_connection_resources(final_template, keyvault_param_name)
 
-        # 11. NUEVO: meter todos los parámetros en properties.definition.parameters
+        # 11. Meter todos los parámetros en properties.definition.parameters
         ensure_definition_parameters(final_template)
 
         out_path = filedialog.asksaveasfilename(
