@@ -223,7 +223,7 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "Automation_CrowdStrike_Sync_Incidents_Playbook",
+			"name": "Orchestator_CrowdStrike_Sync_Incidents_Playbook",
 			"dependsOn": [
 				"OrchestatorPart_CrowdStrike_Auth_Playbook"
 			],
