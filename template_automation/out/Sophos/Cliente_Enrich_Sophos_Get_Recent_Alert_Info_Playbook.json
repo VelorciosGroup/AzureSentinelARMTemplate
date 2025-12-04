@@ -1,0 +1,785 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name": {
+      "defaultValue": "Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook",
+      "type": "String"
+    },
+    "connections_azuresentinel_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
+      "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/azuresentinel-Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook",
+      "type": "String"
+    },
+    "connections_keyvault_velorsoc_keyvault_externalid": {
+      "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/keyvault-velorsoc-keyvault",
+      "type": "String"
+    },
+    "PlaybookName": {
+      "type": "String",
+      "defaultValue": "BORRAR_PlaybookName"
+    },
+    "keyvault_Name": {
+      "type": "String",
+      "defaultValue": "BORRAR_keyvault_Name"
+    },
+    "keyvault_ClientID": {
+      "type": "String",
+      "defaultValue": "BORRAR_keyvault_ClientID"
+    },
+    "keyvault_Secret": {
+      "type": "String",
+      "defaultValue": "BORRAR_keyvault_Secret"
+    }
+  },
+  "variables": {
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name'))]",
+    "keyvault_Connection_Name": "[concat('keyvault-', parameters('workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name')]",
+      "location": "westeurope",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            },
+            "keyvault_ClientID": {
+              "defaultValue": "sophos-velorcios-client-id",
+              "type": "String"
+            },
+            "keyvault_Secret": {
+              "defaultValue": "sophos-velorcios-client-secret",
+              "type": "String"
+            },
+            "PlaybookName": {
+              "type": "String",
+              "defaultValue": "BORRAR_PlaybookName"
+            },
+            "keyvault_Name": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_Name"
+            }
+          },
+          "triggers": {
+            "Microsoft_Sentinel_incident": {
+              "type": "ApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "body": {
+                  "callback_url": "@{listCallbackUrl()}"
+                },
+                "path": "/incident-creation"
+              }
+            }
+          },
+          "actions": {
+            "Initialize_variables_ClientID_SecretID": {
+              "runAfter": {
+                "Get-ClientSecret": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "ClientID",
+                    "type": "string",
+                    "value": "@{body('Get-ClientId')?['value']}"
+                  },
+                  {
+                    "name": "SecretID",
+                    "type": "string",
+                    "value": "@{body('Get-ClientSecret')?['value']}"
+                  }
+                ]
+              }
+            },
+            "HTTP_POST_Token": {
+              "runAfter": {
+                "Initialize_variables_ClientID_SecretID": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Http",
+              "inputs": {
+                "uri": "https://id.sophos.com/api/v2/oauth2/token",
+                "method": "POST",
+                "headers": {
+                  "Content-Type": " application/x-www-form-urlencoded"
+                },
+                "body": "grant_type=client_credentials&client_id=@{variables('ClientID')}&client_secret=@{variables('SecretID')}&scope=token"
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            },
+            "Parse_JSON_Token": {
+              "runAfter": {
+                "HTTP_POST_Token": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP_POST_Token')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "token_type": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "HTTP_GET_TenantID": {
+              "runAfter": {
+                "Parse_JSON_Token": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Http",
+              "inputs": {
+                "uri": "https://api.central.sophos.com/whoami/v1",
+                "method": "GET",
+                "headers": {
+                  "Authorization": "Bearer @{body('Parse_JSON_Token')?['access_token']}",
+                  "Accept": "application/json"
+                }
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            },
+            "Parse_JSON_TenantID": {
+              "runAfter": {
+                "HTTP_GET_TenantID": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP_GET_TenantID')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "apiHosts": {
+                      "type": "object",
+                      "properties": {
+                        "dataRegion": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Parse_JSON_Entities": {
+              "runAfter": {},
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "type": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string"
+                      },
+                      "properties": {
+                        "type": "object",
+                        "properties": {
+                          "hostName": {
+                            "type": "string"
+                          },
+                          "friendlyName": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "type",
+                      "kind",
+                      "properties"
+                    ]
+                  }
+                }
+              }
+            },
+            "For_each_Hostanme_in_Entity": {
+              "foreach": "@body('Parse_JSON_Entities')",
+              "actions": {
+                "For_each_Alert_in_Get_All_Alerts": {
+                  "foreach": "@body('Parse_JSON_Get_All_Alerts')?['items']",
+                  "actions": {
+                    "Condition": {
+                      "actions": {
+                        "Append_to_Summary": {
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "Summary",
+                            "value": "\n<h2>INFORMACIÓN DE LA ALERTA @{body('Parse_JSON_Current_Alert')?['description']}:</h2>\n<b>ID:</b> @{body('Parse_JSON_Current_Alert')?['id']}<br>\n<b>Categoría:</b> @{body('Parse_JSON_Current_Alert')?['category']}<br>\n<b>Descripción:</b> @{body('Parse_JSON_Current_Alert')?['description']}<br>\n<b>Producto:</b> @{body('Parse_JSON_Current_Alert')?['product']}<br>\n<b>Tipo:</b> @{body('Parse_JSON_Current_Alert')?['type']}<br>\n<b>Severidad:</b> @{body('Parse_JSON_Current_Alert')?['severity']}<br>\n<b>Fecha y hora (raisedAt):</b> @{body('Parse_JSON_Current_Alert')?['raisedAt']}<br>\n<b>Acciones permitidas:</b> @{body('Parse_JSON_Current_Alert')?['allowedActions']}<br>\n<b>GroupKey:</b> @{body('Parse_JSON_Current_Alert')?['groupKey']}<br>\n\n<h3>AGENTE GESTIONADO (managedAgent):</h3>\n<b>ID:</b> @{body('Parse_JSON_Current_Alert')?['managedAgent']?['id']}<br>\n<b>Tipo:</b> @{body('Parse_JSON_Current_Alert')?['type']}<br>\n<b>Nombre:</b> @{body('Parse_JSON_Current_Alert')?['person']?['name']}<br>\n\n<h3>PERSONA ASOCIADA:</h3>\n<b>ID:</b>  @{body('Parse_JSON_Current_Alert')?['person']?['id']}<br>\n<b>Nombre:</b> @{body('Parse_JSON_Current_Alert')?['person']?['name']}<br>\n\n<h3>TENANT (SOPHOS):</h3>\n<b>ID:</b> @{body('Parse_JSON_Current_Alert')?['tenant']?['id']}<br>\n<b>Nombre:</b> @{body('Parse_JSON_Current_Alert')?['tenant']?['name']}<br>\n<b>Región de datos:</b> @{body('Parse_JSON_Current_Alert')?['tenant']?['dataRegion']}<br>"
+                          }
+                        }
+                      },
+                      "runAfter": {
+                        "Parse_JSON_Current_Alert": [
+                          "Succeeded"
+                        ]
+                      },
+                      "else": {
+                        "actions": {}
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "equals": [
+                              "@body('Parse_JSON_Current_Alert')?['managedAgent']?['name']",
+                              "@variables('Hostname')"
+                            ]
+                          }
+                        ]
+                      },
+                      "type": "If"
+                    },
+                    "Parse_JSON_Current_Alert": {
+                      "type": "ParseJson",
+                      "inputs": {
+                        "content": "@items('For_each_Alert_in_Get_All_Alerts')",
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "allowedActions": {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            },
+                            "category": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "type": "string"
+                            },
+                            "groupKey": {
+                              "type": "string"
+                            },
+                            "managedAgent": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "person": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "product": {
+                              "type": "string"
+                            },
+                            "raisedAt": {
+                              "type": "string"
+                            },
+                            "severity": {
+                              "type": "string"
+                            },
+                            "tenant": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "dataRegion": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "type": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Set_variable_Device_Hostname": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Foreach",
+                  "runtimeConfiguration": {
+                    "concurrency": {
+                      "repetitions": 1
+                    }
+                  }
+                },
+                "Parse_JSON_Current_Device": {
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": "@items('For_each_Hostanme_in_Entity')",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "type": "string"
+                        },
+                        "kind": {
+                          "type": "string"
+                        },
+                        "properties": {
+                          "type": "object",
+                          "properties": {
+                            "hostName": {
+                              "type": "string"
+                            },
+                            "friendlyName": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "Set_variable_Device_Hostname": {
+                  "runAfter": {
+                    "Parse_JSON_Current_Device": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "Hostname",
+                    "value": "@body('Parse_JSON_Current_Device')?['properties']?['hostName']"
+                  }
+                }
+              },
+              "runAfter": {
+                "Summary": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach",
+              "runtimeConfiguration": {
+                "concurrency": {
+                  "repetitions": 1
+                }
+              }
+            },
+            "HTTP_GET_All_Alerts": {
+              "runAfter": {
+                "Parse_JSON_TenantID": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Http",
+              "inputs": {
+                "uri": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}/common/v1/alerts?from=@{formatDateTime(addHours(utcNow(), -24), 'yyyy-MM-ddTHH:mm:ss.000Z')\r\n}&to=@{formatDateTime(utcNow(), 'yyyy-MM-ddTHH:mm:ss.000Z')\r\n}&sort=raisedAt:desc",
+                "method": "GET",
+                "headers": {
+                  "X-Tenant-ID": "@{body('Parse_JSON_TenantID')?['id']}",
+                  "Authorization": "Bearer @{body('Parse_JSON_Token')?['access_token']}",
+                  "Accept": "application/json"
+                }
+              },
+              "runtimeConfiguration": {
+                "contentTransfer": {
+                  "transferMode": "Chunked"
+                }
+              }
+            },
+            "Parse_JSON_Get_All_Alerts": {
+              "runAfter": {
+                "HTTP_GET_All_Alerts": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('HTTP_GET_All_Alerts')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "allowedActions": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "groupKey": {
+                            "type": "string"
+                          },
+                          "managedAgent": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "person": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "product": {
+                            "type": "string"
+                          },
+                          "raisedAt": {
+                            "type": "string"
+                          },
+                          "severity": {
+                            "type": "string"
+                          },
+                          "tenant": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "dataRegion": {
+                                "type": "string"
+                              }
+                            }
+                          },
+                          "type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "allowedActions",
+                          "category",
+                          "description",
+                          "groupKey",
+                          "managedAgent",
+                          "person",
+                          "product",
+                          "raisedAt",
+                          "severity",
+                          "tenant",
+                          "type"
+                        ]
+                      }
+                    },
+                    "pages": {
+                      "type": "object",
+                      "properties": {
+                        "size": {
+                          "type": "integer"
+                        },
+                        "maxSize": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Hostname": {
+              "runAfter": {
+                "Parse_JSON_Get_All_Alerts": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Hostname",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "Summary": {
+              "runAfter": {
+                "Hostname": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Summary",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "Condition_1": {
+              "actions": {
+                "Agregar_un_comentario_al_incidente_(V3)-copy": {
+                  "type": "ApiConnection",
+                  "inputs": {
+                    "host": {
+                      "connection": {
+                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                      }
+                    },
+                    "method": "post",
+                    "body": {
+                      "incidentArmId": "@triggerBody()?['object']?['id']",
+                      "message": "<p class=\"editor-paragraph\"><b><strong class=\"editor-text-bold\">No hay información en las últimas 24h</strong></b></p>"
+                    },
+                    "path": "/Incidents/Comment"
+                  }
+                }
+              },
+              "runAfter": {
+                "For_each_Hostanme_in_Entity": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Agregar_un_comentario_al_incidente_(V3)": {
+                    "type": "ApiConnection",
+                    "inputs": {
+                      "host": {
+                        "connection": {
+                          "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                        }
+                      },
+                      "method": "post",
+                      "body": {
+                        "incidentArmId": "@triggerBody()?['object']?['id']",
+                        "message": "<p class=\"editor-paragraph\">@{variables('Summary')}</p><br>"
+                      },
+                      "path": "/Incidents/Comment"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "equals": [
+                      "@length(variables('Summary'))",
+                      0
+                    ]
+                  }
+                ]
+              },
+              "type": "If"
+            },
+            "Get-ClientId": {
+              "runAfter": {
+                "Parse_JSON_Entities": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientID'))}/value"
+              },
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            },
+            "Get-ClientSecret": {
+              "runAfter": {
+                "Get-ClientId": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                  }
+                },
+                "method": "get",
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_Secret'))}/value"
+              },
+              "runtimeConfiguration": {
+                "secureData": {
+                  "properties": [
+                    "inputs",
+                    "outputs"
+                  ]
+                }
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azuresentinel": {
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              },
+              "keyvault": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
+                "connectionName": "[variables('keyvault_Connection_Name')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+        "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('AzureSentinelConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[variables('AzureSentinelConnectionName')]",
+        "customParameterValues": {},
+        "parameterValueType": "Alternative",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('keyvault_Connection_Name')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "api": {
+          "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]"
+        },
+        "displayName": "[variables('keyvault_Connection_Name')]",
+        "parameterValueType": "Alternative",
+        "AlternativeParameterValues": {
+          "vaultName": "[parameters('keyvault_Name')]"
+        }
+      }
+    }
+  ]
+}
