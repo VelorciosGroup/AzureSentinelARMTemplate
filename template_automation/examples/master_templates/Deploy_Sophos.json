@@ -33,7 +33,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/SentinelCICD/RepositoriesSampleContent/refs/heads/main/out/Cliente_Action_Sophos_Device_Isolation_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/template_automation/examples/master_templates/Deploy_Sophos_Master.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {

@@ -5,12 +5,12 @@
     <th>Contenido</th>
   </tr>
 
-  <!-- SOPHOS
+  <!-- SOPHOS -->
   <tr>
     <td><b>Sophos</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2Fmaster_templates%2FDeploy_Sophos.json">
-        <img src="./Button.png" alt="Deploy to Azure" width="140px" />
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2Ftemplate_automation%2Fexamples%2Fmaster_templates%2FDeploy_Sophos.json">
+          <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
     <td>
@@ -27,7 +27,7 @@
       • <a href="./Sophos/Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json">Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json</a><br>
       • <a href="./Sophos/Deploy_Sophos.json">Deploy_Sophos.json</a>
     </td>
-  </tr> -->
+  </tr>
 
   <!-- API PARSER
   <tr>
@@ -47,7 +47,7 @@
     </td>
   </tr> -->
 
-  <!-- CROWDSTRIKE -->
+  <!-- CROWDSTRIKE
   <tr>
     <td><b>CrowdStrike</b></td>
     <td>
@@ -65,5 +65,5 @@
       • <a href="./CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json">Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json</a><br>
       • <a href="./CrowdStrike/Deploy_CrowdStrike.json">Deploy_CrowdStrike.json</a>
     </td>
-  </tr>
+  </tr> -->
 </table>
