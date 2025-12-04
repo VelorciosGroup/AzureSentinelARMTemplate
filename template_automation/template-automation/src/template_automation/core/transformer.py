@@ -236,7 +236,8 @@ def _add_connection_keyvault_externalid_variables(playbook: Dict[str, Any]) -> L
     Para cada parámetro connections_keyvault.*_externalid:
       - Crea (si no existe) la variable:
           keyvault_Connection_Name =
-            "[concat('keyvault-', parameters('keyvault_Name'))]"
+            "[concat('azuresentinel-', parameters('<workflow_name_param>'))]"
+        donde <workflow_name_param> es algún parámetro workflows_.*_name del playbook.
       - Crea una variable:
           var_<param_name> = "[variables('keyvault_Connection_Name')]"
     """
@@ -261,19 +262,35 @@ def _add_connection_keyvault_externalid_variables(playbook: Dict[str, Any]) -> L
         variables = {}
         playbook["variables"] = variables
 
-    # Aseguramos keyvault_Connection_Name
-    if "keyvault_Connection_Name" not in variables:
-        if "keyvault_Name" in params:
-            variables["keyvault_Connection_Name"] = (
-                "[concat('keyvault-', parameters('keyvault_Name'))]"
-            )
-        else:
-            logger.warning(
-                "No se encontró parámetro 'keyvault_Name'. "
-                "Se creará keyvault_Connection_Name con un valor fijo."
-            )
-            variables["keyvault_Connection_Name"] = "'keyvault-connection'"
+    # Buscar un parámetro workflows_*_name para usarlo como "Parametronombreplaybook"
+    workflow_name_param = None
+    for pname in params.keys():
+        if isinstance(pname, str) and RE_WORKFLOW_NAME.fullmatch(pname):
+            workflow_name_param = pname
+            break
 
+    if workflow_name_param is None:
+        # Fallback: usar PlaybookName, pero avisando
+        logger.warning(
+            "No se encontró ningún parámetro workflows_*_name para keyvault. "
+            "Se usará 'PlaybookName' en el concat."
+        )
+        workflow_name_param = "PlaybookName"
+
+    # keyvault_Connection_Name siempre debe seguir el patrón:
+    # "[concat('azuresentinel-', parameters('<workflow_name_param>'))]"
+    variables["keyvault_Connection_Name"] = (
+        "[concat('azuresentinel-', parameters('"
+        + workflow_name_param
+        + "'))]"
+    )
+
+    logger.debug(
+        "keyvault_Connection_Name establecido a usar el parámetro de nombre de playbook '%s'.",
+        workflow_name_param,
+    )
+
+    # Para cada connections_keyvault*_externalid → var_<param> = [variables('keyvault_Connection_Name')]
     for param_name in externalid_params:
         var_name = f"var_{param_name}"
         expression = "[variables('keyvault_Connection_Name')]"
