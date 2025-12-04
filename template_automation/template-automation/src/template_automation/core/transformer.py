@@ -40,6 +40,12 @@ Flujo actual:
              }
          y también en:
              resources[*].properties.definition.parameters["<param>"]
+   - Y además:
+       * Para cada keyvault_<Sufijo> del deployment:
+           - Busca en TODO el playbook la subcadena:
+               "variables('<Sufijo>')"
+           - La sustituye por:
+               "parameters('keyvault_<Sufijo>')"
 """
 
 from __future__ import annotations
@@ -629,6 +635,70 @@ def _merge_deployment_parameters_into_playbook(
 
 
 # ---------------------------------------------------------------------------
+# KeyVault: reemplazar variables('<Sufijo>') por parameters('keyvault_<Sufijo>')
+# ---------------------------------------------------------------------------
+def _replace_keyvault_variable_references(
+    playbook: Dict[str, Any],
+    deployment_params: Optional[Dict[str, Any]],
+) -> None:
+    """
+    Para cada parámetro keyvault_<Sufijo> definido en el deployment de la master,
+    recorre TODO el playbook y reemplaza:
+
+      "variables('<Sufijo>')"
+
+    por:
+
+      "parameters('keyvault_<Sufijo>')"
+    """
+    if not deployment_params or not isinstance(deployment_params, dict):
+        return
+
+    replacements: Dict[str, str] = {}
+
+    for pname in deployment_params.keys():
+        if not isinstance(pname, str):
+            continue
+        if not pname.startswith("keyvault_"):
+            continue
+
+        suffix = pname[len("keyvault_") :]
+        if not suffix:
+            continue
+
+        old = f"variables('{suffix}')"
+        new = f"parameters('{pname}')"
+        replacements[old] = new
+
+    if not replacements:
+        return
+
+    def _walk(obj: Any) -> Any:
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                obj[k] = _walk(v)
+            return obj
+        if isinstance(obj, list):
+            for i, v in enumerate(obj):
+                obj[i] = _walk(v)
+            return obj
+        if isinstance(obj, str):
+            s = obj
+            for old, new in replacements.items():
+                if old in s:
+                    s = s.replace(old, new)
+            return s
+        return obj
+
+    _walk(playbook)
+
+    logger.debug(
+        "Reemplazadas referencias variables('<Sufijo>') por parameters('keyvault_<Sufijo>'): %s",
+        replacements,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Transformación principal
 # ---------------------------------------------------------------------------
 def transform_playbook(
@@ -638,20 +708,24 @@ def transform_playbook(
     """
     Aplica todas las transformaciones sobre un playbook individual.
 
-    - Primero fusiona los parámetros del deployment de la master (properties.parameters)
+    - Fusiona los parámetros del deployment de la master (properties.parameters)
       añadiendo al playbook los que falten (root + definition.parameters).
-    - Luego aplica la lógica de variables y conexiones.
+    - Reemplaza variables('<Sufijo>') por parameters('keyvault_<Sufijo>') para keyvault_*.
+    - Aplica la lógica de variables y conexiones.
     """
     logger.debug("Iniciando transformación de playbook.")
 
     # 0) Fusionar parámetros de la master → playbook
     _merge_deployment_parameters_into_playbook(playbook, deployment_parameters)
 
-    # 1) Variables de nombre de conexión por playbook
+    # 1) Reemplazar variables('ClientID') / variables('ClientSecret') / ... por parameters('keyvault_*')
+    _replace_keyvault_variable_references(playbook, deployment_parameters)
+
+    # 2) Variables de nombre de conexión por playbook
     _ensure_azuresentinel_connection_name(playbook)
     _ensure_keyvault_connection_name(playbook)
 
-    # 2) Transformaciones *_externalid (solo workflows_*_externalid)
+    # 3) Transformaciones *_externalid (solo workflows_*_externalid)
     wf_params = _add_workflow_externalid_variables(playbook)
     all_params = wf_params
 
@@ -661,10 +735,10 @@ def transform_playbook(
     else:
         logger.debug("No se encontraron parámetros workflows_*_externalid en este playbook.")
 
-    # 3) Bloques de conexión en los workflows (azuresentinel + keyvault)
+    # 4) Bloques de conexión en los workflows (azuresentinel + keyvault)
     _ensure_workflow_connection_blocks(playbook)
 
-    # 4) Recursos Microsoft.Web/connections al final (azuresentinel + keyvault)
+    # 5) Recursos Microsoft.Web/connections al final (azuresentinel + keyvault)
     _ensure_connection_resources(playbook)
 
     logger.debug("Transformación completada.")
