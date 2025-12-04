@@ -33,7 +33,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/template_automation/examples/master_templates/Deploy_Sophos_Master.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/Sophos/Cliente_Action_Sophos_Launch_Antivirus_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {

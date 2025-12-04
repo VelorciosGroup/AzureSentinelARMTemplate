@@ -9,7 +9,7 @@
   <tr>
     <td><b>Sophos</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2Ftemplate_automation%2Fexamples%2Fmaster_templates%2FDeploy_Sophos.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fplaybook_parse_automation%2Ftemplate_automation%2Fexamples%2Fmaster_templates%2FDeploy_Sophos.json">
           <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
