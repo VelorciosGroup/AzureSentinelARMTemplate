@@ -38,7 +38,7 @@
 				},
 				"parameters": {
 					"workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_name": {
-						"value": "[concat(parameters('client_Name'), '_Automation_Sophos_Block_IOC_Playbook_name')]"
+						"value": "[concat(parameters('client_Name'), '_Velorcios_Automation_Sophos_Block_IOC_Playbook_name')]"
 					},
 					"connections_azuresentinel_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid": {
 						"value": "[concat(parameters('client_Name'), '_azuresentinel_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid')]"
