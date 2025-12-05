@@ -14,10 +14,6 @@
       "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/keyvault-velorsoc-keyvault",
       "type": "String"
     },
-    "PlaybookName": {
-      "type": "String",
-      "defaultValue": "BORRAR_PlaybookName"
-    },
     "keyvault_Name": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_Name"
@@ -62,9 +58,17 @@
               "defaultValue": "sophos-velorcios-client-secret",
               "type": "String"
             },
-            "PlaybookName": {
+            "workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name": {
               "type": "String",
-              "defaultValue": "BORRAR_PlaybookName"
+              "defaultValue": "BORRAR_workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name"
+            },
+            "connections_azuresentinel_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
+              "type": "String",
+              "defaultValue": "BORRAR_connections_azuresentinel_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid"
+            },
+            "connections_keyvault_velorsoc_keyvault_externalid": {
+              "type": "String",
+              "defaultValue": "BORRAR_connections_keyvault_velorsoc_keyvault_externalid"
             },
             "keyvault_Name": {
               "type": "String",
