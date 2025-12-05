@@ -14,14 +14,6 @@
       "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/keyvault-velorsoc-keyvault",
       "type": "String"
     },
-    "workflows_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_name": {
-      "type": "String",
-      "defaultValue": "BORRAR_workflows_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_name"
-    },
-    "connections_azuresentinel_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_externalid": {
-      "type": "String",
-      "defaultValue": "BORRAR_connections_azuresentinel_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_externalid"
-    },
     "keyvault_Name": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_Name"
@@ -66,13 +58,13 @@
               "defaultValue": "sophos-velorcios-client-secret",
               "type": "String"
             },
-            "workflows_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_name": {
+            "workflows_Velorcios_Action_Sophos_Device_Isolation_Playbook_name": {
               "type": "String",
-              "defaultValue": "BORRAR_workflows_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_name"
+              "defaultValue": "BORRAR_workflows_Velorcios_Action_Sophos_Device_Isolation_Playbook_name"
             },
-            "connections_azuresentinel_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_externalid": {
+            "connections_azuresentinel_Velorcios_Action_Sophos_Device_Isolation_Playbook_externalid": {
               "type": "String",
-              "defaultValue": "BORRAR_connections_azuresentinel_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_externalid"
+              "defaultValue": "BORRAR_connections_azuresentinel_Velorcios_Action_Sophos_Device_Isolation_Playbook_externalid"
             },
             "connections_keyvault_velorsoc_keyvault_externalid": {
               "type": "String",
