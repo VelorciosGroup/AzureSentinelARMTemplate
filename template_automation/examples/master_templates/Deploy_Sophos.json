@@ -194,9 +194,7 @@
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
 			"name": "Action_Sophos_Block_IP_Playbook",
-			"dependsOn": [
-				"OrchestatorPart_Sophos_Block_IOC_Playbook"
-			],
+			"dependsOn": [],
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
