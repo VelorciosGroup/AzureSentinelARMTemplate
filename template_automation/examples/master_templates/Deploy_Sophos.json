@@ -38,13 +38,49 @@
 				},
 				"parameters": {
 					"workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_name": {
-						"value": "AAAAAAAAAAAAAAAAAAAA"
+						"value": "BORRAR_workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_name"
 					},
 					"connections_azuresentinel_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid": {
-						"value": "BBBBBBBBBBBBBBBBBBBBBBBB"
+						"value": "BORRAR_connections_azuresentinel_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid"
 					},
 					"connections_keyvault_velorsoc_keyvault_externalid": {
-						"value": "CCCCCCCCCCCCCCCCCCCCCCC"
+						"value": "BORRAR_connections_keyvault_velorsoc_keyvault_externalid"
+					},
+					"keyvault_Name": {
+						"value": "[parameters('keyvault_Name_Pack')]"
+					},
+					"keyvault_ClientID": {
+						"value": "[parameters('keyvault_ClientID_Pack')]"
+					},
+					"keyvault_Secret": {
+						"value": "[parameters('keyvault_Secret_Pack')]"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Enrich_Sophos_Get_Device_Info_Playbook",
+			"dependsOn": [],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/Sophos/Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name": {
+						"defaultValue": "BORRAR_workflows_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_name",
+						"type": "String"
+					},
+					"connections_azuresentinel_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
+						"defaultValue": "BORRAR_connections_azuresentinel_Velorcios_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid",
+						"type": "String"
+					},
+					"connections_keyvault_velorsoc_keyvault_externalid": {
+						"defaultValue": "BORRAR_connections_keyvault_velorsoc_keyvault_externalid",
+						"type": "String"
 					},
 					"keyvault_Name": {
 						"value": "[parameters('keyvault_Name_Pack')]"
