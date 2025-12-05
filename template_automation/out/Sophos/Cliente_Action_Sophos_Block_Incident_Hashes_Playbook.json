@@ -13,14 +13,6 @@
     "connections_azuresentinel_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_externalid": {
       "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/azuresentinel-Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook",
       "type": "String"
-    },
-    "PlaybookName": {
-      "type": "String",
-      "defaultValue": "BORRAR_PlaybookName"
-    },
-    "Block_IOC_Playbook_Name": {
-      "type": "String",
-      "defaultValue": "BORRAR_Block_IOC_Playbook_Name"
     }
   },
   "variables": {
@@ -46,13 +38,17 @@
               "defaultValue": {},
               "type": "Object"
             },
-            "PlaybookName": {
+            "workflows_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_name": {
               "type": "String",
-              "defaultValue": "BORRAR_PlaybookName"
+              "defaultValue": "BORRAR_workflows_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_name"
             },
-            "Block_IOC_Playbook_Name": {
+            "workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid": {
               "type": "String",
-              "defaultValue": "BORRAR_Block_IOC_Playbook_Name"
+              "defaultValue": "BORRAR_workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid"
+            },
+            "connections_azuresentinel_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_externalid": {
+              "type": "String",
+              "defaultValue": "BORRAR_connections_azuresentinel_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_externalid"
             }
           },
           "triggers": {

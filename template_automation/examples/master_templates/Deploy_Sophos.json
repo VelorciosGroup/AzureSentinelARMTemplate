@@ -241,6 +241,32 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_Sophos_Block_Incident_Hashes_Playbook",
+			"dependsOn": [
+				"OrchestatorPart_Sophos_Block_IOC_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/Sophos/Cliente_Action_Sophos_Block_Incident_Hashes_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"workflows_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_name": {
+						"value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Incident_Hashes_Playbook_name')]"
+					},
+					"workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid": {
+						"value": "[concat(parameters('client_Name'), '_Automation_Sophos_Block_IOC_Playbook_name')]"
+					},
+					"connections_azuresentinel_Velorcios_Action_Sophos_Block_Incident_Hashes_Playbook_externalid": {
+						"value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Incident_Hashes_Playbook_externalid')]"
+					}
+				}
+			}
 		}
 	],
 	"outputs": {
