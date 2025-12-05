@@ -3,7 +3,7 @@
 	"contentVersion": "1.0.0.0",
 	"parameters": {
 		"client_Name": {
-			"defaultValue": "Cliente",
+			"defaultValue": "BORRAR",
 			"type": "string"
 		},
 		"keyvault_Name_Pack": {
