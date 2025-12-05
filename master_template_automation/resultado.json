@@ -7,8 +7,8 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
+            "name": "PRUEBA_Action_CrowdStrike_Launch_Antivirus_Playbook",
+            "dependsOn": "PRUEBA_Automation_CrowdStrike_Auth_Playbook",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
@@ -16,11 +16,14 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Block_Domain_Playbook"
+                    "workflows_Prueba_Action_CrowdStrike_Launch_Antivirus_name": {
+                        "value": "Prueba_Action_CrowdStrike_Launch_Antivirus"
                     },
-                    "Block_IOC_Playbook_Name": {
-                        "value": "Cliente_Automation_Sophos_Block_IOC_Playbook"
+                    "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
+                        "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook"
+                    },
+                    "connections_azuresentinel_Prueba_Action_CrowdStrike_Launch_Antivirus_externalid": {
+                        "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Prueba_Action_CrowdStrike_Launch_Antivirus"
                     }
                 }
             }
@@ -28,7 +31,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2025-03-01",
-            "name": "",
+            "name": "PRUEBA_Automation_CrowdStrike_Auth_Playbook",
             "dependsOn": [],
             "properties": {
                 "mode": "Incremental",
@@ -37,233 +40,20 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Block_Hash_Playbook"
-                    },
-                    "Block_IOC_Playbook_Name": {
-                        "value": "Cliente_Automation_Block_IOC_Playbook"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Block_Incident_Domains_Playbook"
-                    },
-                    "Block_IOC_Playbook_Name": {
-                        "value": "Cliente_Automation_Block_IOC_Playbook"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Block_Incident_Hashes_Playbook"
-                    },
-                    "Block_IOC_Playbook_Name": {
-                        "value": "Cliente_Automation_Block_IOC_Playbook"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Block_Incident_IPs_Playbook"
-                    },
-                    "Block_IOC_Playbook_Name": {
-                        "value": "Cliente_Automation_Block_IOC_Playbook"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Block_IP_Playbook"
-                    },
-                    "Block_IOC_Playbook_Name": {
-                        "value": "Cliente_Automation_Block_IOC_Playbook"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Action_Sophos_Device_Isolation_Playbook"
-                    },
-                    "keyvault_Name": {
-                        "value": "Cliente-Desarrollo-SOC"
+                    "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
+                        "value": "PRUEBA_Automation_CrowdStrike_Auth_Playbook"
                     },
                     "keyvault_ClientID": {
-                        "value": "sophos-velorcios-client-id"
+                        "value": "[parameters('keyvault_ClientID_Pack')]"
                     },
-                    "keyvault_Secret": {
-                        "value": "sophos-velorcios-client-secret"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Actions_Sophos_Launch_AntiVirus_Playbook"
+                    "keyvault_ClientSecret": {
+                        "value": "[parameters('keyvault_ClientSecret_Pack')]"
                     },
-                    "keyvault_Name": {
-                        "value": "MSSP-Desarrollo-SOC"
+                    "keyvault_BaseUrl": {
+                        "value": "[parameters('keyvault_BaseUrl_Pack')]"
                     },
-                    "keyvault_ClientID": {
-                        "value": "sophos-velorcios-client-id"
-                    },
-                    "keyvault_Secret": {
-                        "value": "sophos-velorcios-client-secret"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "MSSP_Enrich_Sophos_Get_Device_Info_Playbook"
-                    },
-                    "keyvault_Name": {
-                        "value": "MSSP-Desarrollo-SOC"
-                    },
-                    "keyvault_ClientID": {
-                        "value": "sophos-velorcios-client-id"
-                    },
-                    "keyvault_Secret": {
-                        "value": "sophos-velorcios-client-secret"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook"
-                    },
-                    "keyvault_Name": {
-                        "value": "Cliente-Desarrollo-SOC"
-                    },
-                    "keyvault_ClientID": {
-                        "value": "sophos-velorcios-client-id"
-                    },
-                    "keyvault_Secret": {
-                        "value": "sophos-velorcios-client-secret"
-                    }
-                }
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2025-03-01",
-            "name": "",
-            "dependsOn": [],
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "PlaybookName": {
-                        "value": "Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook"
-                    },
-                    "keyvault_Name": {
-                        "value": "MSSP-Desarrollo-SOC"
-                    },
-                    "keyvault_ClientID": {
-                        "value": "sophos-velorcios-client-id"
-                    },
-                    "keyvault_Secret": {
-                        "value": "sophos-velorcios-client-secret"
-                    },
-                    "api_block_tag": {
-                        "value": "Blocked by SOC"
+                    "connections_keyvault_externalid": {
+                        "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault"
                     }
                 }
             }

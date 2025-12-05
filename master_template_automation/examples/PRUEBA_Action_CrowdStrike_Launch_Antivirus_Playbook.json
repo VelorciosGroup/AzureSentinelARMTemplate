@@ -1,0 +1,319 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_Prueba_Action_CrowdStrike_Launch_Antivirus_name": {
+            "defaultValue": "Prueba_Action_CrowdStrike_Launch_Antivirus",
+            "type": "string"
+        },
+        "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
+            "type": "string"
+        },
+        "connections_azuresentinel_Prueba_Action_CrowdStrike_Launch_Antivirus_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Prueba_Action_CrowdStrike_Launch_Antivirus",
+            "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_Prueba_Action_CrowdStrike_Launch_Antivirus_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Microsoft_Sentinel_entity": {
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "body": {
+                                    "callback_url": "@{listCallbackUrl()}"
+                                },
+                                "path": "/entity/@{encodeURIComponent('Host')}"
+                            }
+                        }
+                    },
+                    "actions": {
+                        "HTTP_GET_ID_From_Hostname": {
+                            "runAfter": {
+                                "Parse_JSON_AUTH": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}/devices/queries/devices/v1?filter=hostname:'@{triggerBody()?['Entity']?['properties']?['HostName']}'",
+                                "method": "GET",
+                                "headers": {
+                                    "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
+                                    "Accept": "application/json",
+                                    "Content-Type": "application/json"
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "PRUEBA_Automation_CrowdStrike_Auth_Playbook": {
+                            "runAfter": {},
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "manual"
+                                }
+                            }
+                        },
+                        "Parse_JSON_AUTH": {
+                            "runAfter": {
+                                "PRUEBA_Automation_CrowdStrike_Auth_Playbook": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('PRUEBA_Automation_CrowdStrike_Auth_Playbook')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "AccessToken": {
+                                            "type": "string"
+                                        },
+                                        "FalconHost": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Parse_JSON_ID": {
+                            "runAfter": {
+                                "HTTP_GET_ID_From_Hostname": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('HTTP_GET_ID_From_Hostname')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "resources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "HTTP_POST_Initialize_RTR_Session": {
+                            "runAfter": {
+                                "Parse_JSON_ID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}/real-time-response/entities/sessions/v1",
+                                "method": "POST",
+                                "headers": {
+                                    "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
+                                    "Accept": "application/json",
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "device_id": "@body('Parse_JSON_ID')?['resources']?[0]",
+                                    "queue_offline": true
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "Parse_JSON_SessionID": {
+                            "runAfter": {
+                                "HTTP_POST_Initialize_RTR_Session": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('HTTP_POST_Initialize_RTR_Session')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "resources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "session_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "device_id": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "session_id",
+                                                    "device_id"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "HTTP_POST_Run_Script": {
+                            "runAfter": {
+                                "Parse_JSON_SessionID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}/real-time-response/entities/active-responder-command/v1",
+                                "method": "POST",
+                                "headers": {
+                                    "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/json"
+                                },
+                                "body": {
+                                    "base_command": "runscript",
+                                    "command_string": "runscript -CloudFile=escanear-todos-los-discos-cmd.ps1",
+                                    "device_id": "@body('Parse_JSON_SessionID')?['resources']?[0]?['device_id']",
+                                    "session_id": "@body('Parse_JSON_SessionID')?['resources']?[0]?['session_id']"
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "Parse_JSON_Run_Script": {
+                            "runAfter": {
+                                "HTTP_POST_Run_Script": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('HTTP_POST_Run_Script')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "query_time": {
+                                                    "type": "number"
+                                                },
+                                                "powered_by": {
+                                                    "type": "string"
+                                                },
+                                                "trace_id": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "resources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "session_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "cloud_request_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "queued_command_offline": {
+                                                        "type": "boolean"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "session_id",
+                                                    "cloud_request_id",
+                                                    "queued_command_offline"
+                                                ]
+                                            }
+                                        },
+                                        "errors": {}
+                                    }
+                                }
+                            }
+                        },
+                        "HTTP_GET_Output_Info": {
+                            "runAfter": {
+                                "Parse_JSON_Run_Script": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}/real-time-response/entities/command/v1?cloud_request_id=@{body('Parse_JSON_Run_Script')?['resources']?[0]?['cloud_request_id']}&sequence_id=0",
+                                "method": "GET",
+                                "headers": {
+                                    "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
+                                    "Content-Type": "application/json",
+                                    "Accept": "application/json"
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azuresentinel": {
+                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
+                                "connectionId": "[parameters('connections_azuresentinel_Prueba_Action_CrowdStrike_Launch_Antivirus_externalid')]",
+                                "connectionName": "[concat('azuresentinel-', parameters('workflows_Prueba_Action_CrowdStrike_Launch_Antivirus_name'))]",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

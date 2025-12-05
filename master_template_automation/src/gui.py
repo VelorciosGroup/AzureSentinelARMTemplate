@@ -3,12 +3,14 @@ import tkinter as tk
 import os
 import json
 import main
+import parametrize
 
 
 
 def rendergui():
 
     params_for_file = {}
+    depends_on = {}
 
     root = Tk()
     root.title("Creador de Master Templates")
@@ -39,6 +41,17 @@ def rendergui():
     canvas.bind_all("<Button-4>", lambda e: canvas.yview_scroll(-1, "units"))  # Linux
     canvas.bind_all("<Button-5>", lambda e: canvas.yview_scroll(1, "units"))   # Linux
 
+    def error(mensaje):
+        root = tk.Tk()
+        root.withdraw()  # Oculta la ventana principal
+        
+        # Muestra mensaje de error
+        messagebox.showerror("Error", mensaje)
+        
+        # Cierra toda la aplicación
+        root.destroy()
+        exit()  # Opcional si quieres asegurarte de salir del script
+    
 
 
 
@@ -48,9 +61,6 @@ def rendergui():
     style.theme_use('clam')
 
     #____________________________________ Frames _____________________________________
-
-    frame_master_name = ttk.Frame(frame_interior, padding=10)
-    frame_master_name.pack(fill="x")
 
     frame_base_templates = ttk.Frame(frame_interior, padding=10)
     frame_base_templates.pack(fill="x")
@@ -64,12 +74,6 @@ def rendergui():
     frame_organize_variables = ttk.Frame(frame_interior, padding=10)
     frame_organize_variables.pack(fill="x")
 
-    #___________________________________ master_name __________________________________
-    
-    ttk.Label(frame_master_name, text="Introduzca el nombre de la master template (ej: Deploy_Crowdstrike.json):").grid(row=0, column=0, sticky="w")
-    entry_master_name = ttk.Entry(frame_master_name, width=100)
-    entry_master_name.grid(row=1, column=0, sticky="w", pady=10)
-
     #__________________________________ base_templates _________________________________
 
     ttk.Label(frame_base_templates, text="Selección de las templates que se usarán").grid(row=0, column=0, sticky="w")
@@ -79,6 +83,9 @@ def rendergui():
     archivos = []  # lista interna para almacenar rutas
 
     def seleccionar_archivos():
+        nonlocal params_for_file
+        nonlocal depends_on
+
         nuevos = filedialog.askopenfilenames(
             filetypes=[("JSON files", "*.json")],
             title="Selecciona archivos JSON"
@@ -89,21 +96,17 @@ def rendergui():
                     archivos.append(archivo)
                     lista_archivos.insert(tk.END, archivo)
         
-        for archivo in archivos:
-            params_for_file[archivo] = {}
-            with open(archivo, "r") as file:
-                lines = file.readlines()
+        params_for_file = parametrize.parametrizeFiles(archivos)
+        depends_on = parametrize.parametrizeDependsOn(archivos)
+
+        for file in depends_on:
+            for dependency in depends_on[file]:
+                if dependency not in params_for_file.keys():
+                    error(f"Workflow de archivo {file} no encontrado en los otros archivos seleccionados. Revisa si se ha seleccionado o se ha cambiado el nombre")
+        
             
-            json_string = "".join(lines)
-            data = json.loads(json_string)
 
-            for param in data['parameters']:
-                
-                params_for_file[archivo][param] = data['parameters'][param]
-    
         mostrar_variables(frame_variables, params_for_file)
-
-
 
 
     def eliminar_seleccionados():
@@ -160,11 +163,6 @@ def rendergui():
 
                 # si no pone nada, queda el nombre original
                 resultado[ruta] = nuevo_nombre if nuevo_nombre else original
-
-            # aquí haces lo que quieras: imprimir, renombrar, guardar, etc.
-            print("RESULTADO DE RENOMBRE:")
-            for ruta, nuevo in resultado.items():
-                print(f"{ruta}  →  {nuevo}")
 
             messagebox.showinfo("OK", "Nombres procesados en consola.")
             ren_win.destroy()
@@ -255,11 +253,10 @@ def rendergui():
     
     def salir():
         root.destroy()
-        main.main(params_for_file, entry_master_name)
+        main.main(params_for_file, depends_on)
 
     
     ttk.Button(frame_organize_variables, text="Generar", command=salir).grid(row=len(archivos), column=1, pady=10)
 
 
     root.mainloop()
-

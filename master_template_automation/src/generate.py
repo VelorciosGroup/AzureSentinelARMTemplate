@@ -1,6 +1,8 @@
 import json
+import os
 
-def generate_master(playbooks, master_template_name):
+
+def generate_master(playbooks, dependsOn):
     template_base = {
         "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
         "contentVersion": "1.0.0.0",
@@ -38,6 +40,11 @@ def generate_master(playbooks, master_template_name):
 				}
 			}
         }
+
+        # añador el nombre del playbook
+        playbookpayload["name"] = playbook
+
+        # añado los parámetros
         for param in playbooks[playbook]:
             
             playbookpayload['properties']['parameters'][param] = {
@@ -45,8 +52,13 @@ def generate_master(playbooks, master_template_name):
             }
 
 
-
-
+        # añado las dependencias
+        for file in dependsOn:
+            if file == playbookpayload["name"]:
+                for dependencies in dependsOn[file]:
+                    playbookpayload['dependsOn'] = dependencies
+                    
+        # añado la declaración del playbook a resources
         template_base['resources'].append(playbookpayload)
 
 
