@@ -194,10 +194,10 @@
 				},
 				"parameters": {
 					"workflows_Velorcios_Action_Sophos_Block_IP_Playbook_name": {
-						"value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Playbook_nameA')]"
+						"value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Playbook_name')]"
 					},
 					"workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid": {
-						"value": "[concat(parameters('client_Name'), '_Automation_Sophos_Block_IOC_Playbook_nameB)')]"
+						"value": "[concat(parameters('client_Name'), '_Automation_Sophos_Block_IOC_Playbook_name')]"
 					},
 					"connections_azuresentinel_Velorcios_Action_Sophos_Block_IP_Playbook_externalid": {
 						"value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Playbook_externalid')]"
