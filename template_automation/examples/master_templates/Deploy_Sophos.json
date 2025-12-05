@@ -33,7 +33,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/Sophos/Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
