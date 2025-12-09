@@ -33,7 +33,7 @@
 			"properties": {
 				"mode": "Incremental",
 				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
 					"contentVersion": "1.0.0.0"
 				},
 				"parameters": {
