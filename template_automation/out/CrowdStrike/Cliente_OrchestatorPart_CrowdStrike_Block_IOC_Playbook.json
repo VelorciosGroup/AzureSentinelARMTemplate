@@ -12,11 +12,11 @@
     },
     "PlaybookName": {
       "type": "String",
-      "defaultValue": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
+      "defaultValue": "BORRAR_PlaybookName"
     },
     "Auth_Playbook_Name": {
       "type": "String",
-      "defaultValue": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
+      "defaultValue": "BORRAR_Auth_Playbook_Name"
     }
   },
   "variables": {
@@ -41,6 +41,14 @@
             "$connections": {
               "defaultValue": {},
               "type": "Object"
+            },
+            "PlaybookName": {
+              "type": "String",
+              "defaultValue": "BORRAR_PlaybookName"
+            },
+            "Auth_Playbook_Name": {
+              "type": "String",
+              "defaultValue": "BORRAR_Auth_Playbook_Name"
             }
           },
           "triggers": {

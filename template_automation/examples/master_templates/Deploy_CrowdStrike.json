@@ -44,16 +44,16 @@
 						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault"
 					},
 					"keyvault_Name": {
-						"value": "KEYVAULTNAME"
+						"value": "MSSP-Desarrollo-SOCA"
 					},
 					"keyvault_ClientID": {
-						"value": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+						"value": "ClientID-CrowdstrikeA"
 					},
 					"keyvault_ClientSecret": {
-						"value": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+						"value": "Secret-CrowdstrikeA"
 					},
 					"keyvault_BaseUrl": {
-						"value": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+						"value": "BaseURL-CrowdstrikeA"
 					}
 				}
 			}

@@ -12,19 +12,19 @@
     },
     "keyvault_Name": {
       "type": "String",
-      "defaultValue": "KEYVAULTNAME"
+      "defaultValue": "BORRAR_keyvault_Name"
     },
     "keyvault_ClientID": {
       "type": "String",
-      "defaultValue": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      "defaultValue": "BORRAR_keyvault_ClientID"
     },
     "keyvault_ClientSecret": {
       "type": "String",
-      "defaultValue": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+      "defaultValue": "BORRAR_keyvault_ClientSecret"
     },
     "keyvault_BaseUrl": {
       "type": "String",
-      "defaultValue": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+      "defaultValue": "BORRAR_keyvault_BaseUrl"
     }
   },
   "variables": {
@@ -54,6 +54,30 @@
             "$connections": {
               "defaultValue": {},
               "type": "Object"
+            },
+            "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
+              "type": "String",
+              "defaultValue": "BORRAR_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name"
+            },
+            "connections_keyvault_externalid": {
+              "type": "String",
+              "defaultValue": "BORRAR_connections_keyvault_externalid"
+            },
+            "keyvault_Name": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_Name"
+            },
+            "keyvault_ClientID": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_ClientID"
+            },
+            "keyvault_ClientSecret": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_ClientSecret"
+            },
+            "keyvault_BaseUrl": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_BaseUrl"
             }
           },
           "triggers": {
@@ -77,7 +101,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('ClientID'))}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientID'))}/value"
               },
               "description": "This gets the secret Client Id from the keyvault",
               "runtimeConfiguration": {
@@ -103,7 +127,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('ClientSecret'))}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientSecret'))}/value"
               },
               "description": "This gets the Clientsecret from the keyvault",
               "runtimeConfiguration": {
@@ -235,7 +259,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(variables('BaseUrl'))}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_BaseUrl'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {

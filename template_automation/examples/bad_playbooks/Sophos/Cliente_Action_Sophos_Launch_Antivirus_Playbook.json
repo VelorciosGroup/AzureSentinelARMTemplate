@@ -34,14 +34,6 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
-                        },
-                        "keyvault_ClientID": {
-                            "defaultValue": "sophos-velorcios-client-id",
-                            "type": "String"
-                        },
-                        "keyvault_Secret": {
-                            "defaultValue": "sophos-velorcios-client-secret",
-                            "type": "String"
                         }
                     },
                     "triggers": {

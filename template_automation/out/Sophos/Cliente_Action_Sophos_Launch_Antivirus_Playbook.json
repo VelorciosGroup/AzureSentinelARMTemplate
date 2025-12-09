@@ -50,14 +50,6 @@
               "defaultValue": {},
               "type": "Object"
             },
-            "keyvault_ClientID": {
-              "defaultValue": "[parameters('keyvault_ClientID')]",
-              "type": "String"
-            },
-            "keyvault_Secret": {
-              "defaultValue": "sophos-velorcios-client-secret",
-              "type": "String"
-            },
             "workflows_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_name": {
               "type": "String",
               "defaultValue": "BORRAR_workflows_Velorcios_Action_Sophos_Launch_Antivirus_Playbook_name"
@@ -73,6 +65,14 @@
             "keyvault_Name": {
               "type": "String",
               "defaultValue": "BORRAR_keyvault_Name"
+            },
+            "keyvault_ClientID": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_ClientID"
+            },
+            "keyvault_Secret": {
+              "type": "String",
+              "defaultValue": "BORRAR_keyvault_Secret"
             }
           },
           "triggers": {

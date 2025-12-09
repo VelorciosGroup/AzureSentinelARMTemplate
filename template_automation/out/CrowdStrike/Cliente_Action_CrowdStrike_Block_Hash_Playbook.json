@@ -37,6 +37,18 @@
             "$connections": {
               "defaultValue": {},
               "type": "Object"
+            },
+            "workflows_PRUEBA_Action_Crowdstrike_Block_Hash_name": {
+              "type": "String",
+              "defaultValue": "BORRAR_workflows_PRUEBA_Action_Crowdstrike_Block_Hash_name"
+            },
+            "workflows_PRUEBA_Automation_Block_IOC_externalid": {
+              "type": "String",
+              "defaultValue": "BORRAR_workflows_PRUEBA_Automation_Block_IOC_externalid"
+            },
+            "connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
+              "type": "String",
+              "defaultValue": "BORRAR_connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid"
             }
           },
           "triggers": {
