@@ -51,7 +51,8 @@
               "type": "Object"
             },
             "keyvault_ClientID": {
-              "value": "[parameters('keyvault_ClientID')]"
+              "value": "[parameters('keyvault_ClientID')]",
+              "type": "String"
             },
             "keyvault_Secret": {
               "defaultValue": "sophos-velorcios-client-secret",
