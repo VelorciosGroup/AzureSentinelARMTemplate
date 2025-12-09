@@ -53,7 +53,7 @@
   <tr>
     <td><b>CrowdStrike</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/urihttps%3a%2f%2fraw.githubusercontent.com%2fVelorciosGroup%2fAzureSentinelARMTemplate%2frefs%2fheads%2fplaybook_parse_automation%2ftemplate_automation%2fexamples%2fmaster_templates%2fDeploy_CrowdStrike.json/"
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3a%2f%2fraw.githubusercontent.com%2fVelorciosGroup%2fAzureSentinelARMTemplate%2frefs%2fheads%2fplaybook_parse_automation%2ftemplate_automation%2fexamples%2fmaster_templates%2fDeploy_CrowdStrike.json/"
          rel="noopener noreferrer">
           <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
