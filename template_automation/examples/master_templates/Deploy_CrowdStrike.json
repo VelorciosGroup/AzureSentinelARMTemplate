@@ -7,7 +7,7 @@
 			"type": "string"
 		},
 		"keyvault_Name_Pack": {
-			"defaultValue": "Keyvault-name-Crowdstrike",
+			"defaultValue": "MSSP-Desarrollo-SOC",
 			"type": "string"
 		},
 		"keyvault_ClientID_Pack": {
