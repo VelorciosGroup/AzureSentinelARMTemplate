@@ -51,7 +51,7 @@
               "type": "Object"
             },
             "keyvault_ClientID": {
-              "defaultValue": "BORRAR_sophos-velorcios-client-id",
+              "defaultValue": "parameters('keyvault_ClientID')",
               "type": "String"
             },
             "keyvault_Secret": {
