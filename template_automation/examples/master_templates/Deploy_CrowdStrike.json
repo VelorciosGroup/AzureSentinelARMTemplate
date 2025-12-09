@@ -38,7 +38,7 @@
 				},
 				"parameters": {
 					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
-						"value": "PRUEBA_Automation_CrowdStrike_Auth_Playbook"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPar_CrowdStrike_Auth_Playbook')]"
 					},
 					"connections_keyvault_externalid": {
 						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault"
@@ -73,12 +73,10 @@
 				},
 				"parameters": {
 					"workflows_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_name": {
-						"defaultValue": "PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook",
-						"type": "String"
+						"value": "[concat(parameters('client_Name'), 'Action_CrowdStrike_Device_Isolation_Playbook')]"
 					},
 					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
-						"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
-						"type": "String"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPar_CrowdStrike_Auth_Playbook')]"
 					},
 					"connections_azuresentinel_6_externalid": {
 						"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6",
