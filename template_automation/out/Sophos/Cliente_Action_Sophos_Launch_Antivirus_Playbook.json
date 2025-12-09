@@ -51,7 +51,7 @@
               "type": "Object"
             },
             "keyvault_ClientID": {
-              "defaultValue": "[parameters('keyvault_Name_Pack')]",
+              "defaultValue": "[parameters('keyvault_ClientID')]",
               "type": "String"
             },
             "keyvault_Secret": {
