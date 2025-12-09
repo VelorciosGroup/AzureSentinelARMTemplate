@@ -51,8 +51,8 @@
               "type": "Object"
             },
             "keyvault_ClientID": {
-              "type": "String",
-              "defaultValue": "[parameters('keyvault_ClientID')]"
+              "defaultValue": "sophos-velorcios-client-id",
+              "type": "String"
             },
             "keyvault_Secret": {
               "defaultValue": "sophos-velorcios-client-secret",
@@ -105,7 +105,7 @@
                 "headers": {
                   "Content-Type": " application/x-www-form-urlencoded"
                 },
-                "body": "grant_type=client_credentials&client_id=@{variables('ClientSecret')}&client_secret=@{variables('ClientSecret')}&scope=token"
+                "body": "grant_type=client_credentials&client_id=@{parameters('keyvault_ClientID')}&client_secret=@{variables('ClientSecret')}&scope=token"
               },
               "runtimeConfiguration": {
                 "contentTransfer": {
