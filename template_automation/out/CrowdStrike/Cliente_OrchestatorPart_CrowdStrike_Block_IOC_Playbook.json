@@ -9,14 +9,6 @@
     "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
       "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
       "type": "String"
-    },
-    "PlaybookName": {
-      "type": "String",
-      "defaultValue": "BORRAR_PlaybookName"
-    },
-    "Auth_Playbook_Name": {
-      "type": "String",
-      "defaultValue": "BORRAR_Auth_Playbook_Name"
     }
   },
   "variables": {
@@ -42,13 +34,13 @@
               "defaultValue": {},
               "type": "Object"
             },
-            "PlaybookName": {
+            "workflows_PRUEBA_Automation_Block_IOC_name": {
               "type": "String",
-              "defaultValue": "BORRAR_PlaybookName"
+              "defaultValue": "[parameters('workflows_PRUEBA_Automation_Block_IOC_name')]"
             },
-            "Auth_Playbook_Name": {
+            "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
               "type": "String",
-              "defaultValue": "BORRAR_Auth_Playbook_Name"
+              "defaultValue": "[variables('var_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
             }
           },
           "triggers": {
