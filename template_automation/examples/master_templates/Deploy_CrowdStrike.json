@@ -158,6 +158,33 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Action_CrowdStrike_Block_Hash_Playbook",
+			"dependsOn": [
+				"OrchestatorPart_CrowdStrike_Auth_Playbook",
+				"OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/CrowdStrike/Cliente_Action_CrowdStrike_Block_Hash_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"workflows_PRUEBA_Action_Crowdstrike_Block_Hash_name": {
+						"value": "[concat(parameters('client_Name'), '_Action_CrowdStrike_Block_Hash_Playbook')]"
+					},
+					"workflows_PRUEBA_Automation_Block_IOC_externalid": {
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
+					},
+					"connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Action_Crowdstrike_Block_Hash"
+					}
+				}
+			}
 		}
 	],
 	"outputs": {
