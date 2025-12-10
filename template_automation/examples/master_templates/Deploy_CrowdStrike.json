@@ -122,8 +122,7 @@
 				},
 				"parameters": {
 					"workflows_PRUEBA_Enrich_CrowdStike_Device_Info_name": {
-						"defaultValue": "PRUEBA_Enrich_CrowdStike_Device_Info",
-						"type": "String"
+						"value": "PRUEBA_Enrich_CrowdStike_Device_Info"
 					},
 					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
