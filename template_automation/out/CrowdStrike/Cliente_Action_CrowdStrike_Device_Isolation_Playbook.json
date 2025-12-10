@@ -11,7 +11,7 @@
       "type": "String"
     },
     "connections_azuresentinel_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_externalid": {
-      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStike_Device_Info",
+      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/connections_azuresentinel_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_externalid",
       "type": "String"
     }
   },
