@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_Velorcios_Action_Sophos_Device_Isolation_Playbook_name": {
-            "defaultValue": "Velorcios_Action_Sophos_Device_Isolation_Playbook",
+        "workflows_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_name": {
+            "defaultValue": "PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook",
             "type": "String"
         },
-        "connections_azuresentinel_Velorcios_Action_Sophos_Device_Isolation_Playbook_externalid": {
-            "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/azuresentinel-Velorcios_Action_Sophos_Device_Isolation_Playbook",
+        "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
             "type": "String"
         },
-        "connections_keyvault_velorsoc_keyvault_externalid": {
-            "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/keyvault-velorsoc-keyvault",
+        "connections_azuresentinel_6_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6",
             "type": "String"
         }
     },
@@ -20,7 +20,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_Velorcios_Action_Sophos_Device_Isolation_Playbook_name')]",
+            "name": "[parameters('workflows_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -34,14 +34,6 @@
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
-                        },
-                        "keyvault_ClientID": {
-                            "defaultValue": "sophos-velorcios-client-id",
-                            "type": "String"
-                        },
-                        "keyvault_Secret": {
-                            "defaultValue": "sophos-velorcios-client-secret",
-                            "type": "String"
                         }
                     },
                     "triggers": {
@@ -50,7 +42,7 @@
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
                                     }
                                 },
                                 "body": {
@@ -61,165 +53,9 @@
                         }
                     },
                     "actions": {
-                        "Petición_de_JWT": {
+                        "Initialize_Host_Name": {
                             "runAfter": {
-                                "ClientSecret": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "uri": "https://id.sophos.com/api/v2/oauth2/token",
-                                "method": "POST",
-                                "headers": {
-                                    "Content-Type": " application/x-www-form-urlencoded"
-                                },
-                                "body": "grant_type=client_credentials&client_id=@{variables('ClientID')}&client_secret=@{variables('ClientSecret')}&scope=token"
-                            },
-                            "runtimeConfiguration": {
-                                "contentTransfer": {
-                                    "transferMode": "Chunked"
-                                }
-                            }
-                        },
-                        "ClientID": {
-                            "runAfter": {
-                                "Get-ClientSecret": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "ClientID",
-                                        "type": "string",
-                                        "value": "@{body('Get-ClientId')?['value']}"
-                                    }
-                                ]
-                            }
-                        },
-                        "ClientSecret": {
-                            "runAfter": {
-                                "ClientID": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "ClientSecret",
-                                        "type": "string",
-                                        "value": "@{body('Get-ClientSecret')?['value']}"
-                                    }
-                                ]
-                            }
-                        },
-                        "GetTenantID": {
-                            "runAfter": {
-                                "Parse_JSON_JWT": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "uri": "https://api.central.sophos.com/whoami/v1",
-                                "method": "GET",
-                                "headers": {
-                                    "Authorization": "Bearer @{body('Parse_JSON_JWT')?['access_token']}",
-                                    "Accept": "application/json"
-                                }
-                            },
-                            "runtimeConfiguration": {
-                                "contentTransfer": {
-                                    "transferMode": "Chunked"
-                                }
-                            }
-                        },
-                        "Parse_JSON_JWT": {
-                            "runAfter": {
-                                "Petición_de_JWT": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ParseJson",
-                            "inputs": {
-                                "content": "@body('Petición_de_JWT')",
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "access_token": {
-                                            "type": "string"
-                                        },
-                                        "expires_in": {
-                                            "type": "integer"
-                                        },
-                                        "token_type": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "Parse_JSON_TenantID": {
-                            "runAfter": {
-                                "GetTenantID": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ParseJson",
-                            "inputs": {
-                                "content": "@body('GetTenantID')",
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "string"
-                                        },
-                                        "idType": {
-                                            "type": "string"
-                                        },
-                                        "apiHosts": {
-                                            "type": "object",
-                                            "properties": {
-                                                "global": {
-                                                    "type": "string"
-                                                },
-                                                "dataRegion": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        "GetDeviceID": {
-                            "runAfter": {
-                                "HostName": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
-                            "inputs": {
-                                "uri": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}/endpoint/v1/endpoints?hostnameContains=@{variables('HostName')}",
-                                "method": "GET",
-                                "headers": {
-                                    "Content-Type": "application/json",
-                                    "X-Tenant-ID": "@{body('Parse_JSON_TenantID')?['id']}",
-                                    "Authorization": "Bearer @{body('Parse_JSON_JWT')?['access_token']}"
-                                }
-                            },
-                            "runtimeConfiguration": {
-                                "contentTransfer": {
-                                    "transferMode": "Chunked"
-                                }
-                            }
-                        },
-                        "HostName": {
-                            "runAfter": {
-                                "Parse_JSON_TenantID": [
+                                "Call_Automation_CrowdStrike_Auth_Playbook": [
                                     "Succeeded"
                                 ]
                             },
@@ -234,65 +70,245 @@
                                 ]
                             }
                         },
-                        "Parse_JSON": {
+                        "Call_Automation_CrowdStrike_Auth_Playbook": {
+                            "runAfter": {},
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "manual"
+                                }
+                            }
+                        },
+                        "HTTP-GET_-_Get_device_id": {
                             "runAfter": {
-                                "GetDeviceID": [
+                                "Initialize_Host_Name": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "@{body('Call_Automation_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/queries/devices/v1?filter=hostname:'@{variables('HostName')}'",
+                                "method": "GET",
+                                "headers": {
+                                    "Accept": "application/json",
+                                    "Authorization": "@{body('Call_Automation_CrowdStrike_Auth_Playbook')?['AccessToken']}",
+                                    "Content-Type": "application/json"
+                                }
+                            },
+                            "description": "This gets the device id from crowdstrike by filtering on hostname"
+                        },
+                        "Parse_JSON_Get_device_id_response": {
+                            "runAfter": {
+                                "HTTP-GET_-_Get_device_id": [
                                     "Succeeded"
                                 ]
                             },
                             "type": "ParseJson",
                             "inputs": {
-                                "content": "@body('GetDeviceID')",
+                                "content": "@body('HTTP-GET_-_Get_device_id')",
                                 "schema": {
                                     "type": "object",
                                     "properties": {
-                                        "items": {
+                                        "errors": {
+                                            "type": "array"
+                                        },
+                                        "meta": {
+                                            "type": "object",
+                                            "properties": {
+                                                "pagination": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "limit": {
+                                                            "type": "integer"
+                                                        },
+                                                        "offset": {
+                                                            "type": "integer"
+                                                        },
+                                                        "total": {
+                                                            "type": "integer"
+                                                        }
+                                                    }
+                                                },
+                                                "powered_by": {
+                                                    "type": "string"
+                                                },
+                                                "query_time": {
+                                                    "type": "number"
+                                                },
+                                                "trace_id": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "resources": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "description": "prepare json message for the device id response"
+                        },
+                        "HTTP-GET_-_Get_Device_Info_By_ID": {
+                            "runAfter": {
+                                "Parse_JSON_Get_device_id_response": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "@{body('Call_Automation_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices/v2?ids=@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}",
+                                "method": "GET",
+                                "headers": {
+                                    "Accept": "application/json",
+                                    "Authorization": "@{body('Call_Automation_CrowdStrike_Auth_Playbook')?['AccessToken']}",
+                                    "Content-Type": "application/json"
+                                }
+                            },
+                            "description": "This gets the device id from crowdstrike by filtering on hostname"
+                        },
+                        "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": {
+                            "runAfter": {
+                                "HTTP-GET_-_Get_Device_Info_By_ID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('HTTP-GET_-_Get_Device_Info_By_ID')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "resources": {
                                             "type": "array",
                                             "items": {
                                                 "type": "object",
                                                 "properties": {
-                                                    "id": {
+                                                    "device_id": {
+                                                        "type": "string"
+                                                    },
+                                                    "agent_version": {
+                                                        "type": "string"
+                                                    },
+                                                    "bios_manufacturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "bios_version": {
+                                                        "type": "string"
+                                                    },
+                                                    "build_number": {
+                                                        "type": "string"
+                                                    },
+                                                    "external_ip": {
+                                                        "type": "string"
+                                                    },
+                                                    "mac_address": {
                                                         "type": "string"
                                                     },
                                                     "hostname": {
                                                         "type": "string"
+                                                    },
+                                                    "filesystem_containment_status": {
+                                                        "type": "string"
+                                                    },
+                                                    "first_seen": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_login_timestamp": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_login_user": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_login_user_sid": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_seen": {
+                                                        "type": "string"
+                                                    },
+                                                    "machine_domain": {
+                                                        "type": "string"
+                                                    },
+                                                    "major_version": {
+                                                        "type": "string"
+                                                    },
+                                                    "os_version": {
+                                                        "type": "string"
+                                                    },
+                                                    "rtr_state": {
+                                                        "type": "string"
+                                                    },
+                                                    "groups": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "provision_status": {
+                                                        "type": "string"
+                                                    },
+                                                    "serial_number": {
+                                                        "type": "string"
+                                                    },
+                                                    "status": {
+                                                        "type": "string"
+                                                    },
+                                                    "system_manufacturer": {
+                                                        "type": "string"
+                                                    },
+                                                    "kernel_version": {
+                                                        "type": "string"
+                                                    },
+                                                    "os_product_name": {
+                                                        "type": "string"
+                                                    },
+                                                    "chassis_type_desc": {
+                                                        "type": "string"
+                                                    },
+                                                    "last_reboot": {
+                                                        "type": "string"
+                                                    },
+                                                    "connection_ip": {
+                                                        "type": "string"
+                                                    },
+                                                    "default_gateway_ip": {
+                                                        "type": "string"
+                                                    },
+                                                    "connection_mac_address": {
+                                                        "type": "string"
                                                     }
-                                                },
-                                                "required": [
-                                                    "id",
-                                                    "hostname"
-                                                ]
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         },
-                        "For_each": {
-                            "foreach": "@body('Parse_JSON')?['items']",
+                        "For_each_Device_Info": {
+                            "foreach": "@body('Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID')?['resources']",
                             "actions": {
                                 "Condition": {
                                     "actions": {
-                                        "PostIsolateDevices": {
-                                            "runAfter": {
-                                                "Set_variable": [
-                                                    "Succeeded"
-                                                ]
-                                            },
+                                        "HTTP-POST_-_IsolateDevice": {
                                             "type": "Http",
                                             "inputs": {
-                                                "uri": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}/endpoint/v1/endpoints/isolation",
+                                                "uri": "@{body('Call_Automation_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices-actions/v2?action_name=contain",
                                                 "method": "POST",
                                                 "headers": {
+                                                    "Accept": "application/json",
                                                     "Content-Type": "application/json",
-                                                    "X-Tenant-ID": "@{body('Parse_JSON_TenantID')?['id']}",
-                                                    "Authorization": "Bearer @{body('Parse_JSON_JWT')?['access_token']}"
+                                                    "Authorization": "@{body('Call_Automation_CrowdStrike_Auth_Playbook')?['AccessToken']}"
                                                 },
                                                 "body": {
                                                     "enabled": true,
-                                                    "comment": "Isolating endpoints with suspicious health",
+                                                    "comment": "Bloqueado por SOC",
                                                     "ids": [
-                                                        "@variables('Isolation Device ID')"
+                                                        "@items('For_each_Device_Info')?['device_id']\r\n"
                                                     ]
                                                 }
                                             },
@@ -300,13 +316,6 @@
                                                 "contentTransfer": {
                                                     "transferMode": "Chunked"
                                                 }
-                                            }
-                                        },
-                                        "Set_variable": {
-                                            "type": "SetVariable",
-                                            "inputs": {
-                                                "name": "Isolation Device ID",
-                                                "value": "@item()?['id']"
                                             }
                                         }
                                     },
@@ -317,8 +326,8 @@
                                         "and": [
                                             {
                                                 "equals": [
-                                                    "@item()?['hostname']",
-                                                    "@variables('HostName')"
+                                                    "@variables('HostName')",
+                                                    "@items('For_each_Device_Info')?['hostname']"
                                                 ]
                                             }
                                         ]
@@ -327,73 +336,11 @@
                                 }
                             },
                             "runAfter": {
-                                "Isolation_Device_ID": [
+                                "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": [
                                     "Succeeded"
                                 ]
                             },
                             "type": "Foreach"
-                        },
-                        "Isolation_Device_ID": {
-                            "runAfter": {
-                                "Parse_JSON": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "Isolation Device ID",
-                                        "type": "string"
-                                    }
-                                ]
-                            }
-                        },
-                        "Get-ClientId": {
-                            "runAfter": {},
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['keyvault']['connectionId']"
-                                    }
-                                },
-                                "method": "get",
-                                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientID'))}/value"
-                            },
-                            "runtimeConfiguration": {
-                                "secureData": {
-                                    "properties": [
-                                        "inputs",
-                                        "outputs"
-                                    ]
-                                }
-                            }
-                        },
-                        "Get-ClientSecret": {
-                            "runAfter": {
-                                "Get-ClientId": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['keyvault']['connectionId']"
-                                    }
-                                },
-                                "method": "get",
-                                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_Secret'))}/value"
-                            },
-                            "runtimeConfiguration": {
-                                "secureData": {
-                                    "properties": [
-                                        "inputs",
-                                        "outputs"
-                                    ]
-                                }
-                            }
                         }
                     },
                     "outputs": {}
@@ -401,20 +348,10 @@
                 "parameters": {
                     "$connections": {
                         "value": {
-                            "azuresentinel": {
-                                "connectionId": "[parameters('connections_azuresentinel_Velorcios_Action_Sophos_Device_Isolation_Playbook_externalid')]",
-                                "connectionName": "[concat('azuresentinel-', parameters('workflows_Velorcios_Action_Sophos_Device_Isolation_Playbook_name'))]",
-                                "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionProperties": {
-                                    "authentication": {
-                                        "type": "ManagedServiceIdentity"
-                                    }
-                                }
-                            },
-                            "keyvault": {
-                                "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault",
-                                "connectionId": "[parameters('connections_keyvault_velorsoc_keyvault_externalid')]",
-                                "connectionName": "keyvault-velorsoc-keyvault",
+                            "azuresentinel-1": {
+                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
+                                "connectionId": "[parameters('connections_azuresentinel_6_externalid')]",
+                                "connectionName": "azuresentinel-6",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"

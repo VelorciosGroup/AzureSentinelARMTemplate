@@ -77,10 +77,6 @@
 					},
 					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPar_CrowdStrike_Auth_Playbook')]"
-					},
-					"connections_azuresentinel_6_externalid": {
-						"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6",
-						"type": "String"
 					}
 				}
 			}
