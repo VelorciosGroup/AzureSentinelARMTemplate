@@ -11,7 +11,9 @@
             "type": "string"
         }
     },
-    "variables": { "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]" },
+    "variables": {
+        "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('PlaybookName'))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Logic/workflows",
