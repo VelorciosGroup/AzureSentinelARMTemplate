@@ -96,16 +96,13 @@
 				},
 				"parameters": {
 					"workflows_PRUEBA_Enrich_CrowdStrike_Recent_Playbook_name": {
-						"defaultValue": "PRUEBA_Enrich_CrowdStrike_Recent_Playbook",
-						"type": "String"
+						"value": "[concat(parameters('client_Name'), '_Enrich_CrowdStrike_Recent_Playbook_name')]"
 					},
 					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
-						"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
-						"type": "String"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					},
 					"connections_azuresentinel_PRUEBA_Enrich_CrowdStrike_Recent_Playbook_externalid": {
-						"defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStrike_Recent_Playbook",
-						"type": "String"
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStrike_Recent_Playbook"
 					}
 				}
 			}
