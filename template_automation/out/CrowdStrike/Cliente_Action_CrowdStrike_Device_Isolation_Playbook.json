@@ -355,16 +355,6 @@
         "parameters": {
           "$connections": {
             "value": {
-              "azuresentinel-1": {
-                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                "connectionId": "[parameters('connections_azuresentinel_6_externalid')]",
-                "connectionName": "azuresentinel-6",
-                "connectionProperties": {
-                  "authentication": {
-                    "type": "ManagedServiceIdentity"
-                  }
-                }
-              },
               "azuresentinel": {
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
                 "connectionName": "[variables('AzureSentinelConnectionName')]",
