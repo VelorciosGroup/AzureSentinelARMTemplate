@@ -9,10 +9,6 @@
     "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
       "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
       "type": "String"
-    },
-    "connections_azuresentinel_6_externalid": {
-      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6",
-      "type": "String"
     }
   },
   "variables": {
@@ -45,10 +41,6 @@
             "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
               "type": "String",
               "defaultValue": "BORRAR_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid"
-            },
-            "connections_azuresentinel_6_externalid": {
-              "type": "String",
-              "defaultValue": "BORRAR_connections_azuresentinel_6_externalid"
             }
           },
           "triggers": {
