@@ -50,7 +50,7 @@
 						"value": "[parameters('keyvault_ClientID_Pack')]"
 					},
 					"keyvault_ClientSecret": {
-						"value": "[parameters('keyvault_ClientID_Pack')]"
+						"value": "[parameters('keyvault_Secret_Pack')]"
 					},
 					"keyvault_BaseUrl": {
 						"value": "[parameters('keyvault_BaseUrl_Pack')]"
