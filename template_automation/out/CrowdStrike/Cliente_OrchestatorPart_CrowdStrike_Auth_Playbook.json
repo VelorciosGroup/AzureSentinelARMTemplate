@@ -12,19 +12,19 @@
     },
     "keyvault_Name": {
       "type": "String",
-      "defaultValue": "BORRAR_keyvault_Name"
+      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_Name"
     },
     "keyvault_ClientID": {
       "type": "String",
-      "defaultValue": "BORRAR_keyvault_ClientID"
+      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_ClientID"
     },
     "keyvault_ClientSecret": {
       "type": "String",
-      "defaultValue": "BORRAR_keyvault_ClientSecret"
+      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_ClientSecret"
     },
     "keyvault_BaseUrl": {
       "type": "String",
-      "defaultValue": "BORRAR_keyvault_BaseUrl"
+      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_BaseUrl"
     }
   },
   "variables": {
