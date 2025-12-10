@@ -623,7 +623,7 @@ def _merge_deployment_parameters_into_playbook(
 
             def_entry: Dict[str, Any] = {
                 "type": "String",
-                "defaultValue": f"BORRAR_{pname}",
+                "defaultValue": f"[parameters('{pname}')]",
             }
             def_params[pname] = def_entry
 

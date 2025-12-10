@@ -12,19 +12,19 @@
     },
     "keyvault_Name": {
       "type": "String",
-      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_Name"
+      "defaultValue": "BORRAR_keyvault_Name"
     },
     "keyvault_ClientID": {
       "type": "String",
-      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_ClientID"
+      "defaultValue": "BORRAR_keyvault_ClientID"
     },
     "keyvault_ClientSecret": {
       "type": "String",
-      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_ClientSecret"
+      "defaultValue": "BORRAR_keyvault_ClientSecret"
     },
     "keyvault_BaseUrl": {
       "type": "String",
-      "defaultValue": "ESTONODEBERÍAAPARECER1_keyvault_BaseUrl"
+      "defaultValue": "BORRAR_keyvault_BaseUrl"
     }
   },
   "variables": {
@@ -57,27 +57,27 @@
             },
             "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
               "type": "String",
-              "defaultValue": "BORRAR_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name"
+              "defaultValue": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name')]"
             },
             "connections_keyvault_externalid": {
               "type": "String",
-              "defaultValue": "BORRAR_connections_keyvault_externalid"
+              "defaultValue": "[parameters('connections_keyvault_externalid')]"
             },
             "keyvault_Name": {
               "type": "String",
-              "defaultValue": "BORRAR_keyvault_Name"
+              "defaultValue": "[parameters('keyvault_Name')]"
             },
             "keyvault_ClientID": {
               "type": "String",
-              "defaultValue": "BORRAR_keyvault_ClientID"
+              "defaultValue": "[parameters('keyvault_ClientID')]"
             },
             "keyvault_ClientSecret": {
               "type": "String",
-              "defaultValue": "BORRAR_keyvault_ClientSecret"
+              "defaultValue": "[parameters('keyvault_ClientSecret')]"
             },
             "keyvault_BaseUrl": {
               "type": "String",
-              "defaultValue": "BORRAR_keyvault_BaseUrl"
+              "defaultValue": "[parameters('keyvault_BaseUrl')]"
             }
           },
           "triggers": {

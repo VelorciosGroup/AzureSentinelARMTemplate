@@ -40,11 +40,11 @@
             },
             "workflows_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_name": {
               "type": "String",
-              "defaultValue": "BORRAR_workflows_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_name"
+              "defaultValue": "[parameters('workflows_PRUEBA_Action_CrowdStrike_Device_Isolation_Playbook_name')]"
             },
             "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
               "type": "String",
-              "defaultValue": "BORRAR_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid"
+              "defaultValue": "[variables('var_workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
             }
           },
           "triggers": {
