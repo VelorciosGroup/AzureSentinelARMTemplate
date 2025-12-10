@@ -234,7 +234,7 @@
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook')]"
 					},
 					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_Crowdstrike_Auth_Playbook')]"
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					},
 					"connections_azuresentinel_PRUEBA_Automation_Crowdstrike_Sync_Incidents_externalid": {
 						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Automation_Crowdstrike_Sync_Incidents"
