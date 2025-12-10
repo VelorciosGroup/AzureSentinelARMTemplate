@@ -106,6 +106,36 @@
 					}
 				}
 			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "Enrich_CrowdStrike_Device_Info_Playbook",
+			"dependsOn": [
+				"OrchestatorPart_CrowdStrike_Auth_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/CrowdStrike/Cliente_Enrich_CrowdStrike_Device_Info_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"workflows_PRUEBA_Enrich_CrowdStike_Device_Info_name": {
+						"defaultValue": "PRUEBA_Enrich_CrowdStike_Device_Info",
+						"type": "String"
+					},
+					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
+					},
+					"connections_azuresentinel_PRUEBA_Enrich_CrowdStike_Device_Info_externalid": {
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
+					},
+					"connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection"
+					}
+				}
+			}
 		}
 	],
 	"outputs": {
