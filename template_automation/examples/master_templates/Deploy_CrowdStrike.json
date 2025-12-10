@@ -128,10 +128,33 @@
 						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					},
 					"connections_azuresentinel_PRUEBA_Enrich_CrowdStike_Device_Info_externalid": {
-            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStike_Device_Info"
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStike_Device_Info"
 					},
 					"connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStike_Device_Info"
+						"value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStike_Device_Info"
+					}
+				}
+			}
+		},
+		{
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2025-03-01",
+			"name": "OrchestatorPart_CrowdStrike_Block_IOC_Playbook",
+			"dependsOn": [
+				"OrchestatorPart_CrowdStrike_Auth_Playbook"
+			],
+			"properties": {
+				"mode": "Incremental",
+				"templateLink": {
+					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/playbook_parse_automation/template_automation/out/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"workflows_PRUEBA_Automation_Block_IOC_name": {
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
+					},
+					"workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
+						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
 					}
 				}
 			}
