@@ -46,10 +46,17 @@ Flujo actual:
                "variables('<Sufijo>')"
            - La sustituye por:
                "parameters('keyvault_<Sufijo>')"
+   - Finalmente:
+       * Para cada parámetro (tanto en la master como en el playbook),
+         si en el JSON del playbook NO aparece "parameters('<param>')",
+         se considera no usado y se elimina:
+           - del playbook (parameters root + definition.parameters)
+           - del deployment.properties.parameters de la master.
 """
 
 from __future__ import annotations
 
+import json
 import logging
 import re
 from pathlib import Path
@@ -699,6 +706,96 @@ def _replace_keyvault_variable_references(
 
 
 # ---------------------------------------------------------------------------
+# Limpieza: eliminar parámetros no usados
+# ---------------------------------------------------------------------------
+def _remove_unused_parameters(
+    playbook: Dict[str, Any],
+    deployment_params: Optional[Dict[str, Any]],
+) -> None:
+    """
+    Busca parámetros que NO se usan en el playbook.
+
+    Criterio:
+      - Si en el JSON del playbook NO aparece la subcadena:
+            "parameters('<nombre_param>')"
+        se considera no usado.
+
+    Acción:
+      - Se elimina:
+          * de playbook["parameters"]
+          * de definition.parameters de cada workflow
+          * de deployment_params (master), si está ahí.
+    """
+    # Serializamos el playbook a texto para hacer búsquedas simples.
+    playbook_str = json.dumps(playbook)
+
+    # Root parameters del playbook
+    params_root = playbook.get("parameters")
+    if not isinstance(params_root, dict):
+        params_root = {}
+
+    # Claves de parámetros a comprobar: unión de los del playbook + los del deployment
+    names_to_check: set[str] = set(
+        k for k in params_root.keys() if isinstance(k, str)
+    )
+
+    if deployment_params and isinstance(deployment_params, dict):
+        names_to_check.update(
+            k for k in deployment_params.keys() if isinstance(k, str)
+        )
+
+    if not names_to_check:
+        return
+
+    resources = playbook.get("resources", [])
+    if not isinstance(resources, list):
+        resources = []
+
+    for pname in list(names_to_check):
+        pattern = f"parameters('{pname}')"
+
+        if pattern in playbook_str:
+            # Hay al menos una referencia al parámetro en el playbook → se considera usado.
+            continue
+
+        # Si llegamos aquí, el parámetro NO se usa en el playbook, lo eliminamos.
+        removed_somewhere = False
+
+        # 1) Eliminar de parámetros root
+        if isinstance(params_root, dict) and pname in params_root:
+            del params_root[pname]
+            removed_somewhere = True
+
+        # 2) Eliminar de definition.parameters en cada workflow
+        for res in resources:
+            if not isinstance(res, dict):
+                continue
+            if res.get("type") != "Microsoft.Logic/workflows":
+                continue
+
+            props = res.get("properties")
+            if not isinstance(props, dict):
+                continue
+
+            definition = props.get("definition")
+            if not isinstance(definition, dict):
+                continue
+
+            def_params = definition.get("parameters")
+            if isinstance(def_params, dict) and pname in def_params:
+                del def_params[pname]
+                removed_somewhere = True
+
+        # 3) Eliminar de deployment_params (master)
+        if deployment_params and isinstance(deployment_params, dict) and pname in deployment_params:
+            del deployment_params[pname]
+            removed_somewhere = True
+
+        if removed_somewhere:
+            logger.debug("Parámetro no usado eliminado: %s", pname)
+
+
+# ---------------------------------------------------------------------------
 # Transformación principal
 # ---------------------------------------------------------------------------
 def transform_playbook(
@@ -712,6 +809,7 @@ def transform_playbook(
       añadiendo al playbook los que falten (root + definition.parameters).
     - Reemplaza variables('<Sufijo>') por parameters('keyvault_<Sufijo>') para keyvault_*.
     - Aplica la lógica de variables y conexiones.
+    - Elimina parámetros que no se usan en el playbook (y en la master).
     """
     logger.debug("Iniciando transformación de playbook.")
 
@@ -740,6 +838,9 @@ def transform_playbook(
 
     # 5) Recursos Microsoft.Web/connections al final (azuresentinel + keyvault)
     _ensure_connection_resources(playbook)
+
+    # 6) Limpiar parámetros no usados
+    _remove_unused_parameters(playbook, deployment_parameters)
 
     logger.debug("Transformación completada.")
     return playbook
