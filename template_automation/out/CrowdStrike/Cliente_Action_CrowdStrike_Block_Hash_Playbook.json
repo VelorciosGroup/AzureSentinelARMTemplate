@@ -9,10 +9,6 @@
     "workflows_PRUEBA_Automation_Block_IOC_externalid": {
       "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_Block_IOC",
       "type": "String"
-    },
-    "connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
-      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Action_Crowdstrike_Block_Hash",
-      "type": "String"
     }
   },
   "variables": {
@@ -45,10 +41,6 @@
             "workflows_PRUEBA_Automation_Block_IOC_externalid": {
               "type": "String",
               "defaultValue": "[variables('var_workflows_PRUEBA_Automation_Block_IOC_externalid')]"
-            },
-            "connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
-              "type": "String",
-              "defaultValue": "[parameters('connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid')]"
             }
           },
           "triggers": {

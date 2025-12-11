@@ -6,10 +6,6 @@
       "defaultValue": "PRUEBA_Automation_CrowdStrike_Auth_Playbook",
       "type": "String"
     },
-    "connections_keyvault_externalid": {
-      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault",
-      "type": "String"
-    },
     "keyvault_Name": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_Name"
@@ -58,10 +54,6 @@
             "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name": {
               "type": "String",
               "defaultValue": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_name')]"
-            },
-            "connections_keyvault_externalid": {
-              "type": "String",
-              "defaultValue": "[parameters('connections_keyvault_externalid')]"
             },
             "keyvault_Name": {
               "type": "String",
