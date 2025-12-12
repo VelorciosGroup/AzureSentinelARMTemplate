@@ -28,40 +28,8 @@
 		{
 			"type": "Microsoft.Resources/deployments",
 			"apiVersion": "2025-03-01",
-			"name": "OrchestatorPart_CrowdStrike_Auth_Playbook",
-			"dependsOn": [],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
-					},
-					"keyvault_Name": {
-						"value": "[parameters('keyvault_Name_Pack')]"
-					},
-					"keyvault_ClientID": {
-						"value": "[parameters('keyvault_ClientID_Pack')]"
-					},
-					"keyvault_Secret": {
-						"value": "[parameters('keyvault_Secret_Pack')]"
-					},
-					"keyvault_BaseUrl": {
-						"value": "[parameters('keyvault_BaseUrl_Pack')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
 			"name": "Orchestator_CrowdStrike_Recent_Alerts_Incident_Playbook",
 			"dependsOn": [
-				"OrchestatorPart_CrowdStrike_Auth_Playbook",
-				"OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
 			],
 			"properties": {
 				"mode": "Incremental",
