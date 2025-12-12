@@ -1029,11 +1029,20 @@ def run_automation(
     logger.info("Se han encontrado %d deployments: %s", len(deployment_names), deployment_names)
 
     for name in deployment_names:
-        file_name = f"Cliente_{name}.json"
-        playbook_path = dir_in / file_name
+        candidate_paths = [
+            dir_in / f"Cliente_{name}.json",
+            dir_in / f"{name}.json",
+        ]
 
-        if not playbook_path.is_file():
-            logger.warning("No se encontró el playbook esperado: %s", playbook_path)
+        playbook_path = next((p for p in candidate_paths if p.is_file()), None)
+
+        if playbook_path is None:
+            logger.warning(
+                "No se encontró el playbook esperado (Cliente_%s.json ni %s.json) en: %s",
+                name,
+                name,
+                dir_in,
+            )
             continue
 
         logger.info("Leyendo playbook: %s", playbook_path)
@@ -1042,7 +1051,8 @@ def run_automation(
         # Parámetros específicos del deployment en la master
         deployment_params = get_deployment_parameters_from_master(master_template, name)
 
-        inspect_workflow_parameters(playbook_data, source_name=file_name)
+        # Mostrar por pantalla los parámetros de interés usando el nombre real del fichero
+        inspect_workflow_parameters(playbook_data, source_name=playbook_path.name)
 
         transformed = transform_playbook(playbook_data, deployment_params)
 
