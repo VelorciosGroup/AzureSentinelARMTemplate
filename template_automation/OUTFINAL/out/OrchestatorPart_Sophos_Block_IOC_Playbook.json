@@ -46,6 +46,10 @@
             "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
               "type": "String",
               "defaultValue": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+            },
+            "$connections": {
+              "type": "Object",
+              "defaultValue": {}
             }
           },
           "triggers": {

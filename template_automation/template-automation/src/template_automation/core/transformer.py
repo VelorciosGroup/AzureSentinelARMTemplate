@@ -23,6 +23,8 @@ Flujo actual:
            - Crea/actualiza:
                keyvault_Connection_Name =
                  "[concat('keyvault-', parameters('<nombredelplaybook>'))]"
+       * (NUEVO) En cada workflow:
+           - Asegura definition.parameters.$connections (type Object + defaultValue {})
        * En cada workflow:
            - Inserta/ajusta properties.parameters.$connections.value con:
                azuresentinel (AzureSentinelConnectionName)
@@ -62,9 +64,9 @@ Flujo actual:
 
 from __future__ import annotations
 
+import json
 import logging
 import re
-import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -79,7 +81,7 @@ RE_WORKFLOW_NAME = re.compile(r"workflows_.*_name")
 RE_WORKFLOW_EXTERNALID = re.compile(r"workflows_.*_externalid")
 RE_CONNECTION_KEYVAULT_EXTERNALID = re.compile(r"connections_keyvault.*_externalid")
 
-# NUEVO: claves tipo "azuresentinel-1", "azuresentinel-2", ...
+# Claves tipo "azuresentinel-1", "azuresentinel-2", ...
 RE_AZURESENTINEL_NUMBERED_KEY = re.compile(r"^azuresentinel-\d+$")
 
 
@@ -163,7 +165,6 @@ def _sync_master_deployment_parameters_with_playbook(
     if not isinstance(resources, list):
         return
 
-    # Conjunto de parámetros que siguen existiendo en el playbook
     used_param_names: set[str] = set()
 
     params_root = playbook.get("parameters", {})
@@ -197,10 +198,8 @@ def _sync_master_deployment_parameters_with_playbook(
                     used_param_names.add(pname)
 
     if not used_param_names:
-        # Si no hay parámetros en el playbook, no tocamos la master
         return
 
-    # Localizamos el deployment correspondiente en la master
     for res in resources:
         if not isinstance(res, dict):
             continue
@@ -466,6 +465,44 @@ def _replace_parameters_with_variables(
 
 
 # ---------------------------------------------------------------------------
+# NUEVO: asegurar definition.parameters.$connections en todos los workflows
+# ---------------------------------------------------------------------------
+def _ensure_definition_connections_parameter(playbook: Dict[str, Any]) -> None:
+    """
+    Asegura que cada workflow tenga:
+      properties.definition.parameters.$connections = { "type": "Object", "defaultValue": {} }
+    """
+    resources = playbook.get("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Logic/workflows":
+            continue
+
+        props = res.get("properties")
+        if not isinstance(props, dict):
+            continue
+
+        definition = props.get("definition")
+        if not isinstance(definition, dict):
+            continue
+
+        def_params = definition.get("parameters")
+        if not isinstance(def_params, dict):
+            def_params = {}
+            definition["parameters"] = def_params
+
+        if "$connections" not in def_params or not isinstance(def_params.get("$connections"), dict):
+            def_params["$connections"] = {"type": "Object", "defaultValue": {}}
+        else:
+            def_params["$connections"].setdefault("type", "Object")
+            def_params["$connections"].setdefault("defaultValue", {})
+
+
+# ---------------------------------------------------------------------------
 # NUEVO: quitar conexiones "azuresentinel-<numero>" del $connections.value
 # ---------------------------------------------------------------------------
 def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None:
@@ -675,25 +712,21 @@ def _merge_deployment_parameters_into_playbook(
     if not deployment_params or not isinstance(deployment_params, dict):
         return
 
-    # 1) Root parameters del playbook
     params = playbook.get("parameters")
     if not isinstance(params, dict):
         params = {}
         playbook["parameters"] = params
 
-    # 2) Definition.parameters de cada workflow
     resources = playbook.get("resources", [])
     if not isinstance(resources, list):
         resources = []
 
     for pname in deployment_params.keys():
-        # --- root-level parameters ---
         if pname not in params:
             entry: Dict[str, Any] = {"type": "String", "defaultValue": f"BORRAR_{pname}"}
             params[pname] = entry
             logger.debug("Añadido parámetro root desde master al playbook: %s -> %r", pname, entry)
 
-        # --- definition.parameters en cada workflow ---
         for res in resources:
             if not isinstance(res, dict):
                 continue
@@ -734,17 +767,6 @@ def _replace_keyvault_variable_references(
     playbook: Dict[str, Any],
     deployment_params: Optional[Dict[str, Any]],
 ) -> None:
-    """
-    Para cada parámetro keyvault_<Sufijo> definido en el deployment de la master,
-    recorre TODO el playbook y reemplaza:
-
-      variables('<Sufijo>')
-      parameters('<Sufijo>')
-
-    por:
-
-      parameters('keyvault_<Sufijo>')
-    """
     if not deployment_params or not isinstance(deployment_params, dict):
         return
 
@@ -917,13 +939,16 @@ def transform_playbook(
     else:
         logger.debug("No se encontraron parámetros workflows_*_externalid en este playbook.")
 
-    # NUEVO: antes de limpiar/consolidar conexiones, elimina "azuresentinel-<n>"
     _remove_numbered_azuresentinel_connections(playbook)
+
+    # ✅ NUEVO: garantiza definition.parameters.$connections en todos los workflows
+    # _ensure_definition_connections_parameter(playbook)
 
     _ensure_workflow_connection_blocks(playbook)
     _ensure_connection_resources(playbook)
 
     _cleanup_unused_parameters(playbook)
+    _ensure_definition_connections_parameter(playbook)
 
     logger.debug("Transformación completada.")
     return playbook
