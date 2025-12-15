@@ -31,10 +31,12 @@
           "contentVersion": "1.0.0.0",
           "parameters": {
             "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name": {
-              "value": "[parameters('workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name')]"
+              "type": "String",
+              "defaultValue": "[parameters('workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name')]"
             },
             "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-              "value": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+              "type": "String",
+              "defaultValue": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
             }
           },
           "triggers": {
