@@ -43,7 +43,7 @@ Flujo actual:
    - Y además:
        * Para cada keyvault_<Sufijo> del deployment:
            - Busca en TODO el playbook la subcadena:
-               "variables('<Sufijo>')"
+               "variables('<Sufijo>')"  o  "parameters('<Sufijo>')"
            - La sustituye por:
                "parameters('keyvault_<Sufijo>')"
    - Finalmente:
@@ -326,12 +326,7 @@ def _ensure_azuresentinel_connection_name(playbook: Dict[str, Any]) -> None:
         variables = {}
         playbook["variables"] = variables
 
-    expression = (
-        "[concat('azuresentinel-', parameters('"
-        + workflow_name_param
-        + "'))]"
-    )
-
+    expression = "[concat('azuresentinel-', parameters('" + workflow_name_param + "'))]"
     variables["AzureSentinelConnectionName"] = expression
 
     logger.debug(
@@ -361,12 +356,7 @@ def _ensure_keyvault_connection_name(playbook: Dict[str, Any]) -> None:
         variables = {}
         playbook["variables"] = variables
 
-    expression = (
-        "[concat('keyvault-', parameters('"
-        + workflow_name_param
-        + "'))]"
-    )
-
+    expression = "[concat('keyvault-', parameters('" + workflow_name_param + "'))]"
     variables["keyvault_Connection_Name"] = expression
 
     logger.debug(
@@ -388,7 +378,6 @@ def _add_workflow_externalid_variables(playbook: Dict[str, Any]) -> List[str]:
         return []
 
     externalid_params: List[str] = []
-
     for key, definition in params.items():
         if not isinstance(key, str) or not isinstance(definition, dict):
             continue
@@ -473,19 +462,6 @@ def _replace_parameters_with_variables(
 # Bloques $connections + dependsOn usando AzureSentinelConnectionName y keyvault_Connection_Name
 # ---------------------------------------------------------------------------
 def _ensure_workflow_connection_blocks(playbook: Dict[str, Any]) -> None:
-    """
-    En cada recurso Microsoft.Logic/workflows asegura:
-
-      properties.parameters.$connections.value = {
-        "azuresentinel": { ... AzureSentinelConnectionName ... },
-        "keyvault": { ... keyvault_Connection_Name ... } (solo si existe)
-      }
-
-    y añade en dependsOn:
-      - [resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]
-      - [resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]
-        (si existe la variable).
-    """
     resources = playbook.get("resources", [])
     if not isinstance(resources, list):
         return
@@ -533,11 +509,7 @@ def _ensure_workflow_connection_blocks(playbook: Dict[str, Any]) -> None:
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
                 "connectionName": "[variables('AzureSentinelConnectionName')]",
                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
-                "connectionProperties": {
-                    "authentication": {
-                        "type": "ManagedServiceIdentity"
-                    }
-                }
+                "connectionProperties": {"authentication": {"type": "ManagedServiceIdentity"}},
             }
             dep_azure = "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
             if dep_azure not in depends_on:
@@ -548,11 +520,7 @@ def _ensure_workflow_connection_blocks(playbook: Dict[str, Any]) -> None:
                 "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
                 "connectionName": "[variables('keyvault_Connection_Name')]",
-                "connectionProperties": {
-                    "authentication": {
-                        "type": "ManagedServiceIdentity"
-                    }
-                }
+                "connectionProperties": {"authentication": {"type": "ManagedServiceIdentity"}},
             }
             dep_kv = "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]"
             if dep_kv not in depends_on:
@@ -563,11 +531,6 @@ def _ensure_workflow_connection_blocks(playbook: Dict[str, Any]) -> None:
 # Recursos Microsoft.Web/connections para azuresentinel y keyvault
 # ---------------------------------------------------------------------------
 def _ensure_connection_resources(playbook: Dict[str, Any]) -> None:
-    """
-    Añade (si faltan) los recursos Microsoft.Web/connections de:
-      - azuresentinel (AzureSentinelConnectionName)
-      - keyvault (keyvault_Connection_Name + keyvault_Name)
-    """
     resources = playbook.get("resources", [])
     if not isinstance(resources, list):
         return
@@ -598,22 +561,21 @@ def _ensure_connection_resources(playbook: Dict[str, Any]) -> None:
                 break
 
         if not exists:
-            conn_resource_azure = {
-                "type": "Microsoft.Web/connections",
-                "apiVersion": "2016-06-01",
-                "name": azure_name_expr,
-                "location": "[resourceGroup().location]",
-                "kind": "V1",
-                "properties": {
-                    "displayName": azure_name_expr,
-                    "customParameterValues": {},
-                    "parameterValueType": "Alternative",
-                    "api": {
-                        "id": azure_api_id_expr,
+            resources.append(
+                {
+                    "type": "Microsoft.Web/connections",
+                    "apiVersion": "2016-06-01",
+                    "name": azure_name_expr,
+                    "location": "[resourceGroup().location]",
+                    "kind": "V1",
+                    "properties": {
+                        "displayName": azure_name_expr,
+                        "customParameterValues": {},
+                        "parameterValueType": "Alternative",
+                        "api": {"id": azure_api_id_expr},
                     },
-                },
-            }
-            resources.append(conn_resource_azure)
+                }
+            )
 
     # Key Vault connection
     if has_kv:
@@ -634,23 +596,20 @@ def _ensure_connection_resources(playbook: Dict[str, Any]) -> None:
                 break
 
         if not exists_kv:
-            conn_resource_kv = {
-                "type": "Microsoft.Web/connections",
-                "apiVersion": "2016-06-01",
-                "name": kv_name_expr,
-                "location": "[resourceGroup().location]",
-                "properties": {
-                    "api": {
-                        "id": kv_api_id_expr,
+            resources.append(
+                {
+                    "type": "Microsoft.Web/connections",
+                    "apiVersion": "2016-06-01",
+                    "name": kv_name_expr,
+                    "location": "[resourceGroup().location]",
+                    "properties": {
+                        "api": {"id": kv_api_id_expr},
+                        "displayName": kv_name_expr,
+                        "parameterValueType": "Alternative",
+                        "AlternativeParameterValues": {"vaultName": "[parameters('keyvault_Name')]"},
                     },
-                    "displayName": kv_name_expr,
-                    "parameterValueType": "Alternative",
-                    "AlternativeParameterValues": {
-                        "vaultName": "[parameters('keyvault_Name')]",
-                    },
-                },
-            }
-            resources.append(conn_resource_kv)
+                }
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -660,19 +619,6 @@ def _merge_deployment_parameters_into_playbook(
     playbook: Dict[str, Any],
     deployment_params: Optional[Dict[str, Any]],
 ) -> None:
-    """
-    Toma los parámetros definidos en el deployment de la master (properties.parameters)
-    y añade al playbook cualquier parámetro que no exista aún, con:
-
-      "<param>": {
-        "type": "String",
-        "defaultValue": "BORRAR_<param>"
-      }
-
-    Y también los añade en:
-      resources[*].properties.definition.parameters["<param>"]
-    con el mismo esquema.
-    """
     if not deployment_params or not isinstance(deployment_params, dict):
         return
 
@@ -690,16 +636,9 @@ def _merge_deployment_parameters_into_playbook(
     for pname in deployment_params.keys():
         # --- root-level parameters ---
         if pname not in params:
-            entry: Dict[str, Any] = {
-                "type": "String",
-                "defaultValue": f"BORRAR_{pname}",
-            }
+            entry: Dict[str, Any] = {"type": "String", "defaultValue": f"BORRAR_{pname}"}
             params[pname] = entry
-            logger.debug(
-                "Añadido parámetro root desde master al playbook: %s -> %r",
-                pname,
-                entry,
-            )
+            logger.debug("Añadido parámetro root desde master al playbook: %s -> %r", pname, entry)
 
         # --- definition.parameters en cada workflow ---
         for res in resources:
@@ -715,7 +654,6 @@ def _merge_deployment_parameters_into_playbook(
 
             definition = props.get("definition")
             if not isinstance(definition, dict):
-                # si no hay definición de workflow, no hacemos nada aquí
                 continue
 
             def_params = definition.get("parameters")
@@ -726,12 +664,9 @@ def _merge_deployment_parameters_into_playbook(
             if pname in def_params:
                 continue
 
-            def_entry: Dict[str, Any] = {
-                "type": "String",
-                "defaultValue": f"[parameters('{pname}')]",
-            }
-            def_params[pname] = def_entry
+            def_entry: Dict[str, Any] = {"type": "String", "defaultValue": f"[parameters('{pname}')]"}
 
+            def_params[pname] = def_entry
             logger.debug(
                 "Añadido parámetro definition.parameters desde master al playbook: %s -> %r",
                 pname,
@@ -740,7 +675,7 @@ def _merge_deployment_parameters_into_playbook(
 
 
 # ---------------------------------------------------------------------------
-# KeyVault: reemplazar variables('<Sufijo>') por parameters('keyvault_<Sufijo>')
+# KeyVault: reemplazar variables('<Sufijo>') Y parameters('<Sufijo>') por parameters('keyvault_<Sufijo>')
 # ---------------------------------------------------------------------------
 def _replace_keyvault_variable_references(
     playbook: Dict[str, Any],
@@ -750,11 +685,12 @@ def _replace_keyvault_variable_references(
     Para cada parámetro keyvault_<Sufijo> definido en el deployment de la master,
     recorre TODO el playbook y reemplaza:
 
-      "variables('<Sufijo>')"
+      variables('<Sufijo>')
+      parameters('<Sufijo>')
 
     por:
 
-      "parameters('keyvault_<Sufijo>')"
+      parameters('keyvault_<Sufijo>')
     """
     if not deployment_params or not isinstance(deployment_params, dict):
         return
@@ -771,9 +707,13 @@ def _replace_keyvault_variable_references(
         if not suffix:
             continue
 
-        old = f"variables('{suffix}')"
-        new = f"parameters('{pname}')"
-        replacements[old] = new
+        # 1) variables('SUFIJO') -> parameters('keyvault_SUFIJO')
+        replacements[f"variables('{suffix}')"] = f"parameters('{pname}')"
+
+        # 2) parameters('SUFIJO') -> parameters('keyvault_SUFIJO')
+        #    (no tocamos parameters('keyvault_*') porque el patrón no lo busca)
+        if not suffix.startswith("keyvault_"):
+            replacements[f"parameters('{suffix}')"] = f"parameters('{pname}')"
 
     if not replacements:
         return
@@ -798,7 +738,7 @@ def _replace_keyvault_variable_references(
     _walk(playbook)
 
     logger.debug(
-        "Reemplazadas referencias variables('<Sufijo>') por parameters('keyvault_<Sufijo>'): %s",
+        "Reemplazadas referencias variables/parameters('<Sufijo>') por parameters('keyvault_<Sufijo>'): %s",
         replacements,
     )
 
@@ -807,30 +747,15 @@ def _replace_keyvault_variable_references(
 # Limpieza iterativa de parámetros no usados
 # ---------------------------------------------------------------------------
 def _remove_unused_definition_parameters(playbook: Dict[str, Any]) -> bool:
-    """
-    Borra parámetros dentro de definition.parameters que no se usan en ningún
-    sitio fuera de los propios bloques definition.parameters.
-
-    Estrategia:
-      - Hacemos una copia del playbook y le eliminamos TODOS los
-        definition.parameters.
-      - Serializamos esa copia a JSON (stripped_str).
-      - Si en stripped_str NO aparece "parameters('<pname>')", se considera
-        que ese parámetro solo vive en definition.parameters → se elimina.
-    """
     resources = playbook.get("resources", [])
     if not isinstance(resources, list) or not resources:
         return False
 
-    # Copia profunda del playbook para quitar definition.parameters
     stripped = json.loads(json.dumps(playbook))
     stripped_resources = stripped.get("resources", [])
     if isinstance(stripped_resources, list):
         for res in stripped_resources:
-            if (
-                isinstance(res, dict)
-                and res.get("type") == "Microsoft.Logic/workflows"
-            ):
+            if isinstance(res, dict) and res.get("type") == "Microsoft.Logic/workflows":
                 props = res.get("properties")
                 if not isinstance(props, dict):
                     continue
@@ -841,7 +766,6 @@ def _remove_unused_definition_parameters(playbook: Dict[str, Any]) -> bool:
     stripped_str = json.dumps(stripped)
     changed = False
 
-    # Ahora iteramos sobre los definition.parameters reales y vemos si se usan
     for res in resources:
         if not isinstance(res, dict):
             continue
@@ -865,14 +789,9 @@ def _remove_unused_definition_parameters(playbook: Dict[str, Any]) -> bool:
                 continue
             pattern = f"parameters('{pname}')"
             if pattern in stripped_str:
-                # Se usa fuera de definition.parameters → lo dejamos
                 continue
 
-            # No se usa fuera de definition.parameters → lo eliminamos
-            logger.debug(
-                "Parámetro definition.parameters no usado detectado. Se eliminará: %s",
-                pname,
-            )
+            logger.debug("Parámetro definition.parameters no usado detectado. Se eliminará: %s", pname)
             del def_params[pname]
             changed = True
 
@@ -880,35 +799,19 @@ def _remove_unused_definition_parameters(playbook: Dict[str, Any]) -> bool:
 
 
 def _remove_unused_root_parameters(playbook: Dict[str, Any]) -> bool:
-    """
-    Borra parámetros root (playbook['parameters']) que no se usan en ningún
-    sitio fuera de playbook['parameters'] ni de definition.parameters.
-
-    Estrategia:
-      - Copia del playbook sin:
-          * playbook['parameters']
-          * todos los definition.parameters
-      - Serializar esa copia y buscar "parameters('<pname>')" ahí.
-      - Si NO aparece, se considera no usado y se borra del root.
-    """
     params_root = playbook.get("parameters")
     if not isinstance(params_root, dict) or not params_root:
         return False
 
-    # Copia profunda del playbook para quitar root parameters y definition.parameters
     stripped = json.loads(json.dumps(playbook))
 
-    # Eliminar parámetros root
     if "parameters" in stripped:
         del stripped["parameters"]
 
     stripped_resources = stripped.get("resources", [])
     if isinstance(stripped_resources, list):
         for res in stripped_resources:
-            if (
-                isinstance(res, dict)
-                and res.get("type") == "Microsoft.Logic/workflows"
-            ):
+            if isinstance(res, dict) and res.get("type") == "Microsoft.Logic/workflows":
                 props = res.get("properties")
                 if not isinstance(props, dict):
                     continue
@@ -925,13 +828,9 @@ def _remove_unused_root_parameters(playbook: Dict[str, Any]) -> bool:
 
         pattern = f"parameters('{pname}')"
         if pattern in stripped_str:
-            # Se usa en el cuerpo del workflow (acciones, expresiones, etc.) → lo dejamos
             continue
 
-        logger.debug(
-            "Parámetro root no usado detectado. Se eliminará: %s",
-            pname,
-        )
+        logger.debug("Parámetro root no usado detectado. Se eliminará: %s", pname)
         del params_root[pname]
         changed = True
 
@@ -939,16 +838,9 @@ def _remove_unused_root_parameters(playbook: Dict[str, Any]) -> bool:
 
 
 def _cleanup_unused_parameters(playbook: Dict[str, Any]) -> None:
-    """
-    Ejecuta limpieza iterativa:
-      1) Borrar definition.parameters no usados.
-      2) Borrar parámetros root no usados.
-    Repite hasta que en una iteración completa no se borre nada.
-    """
     while True:
         changed_def = _remove_unused_definition_parameters(playbook)
         changed_root = _remove_unused_root_parameters(playbook)
-
         if not (changed_def or changed_root):
             break
 
@@ -960,44 +852,24 @@ def transform_playbook(
     playbook: Dict[str, Any],
     deployment_parameters: Optional[Dict[str, Any]],
 ) -> Dict[str, Any]:
-    """
-    Aplica todas las transformaciones sobre un playbook individual.
-
-    - Fusiona los parámetros del deployment de la master (properties.parameters)
-      añadiendo al playbook los que falten (root + definition.parameters).
-    - Reemplaza variables('<Sufijo>') por parameters('keyvault_<Sufijo>') para keyvault_*.
-    - Aplica la lógica de variables y conexiones.
-    - Limpia parámetros no usados de forma iterativa.
-    """
     logger.debug("Iniciando transformación de playbook.")
 
-    # 0) Fusionar parámetros de la master → playbook
     _merge_deployment_parameters_into_playbook(playbook, deployment_parameters)
-
-    # 1) Reemplazar variables('ClientID') / variables('ClientSecret') / ... por parameters('keyvault_*')
     _replace_keyvault_variable_references(playbook, deployment_parameters)
 
-    # 2) Variables de nombre de conexión por playbook
     _ensure_azuresentinel_connection_name(playbook)
     _ensure_keyvault_connection_name(playbook)
 
-    # 3) Transformaciones *_externalid (solo workflows_*_externalid)
     wf_params = _add_workflow_externalid_variables(playbook)
-    all_params = wf_params
-
-    if all_params:
-        logger.info("Variables creadas para parámetros *_externalid (workflows): %s", all_params)
-        _replace_parameters_with_variables(playbook, all_params)
+    if wf_params:
+        logger.info("Variables creadas para parámetros *_externalid (workflows): %s", wf_params)
+        _replace_parameters_with_variables(playbook, wf_params)
     else:
         logger.debug("No se encontraron parámetros workflows_*_externalid en este playbook.")
 
-    # 4) Bloques de conexión en los workflows (azuresentinel + keyvault)
     _ensure_workflow_connection_blocks(playbook)
-
-    # 5) Recursos Microsoft.Web/connections al final (azuresentinel + keyvault)
     _ensure_connection_resources(playbook)
 
-    # 6) Limpieza iterativa de parámetros no usados
     _cleanup_unused_parameters(playbook)
 
     logger.debug("Transformación completada.")
@@ -1012,10 +884,6 @@ def run_automation(
     dir_in: Path,
     dir_out: Path,
 ) -> None:
-    """
-    Orquesta el flujo completo para todos los playbooks referenciados en la master.
-    Además, sincroniza y guarda una versión limpia de la master en dir_out.
-    """
     logger.info("Cargando master template desde %s", master_path)
     master_template = load_master_template(master_path)
 
@@ -1048,26 +916,18 @@ def run_automation(
         logger.info("Leyendo playbook: %s", playbook_path)
         playbook_data = load_playbook(playbook_path)
 
-        # Parámetros específicos del deployment en la master
         deployment_params = get_deployment_parameters_from_master(master_template, name)
 
-        # Mostrar por pantalla los parámetros de interés usando el nombre real del fichero
         inspect_workflow_parameters(playbook_data, source_name=playbook_path.name)
 
         transformed = transform_playbook(playbook_data, deployment_params)
 
-        # Sincronizar parámetros de la master para este deployment según el playbook resultante
-        _sync_master_deployment_parameters_with_playbook(
-            master_template,
-            name,
-            transformed,
-        )
+        _sync_master_deployment_parameters_with_playbook(master_template, name, transformed)
 
         logger.info("Guardando playbook en el directorio de salida...")
         saved_path = write_playbook(dir_out, playbook_path, transformed)
         logger.info("Playbook guardado correctamente en: %s", saved_path)
 
-    # Guardar también la master template transformada/limpia en dir_out
     logger.info("Guardando master template transformada en el directorio de salida...")
     saved_master = write_playbook(dir_out, master_path, master_template)
     logger.info("Master template guardada en: %s", saved_master)

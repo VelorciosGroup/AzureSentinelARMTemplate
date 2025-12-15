@@ -6,6 +6,14 @@
       "defaultValue": "OrchestatorPart_Sophos_Auth_Playbook",
       "type": "String"
     },
+    "keyvault_ClientID": {
+      "type": "String",
+      "defaultValue": "BORRAR_keyvault_ClientID"
+    },
+    "keyvault_ClientSecret": {
+      "type": "String",
+      "defaultValue": "BORRAR_keyvault_ClientSecret"
+    },
     "keyvault_Name": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_Name"
@@ -30,14 +38,6 @@
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            "ClientID": {
-              "defaultValue": "sophos-velorcios-client-id",
-              "type": "String"
-            },
-            "ClientSecret": {
-              "defaultValue": "sophos-velorcios-client-secret",
-              "type": "String"
-            },
             "$connections": {
               "defaultValue": {},
               "type": "Object"
@@ -45,6 +45,14 @@
             "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
               "type": "String",
               "defaultValue": "[parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_name')]"
+            },
+            "keyvault_ClientID": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_ClientID')]"
+            },
+            "keyvault_ClientSecret": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_ClientSecret')]"
             },
             "keyvault_Name": {
               "type": "String",
@@ -68,7 +76,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(parameters('ClientID'))}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientID'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {
@@ -93,7 +101,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent(parameters('ClientSecret'))}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientSecret'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {

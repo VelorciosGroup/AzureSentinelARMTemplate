@@ -11,11 +11,11 @@
       "type": "String"
     },
     "keyvault_ClientID_Pack": {
-      "defaultValue": "[parameters('keyvault_ClientID_Pack')]",
+      "defaultValue": "aaaaa",
       "type": "string"
     },
     "keyvault_ClientSecret_Pack": {
-      "defaultValue": "[parameters('keyvault_ClientSecret_Pack')]",
+      "defaultValue": "bbbbb",
       "type": "string"
     },
     "keyvault_Name_Pack": {
@@ -439,6 +439,12 @@
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
             "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook_Playbook')]"
+          },
+          "keyvault_ClientID": {
+            "value": "[parameters(keyvault_ClientID_Pack)]"
+          },
+          "keyvault_ClientSecret": {
+            "value": "[parameters(keyvault_ClientSecret_Pack)]"
           },
           "keyvault_Name": {
             "value": "[parameters('keyvault_Name_Pack')]"
