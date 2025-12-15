@@ -1,7 +1,6 @@
 import gui
 import generate
 
-
 def main(playbooks, dependsOn):
     generate.generate_master(playbooks, dependsOn)
 

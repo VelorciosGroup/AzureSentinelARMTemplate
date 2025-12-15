@@ -16,7 +16,7 @@ def searchKeyvaultParams(lines):
     """
     # Creo un patrón con regex para buscar las variables que se usan de keyvault
     # ClientId, ClientSecret ... vienen dentro de  "path": "/secrets/@{encodeURIComponent(variables('ClientID'))}/value"
-    pattern = r"/secrets/@{encodeURIComponent\(variables\('([^']+)'\)"
+    pattern = r"/secrets/@{encodeURIComponent\((variables|parameters)\('([^']+)'\)"
 
     matches = []
 
@@ -24,41 +24,46 @@ def searchKeyvaultParams(lines):
     for line in lines:
         match = re.search(pattern, line)
         if match:
-            matches.append(f"keyvault_{match.group(1)}")
+            matches.append(f"keyvault_{match.group(2)}")
     
     return matches
             
 
 
 def parametrizeFiles(files):
+    print("Parametrizando archivos añadidos")
     params_for_file = {}
     for file in files:
-            #añado el nombre del playbook
-            filename = os.path.basename(file)
-            filename = os.path.splitext(filename)[0] # le quito la extensión .json
+        print(f"\n\nParámetros para el archivo {os.path.basename(file)}:")
+        #añado el nombre del playbook
+        filename = os.path.basename(file)
+        filename = os.path.splitext(filename)[0] # le quito la extensión .json
 
-            params_for_file[filename] = {}
-            with open(file, "r") as read_file:
-                lines = read_file.readlines()
-                keyvault_params = {}
-                keyvault_params[filename] = searchKeyvaultParams(lines)
+        params_for_file[filename] = {}
+        with open(file, "r") as read_file:
+            lines = read_file.readlines()
+            keyvault_params = {}
+            keyvault_params[filename] = searchKeyvaultParams(lines)
 
+        
+        json_string = "".join(lines)
+        data = json.loads(json_string)
+
+        for param in data['parameters']:
             
-            json_string = "".join(lines)
-            data = json.loads(json_string)
+            # introduzco todos los parámetros en params_for_file
+            params_for_file[filename][param] = data['parameters'][param]
+            print(data['parameters'][param]['defaultValue'])
 
-            for param in data['parameters']:
-                
-                # introduzco todos los parámetros en params_for_file
-                params_for_file[filename][param] = data['parameters'][param]
-
-                # introduzco los parámetros de keyvault dentro de params_for_file
-                if len(keyvault_params[filename]) > 0:
-                    for item in keyvault_params[filename]:
-                        params_for_file[filename][item] = {
-                            "defaultValue": f"[parameters('{item}_Pack')]",
-                            "type": "string"
-                        }
+            # introduzco los parámetros de keyvault dentro de params_for_file
+            if len(keyvault_params[filename]) > 0:
+                for item in keyvault_params[filename]:
+                    params_for_file[filename][item] = {
+                        "defaultValue": f"Rellenar_{item}",
+                        "type": "string"
+                    }
+        
+        
 
     # retorno la variable con todos los parámetros
     return params_for_file
@@ -68,6 +73,7 @@ def parametrizeFiles(files):
 
 
 def searchDependsOn(lines):
+    print("Buscando dependencias en archivos (workflows)")
 
     matches = []
     
@@ -78,6 +84,7 @@ def searchDependsOn(lines):
         match = re.search(pattern, line)
 
         if match and match.group(1) not in matches:
+            print(f"Dependencia encontrada: {match.group(1)}")
             matches.append(match.group(1))
             
     return matches
@@ -98,4 +105,3 @@ def parametrizeDependsOn(files):
             dependsOn[filename] = searchDependsOn(lines)
 
     return dependsOn
-

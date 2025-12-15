@@ -1,0 +1,209 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_Velorcios_Action_Sophos_Block_Incident_Domains_Playbook_name": {
+            "defaultValue": "Velorcios_Action_Sophos_Block_Incident_Domains_Playbook",
+            "type": "String"
+        },
+        "workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid": {
+            "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/Velorcios_Automation_Sophos_Block_IOC_Playbook",
+            "type": "String"
+        },
+        "connections_azuresentinel_Velorcios_Action_Sophos_Block_Incident_Domains_Playbook_externalid": {
+            "defaultValue": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Web/connections/azuresentinel-Velorcios_Action_Sophos_Block_Incident_Domains_Playbook",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_Velorcios_Action_Sophos_Block_Incident_Domains_Playbook_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Microsoft_Sentinel_incident": {
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "body": {
+                                    "callback_url": "@{listCallbackUrl()}"
+                                },
+                                "path": "/incident-creation"
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Entidades:_obtener_URL": {
+                            "runAfter": {
+                                "Initialize_variables": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "path": "/entities/url"
+                            }
+                        },
+                        "Sophos_Block_IOC": {
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_Velorcios_Automation_Sophos_Block_IOC_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "manual"
+                                },
+                                "body": {
+                                    "type": "URL",
+                                    "content": "@variables('Urls')"
+                                }
+                            }
+                        },
+                        "Parse_JSON_Urls": {
+                            "runAfter": {
+                                "Entidades:_obtener_URL": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Entidades:_obtener_URL')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "Urls": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "url": {
+                                                        "type": "string"
+                                                    },
+                                                    "friendlyName": {
+                                                        "type": "string"
+                                                    },
+                                                    "Type": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "required": [
+                                                    "url",
+                                                    "friendlyName",
+                                                    "Type"
+                                                ]
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Initialize_variables": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Urls",
+                                        "type": "array"
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each": {
+                            "foreach": "@body('Parse_JSON_Urls')?['Urls']",
+                            "actions": {
+                                "Parse_JSON_1": {
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@items('For_each')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "url": {
+                                                    "type": "string"
+                                                },
+                                                "friendlyName": {
+                                                    "type": "string"
+                                                },
+                                                "Type": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "Append_to_array_variable": {
+                                    "runAfter": {
+                                        "Parse_JSON_1": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "Urls",
+                                        "value": "@body('Parse_JSON_1')?['url']"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_JSON_Urls": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azuresentinel": {
+                                "connectionId": "[parameters('connections_azuresentinel_Velorcios_Action_Sophos_Block_Incident_Domains_Playbook_externalid')]",
+                                "connectionName": "[concat('azuresentinel-', parameters('workflows_Velorcios_Action_Sophos_Block_Incident_Domains_Playbook_name'))]",
+                                "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
