@@ -7,11 +7,11 @@
       "type": "string"
     },
     "keyvault_ClientID_Pack": {
-      "defaultValue": "[parameters('keyvault_ClientID_Pack')]",
+      "defaultValue": "sophos-velorcios-client-id",
       "type": "string"
     },
     "keyvault_ClientSecret_Pack": {
-      "defaultValue": "[parameters('keyvault_ClientSecret_Pack')]",
+      "defaultValue": "sophos-velorcios-client-secret",
       "type": "string"
     },
     "keyvault_Name_Pack": {
