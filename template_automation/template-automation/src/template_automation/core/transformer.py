@@ -46,6 +46,10 @@ Flujo actual:
                "variables('<Sufijo>')"  o  "parameters('<Sufijo>')"
            - La sustituye por:
                "parameters('keyvault_<Sufijo>')"
+   - Y además (NUEVO):
+       * Antes de la limpieza:
+           - En cada workflow, borra entradas en $connections.value con key:
+               azuresentinel-<NUMERO>  (ej: azuresentinel-1, azuresentinel-2, ...)
    - Finalmente:
        * Limpieza iterativa de parámetros no usados en el playbook:
          - Primero borra definition.parameters que no se usen fuera de definition.
@@ -74,6 +78,9 @@ logger = logging.getLogger(__name__)
 RE_WORKFLOW_NAME = re.compile(r"workflows_.*_name")
 RE_WORKFLOW_EXTERNALID = re.compile(r"workflows_.*_externalid")
 RE_CONNECTION_KEYVAULT_EXTERNALID = re.compile(r"connections_keyvault.*_externalid")
+
+# NUEVO: claves tipo "azuresentinel-1", "azuresentinel-2", ...
+RE_AZURESENTINEL_NUMBERED_KEY = re.compile(r"^azuresentinel-\d+$")
 
 
 # ---------------------------------------------------------------------------
@@ -459,6 +466,52 @@ def _replace_parameters_with_variables(
 
 
 # ---------------------------------------------------------------------------
+# NUEVO: quitar conexiones "azuresentinel-<numero>" del $connections.value
+# ---------------------------------------------------------------------------
+def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None:
+    """
+    En cada workflow, elimina entradas del bloque:
+      properties.parameters.$connections.value
+    cuyas keys sean: azuresentinel-<NUMERO>  (ej: azuresentinel-1).
+    """
+    resources = playbook.get("resources", [])
+    if not isinstance(resources, list):
+        return
+
+    removed_total = 0
+
+    for res in resources:
+        if not isinstance(res, dict):
+            continue
+        if res.get("type") != "Microsoft.Logic/workflows":
+            continue
+
+        props = res.get("properties")
+        if not isinstance(props, dict):
+            continue
+
+        parameters = props.get("parameters")
+        if not isinstance(parameters, dict):
+            continue
+
+        connections = parameters.get("$connections")
+        if not isinstance(connections, dict):
+            continue
+
+        value = connections.get("value")
+        if not isinstance(value, dict) or not value:
+            continue
+
+        for k in list(value.keys()):
+            if isinstance(k, str) and RE_AZURESENTINEL_NUMBERED_KEY.fullmatch(k):
+                del value[k]
+                removed_total += 1
+
+    if removed_total:
+        logger.info("Eliminadas %d entradas $connections.value tipo 'azuresentinel-<n>'.", removed_total)
+
+
+# ---------------------------------------------------------------------------
 # Bloques $connections + dependsOn usando AzureSentinelConnectionName y keyvault_Connection_Name
 # ---------------------------------------------------------------------------
 def _ensure_workflow_connection_blocks(playbook: Dict[str, Any]) -> None:
@@ -707,11 +760,8 @@ def _replace_keyvault_variable_references(
         if not suffix:
             continue
 
-        # 1) variables('SUFIJO') -> parameters('keyvault_SUFIJO')
         replacements[f"variables('{suffix}')"] = f"parameters('{pname}')"
 
-        # 2) parameters('SUFIJO') -> parameters('keyvault_SUFIJO')
-        #    (no tocamos parameters('keyvault_*') porque el patrón no lo busca)
         if not suffix.startswith("keyvault_"):
             replacements[f"parameters('{suffix}')"] = f"parameters('{pname}')"
 
@@ -866,6 +916,9 @@ def transform_playbook(
         _replace_parameters_with_variables(playbook, wf_params)
     else:
         logger.debug("No se encontraron parámetros workflows_*_externalid en este playbook.")
+
+    # NUEVO: antes de limpiar/consolidar conexiones, elimina "azuresentinel-<n>"
+    _remove_numbered_azuresentinel_connections(playbook)
 
     _ensure_workflow_connection_blocks(playbook)
     _ensure_connection_resources(playbook)

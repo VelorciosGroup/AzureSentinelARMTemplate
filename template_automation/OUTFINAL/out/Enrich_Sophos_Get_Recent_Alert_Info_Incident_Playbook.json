@@ -9,10 +9,6 @@
     "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
       "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook",
       "type": "String"
-    },
-    "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection",
-      "type": "String"
     }
   },
   "variables": {
@@ -45,10 +41,6 @@
             "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
               "type": "String",
               "defaultValue": "[variables('var_workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid')]"
-            },
-            "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-              "type": "String",
-              "defaultValue": "[parameters('connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid')]"
             }
           },
           "triggers": {
@@ -146,16 +138,6 @@
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
                 "connectionName": "[variables('AzureSentinelConnectionName')]",
                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
-                "connectionProperties": {
-                  "authentication": {
-                    "type": "ManagedServiceIdentity"
-                  }
-                }
-              },
-              "azuresentinel-1": {
-                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                "connectionId": "[parameters('connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid')]",
-                "connectionName": "MSSPDev_Deshabilitar_Reglas_ApiConnection",
                 "connectionProperties": {
                   "authentication": {
                     "type": "ManagedServiceIdentity"

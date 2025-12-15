@@ -11,11 +11,11 @@
       "type": "String"
     },
     "keyvault_ClientID_Pack": {
-      "defaultValue": "aaaaa",
+      "defaultValue": "sophos-velorcios-client-id",
       "type": "string"
     },
     "keyvault_ClientSecret_Pack": {
-      "defaultValue": "bbbbb",
+      "defaultValue": "sophos-velorcios-client-secret",
       "type": "string"
     },
     "keyvault_Name_Pack": {
@@ -320,9 +320,6 @@
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
-          },
-          "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "[parameters(connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid_Pack)]"
           }
         }
       }
@@ -369,9 +366,6 @@
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
-          },
-          "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "[parameters(connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid_Pack)]"
           }
         }
       }
@@ -418,9 +412,6 @@
           },
           "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
-          },
-          "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "[parameters(connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid_Pack)]"
           }
         }
       }
