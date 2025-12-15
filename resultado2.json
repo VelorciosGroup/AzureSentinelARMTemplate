@@ -7,11 +7,11 @@
       "type": "string"
     },
     "keyvault_ClientID_Pack": {
-      "defaultValue": "sophos-velorcios-client-id",
+      "defaultValue": "[parameters('keyvault_ClientID_Pack')]",
       "type": "string"
     },
     "keyvault_ClientSecret_Pack": {
-      "defaultValue": "sophos-velorcios-client-secret",
+      "defaultValue": "[parameters('keyvault_ClientSecret_Pack')]",
       "type": "string"
     },
     "keyvault_Name_Pack": {
@@ -36,13 +36,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Domain_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_Domain_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Alert_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Domain_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Domain_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Domain_Playbook"
           }
         }
       }
@@ -62,13 +65,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Domain_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_Domain_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Entity_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Domain_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Domain_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Domain_Playbook"
           }
         }
       }
@@ -88,13 +94,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Domain_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_Domain_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_Domains_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_Domains_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Incident_Domains_Playbook"
           }
         }
       }
@@ -114,13 +123,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Hash_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_Hash_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Alert_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_Hashes_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_Hashes_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Incident_Hashes_Playbook"
           }
         }
       }
@@ -140,13 +152,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Hash_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_Hash_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Entity_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Hash_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Hash_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Hash_Playbook"
           }
         }
       }
@@ -166,13 +181,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Hash_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_Hash_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_Hashes_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_Hashes_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Incident_Hashes_Playbook"
           }
         }
       }
@@ -192,13 +210,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_IP_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_IP_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Alert_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_IPs_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_IPs_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Incident_IPs_Playbook"
           }
         }
       }
@@ -218,13 +239,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_IP_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_IP_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Entity_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_IP_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_IP_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_IP_Playbook"
           }
         }
       }
@@ -244,13 +268,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_IP_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Block_IP_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_IPs_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_IPs_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Incident_IPs_Playbook"
           }
         }
       }
@@ -270,13 +297,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Device_Isolation_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Device_Isolation_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Alert_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_6_externalid": {
-            "value": "[parameters(connections_azuresentinel_6_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6"
           }
         }
       }
@@ -296,13 +326,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Device_Isolation_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Device_Isolation_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Entity_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_6_externalid": {
-            "value": "[parameters(connections_azuresentinel_6_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6"
           }
         }
       }
@@ -322,13 +355,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Device_Isolation_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Device_Isolation_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_6_externalid": {
-            "value": "[parameters(connections_azuresentinel_6_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6"
           }
         }
       }
@@ -348,16 +384,19 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Launch_Antivirus_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Launch_Antivirus_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Alert_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Launch_Antivirus_Playbook"
           },
           "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "[parameters(connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection"
           }
         }
       }
@@ -377,13 +416,16 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Launch_Antivirus_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Launch_Antivirus_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Entity_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Launch_Antivirus_Playbook"
           }
         }
       }
@@ -403,16 +445,19 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Launch_Antivirus_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Action_Sophos_Launch_Antivirus_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Launch_Antivirus_Playbook"
           },
           "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "[parameters(connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection"
           }
         }
       }
@@ -432,13 +477,16 @@
         },
         "parameters": {
           "workflows_Enrich_Sophos_Get_Device_Info_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Enrich_Sophos_Get_Device_Info_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Device_Info_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Get_Device_Info_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_6_externalid": {
-            "value": "[parameters(connections_azuresentinel_6_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6"
           }
         }
       }
@@ -458,16 +506,19 @@
         },
         "parameters": {
           "workflows_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook"
           },
           "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
-            "value": "[parameters(connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection"
           }
         }
       }
@@ -485,13 +536,13 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook_Playbook')]"
           },
           "keyvault_ClientID": {
-            "value": "[parameters(keyvault_ClientID_Pack)]"
+            "value": "[parameters('keyvault_ClientID_Pack')]"
           },
           "keyvault_ClientSecret": {
-            "value": "[parameters(keyvault_ClientSecret_Pack)]"
+            "value": "[parameters('keyvault_ClientSecret_Pack')]"
           },
           "keyvault_Name": {
             "value": "[parameters('keyvault_Name_Pack')]"
@@ -517,10 +568,10 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Block_IOC_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
           }
         }
       }
@@ -540,10 +591,10 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Device_Isolation_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
           }
         }
       }
@@ -563,13 +614,16 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Get_Device_Info_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Enrich_Sophos_Get_Device_Info_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Enrich_Sophos_Get_Device_Info_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Enrich_Sophos_Get_Device_Info_Playbook"
           }
         }
       }
@@ -589,13 +643,16 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
           },
           "connections_azuresentinel_Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
-            "value": "[parameters(connections_azuresentinel_Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid_Pack)]"
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook"
           }
         }
       }
@@ -615,10 +672,10 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Launch_Antivirus_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-            "value": "[concat(parameters('client_Name'), 'OrchestatorPart_Sophos_Auth_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
           }
         }
       }
