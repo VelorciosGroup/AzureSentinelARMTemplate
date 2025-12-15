@@ -1,0 +1,248 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflows_Action_Sophos_Block_Hash_Alert_Playbook_name": {
+      "defaultValue": "Action_Sophos_Block_Hash_Alert_Playbook",
+      "type": "String"
+    },
+    "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Block_IOC_Playbook",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_Action_Sophos_Block_Hash_Alert_Playbook_name'))]",
+    "var_workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('workflows_Action_Sophos_Block_Hash_Alert_Playbook_name')]",
+      "location": "westeurope",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            },
+            "workflows_Action_Sophos_Block_Hash_Alert_Playbook_name": {
+              "type": "String",
+              "defaultValue": "[parameters('workflows_Action_Sophos_Block_Hash_Alert_Playbook_name')]"
+            },
+            "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+              "type": "String",
+              "defaultValue": "[variables('var_workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid')]"
+            }
+          },
+          "triggers": {
+            "Microsoft_Sentinel_alert": {
+              "type": "ApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "body": {
+                  "callback_url": "@{listCallbackUrl()}"
+                },
+                "path": "/subscribe"
+              }
+            }
+          },
+          "actions": {
+            "Entidades:_obtener_FileHashes": {
+              "runAfter": {
+                "Initialize_variables": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "body": "@triggerBody()?['Entities']",
+                "path": "/entities/filehash"
+              }
+            },
+            "Sophos_Block_IOC": {
+              "runAfter": {
+                "For_each": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "host": {
+                  "workflow": {
+                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid')]"
+                  },
+                  "triggerName": "manual"
+                },
+                "body": {
+                  "type": "HASH",
+                  "content": "@variables('Hashes')"
+                }
+              }
+            },
+            "Parse_JSON_Hashes": {
+              "runAfter": {
+                "Entidades:_obtener_FileHashes": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('Entidades:_obtener_FileHashes')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Filehashes": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "hashValue": {
+                            "type": "string"
+                          },
+                          "algorithm": {
+                            "type": "string"
+                          },
+                          "friendlyName": {
+                            "type": "string"
+                          },
+                          "Type": {
+                            "type": "string"
+                          },
+                          "Value": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "hashValue",
+                          "algorithm",
+                          "friendlyName",
+                          "Type",
+                          "Value"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "Initialize_variables": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Hashes",
+                    "type": "array"
+                  }
+                ]
+              }
+            },
+            "For_each": {
+              "foreach": "@body('Parse_JSON_Hashes')?['Filehashes']",
+              "actions": {
+                "Append_to_array_variable": {
+                  "runAfter": {
+                    "Parse_JSON_Current_Hash": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "AppendToArrayVariable",
+                  "inputs": {
+                    "name": "Hashes",
+                    "value": "@body('Parse_JSON_Current_Hash')?['hashValue']"
+                  }
+                },
+                "Parse_JSON_Current_Hash": {
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": "@items('For_each')",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "hashValue": {
+                          "type": "string"
+                        },
+                        "algorithm": {
+                          "type": "string"
+                        },
+                        "friendlyName": {
+                          "type": "string"
+                        },
+                        "Type": {
+                          "type": "string"
+                        },
+                        "Value": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "runAfter": {
+                "Parse_JSON_Hashes": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azuresentinel": {
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('AzureSentinelConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[variables('AzureSentinelConnectionName')]",
+        "customParameterValues": {},
+        "parameterValueType": "Alternative",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+        }
+      }
+    }
+  ]
+}
