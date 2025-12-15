@@ -511,7 +511,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook",
+      "name": "OrchestatorPart_Sophos_Get_Recent_Alert_Playbook",
       "dependsOn": [
         "OrchestatorPart_Sophos_Auth_Playbook"
       ],
@@ -527,6 +527,12 @@
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
+          },
+          "connections_azuresentinel_Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
+            "value": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook"
           }
         }
       }

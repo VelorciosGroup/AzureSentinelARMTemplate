@@ -631,7 +631,7 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook",
+      "name": "OrchestatorPart_Sophos_Get_Recent_Alert_Playbook",
       "dependsOn": [
         "OrchestatorPart_Sophos_Auth_Playbook"
       ],
