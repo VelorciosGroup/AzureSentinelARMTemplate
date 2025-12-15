@@ -36,7 +36,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Domain_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Alert_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -65,7 +65,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Domain_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Entity_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -94,7 +94,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Domain_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -123,7 +123,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Hash_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Alert_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -152,7 +152,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Hash_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Entity_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -181,7 +181,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_Hash_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -210,7 +210,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_IP_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Alert_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -239,7 +239,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_IP_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Entity_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -268,7 +268,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Block_IP_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
@@ -297,7 +297,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Device_Isolation_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Alert_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
@@ -326,7 +326,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Device_Isolation_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Entity_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
@@ -355,7 +355,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Device_Isolation_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
@@ -384,7 +384,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Launch_Antivirus_Alert_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Alert_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
@@ -416,7 +416,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Launch_Antivirus_Entity_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Entity_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Entity_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
@@ -445,7 +445,7 @@
         },
         "parameters": {
           "workflows_Action_Sophos_Launch_Antivirus_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
@@ -477,7 +477,7 @@
         },
         "parameters": {
           "workflows_Enrich_Sophos_Get_Device_Info_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Device_Info_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Device_Info_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook')]"
@@ -506,7 +506,7 @@
         },
         "parameters": {
           "workflows_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
@@ -536,7 +536,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
           },
           "keyvault_ClientID": {
             "value": "[parameters('keyvault_ClientID_Pack')]"
@@ -568,7 +568,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
@@ -591,7 +591,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
@@ -614,7 +614,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
@@ -643,7 +643,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
@@ -672,7 +672,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
