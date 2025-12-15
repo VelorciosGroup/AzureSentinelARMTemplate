@@ -523,7 +523,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Playbook_Playbook')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_Playbook')]"
           },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
