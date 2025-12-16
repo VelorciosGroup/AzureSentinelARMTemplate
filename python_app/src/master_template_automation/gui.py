@@ -5,79 +5,79 @@ from . import functions
 from . import generate
 import os
 
-def rendergui():
+def render_gui():
     """
-    Renderiza la interfaz gráfica para crear Master Templates a partir de archivos JSON.
+    Renders the graphical interface to create Master Templates from JSON files.
 
-    Funcionalidades principales:
-    - Selección de archivos JSON que contienen playbooks.
-    - Visualización de archivos seleccionados.
-    - Eliminación de archivos seleccionados de la lista.
-    - Validación de dependencias entre workflows.
-    - Generación del Master Template llamando a la función `generate_master`.
+    Main functionalities:
+    - Selection of JSON files containing playbooks.
+    - Display of selected files.
+    - Removal of selected files from the list.
+    - Validation of dependencies between workflows.
+    - Generation of the Master Template by calling the `generate_master` function.
 
-    :return: Devuelve la ruta del directorio de salida de los archivos procesados.
+    :return: Returns the output directory path of the processed files.
     """
     params_for_file = {}
-    depends_on = {}
-    archivos = []
-    dirin = ""
+    dependencies = {}
+    file_list = []
+    input_dir = ""
 
-    # ========================= CONFIGURACIÓN DE LA VENTANA PRINCIPAL =========================
-    print("Renderizando root")
+    # ========================= MAIN WINDOW CONFIGURATION =========================
+    print("Rendering main window")
     root = Tk()
-    root.title("Creador de Master Templates")
+    root.title("Master Template Creator")
     root.geometry("650x380")
     root.resizable(False, False)
-    root.configure(bg="#f5f5f5")  # Fondo blanco grisáceo
+    root.configure(bg="#f5f5f5")  # Light gray background
 
-    # Canvas para scroll o contenedores dinámicos (si se necesitara)
+    # Canvas for scrolling or dynamic containers if needed
     canvas = tk.Canvas(root, borderwidth=0, bg="#f5f5f5", highlightthickness=0)
     canvas.pack(side="left", fill="both", expand=True)
 
-    frame_interior = ttk.Frame(canvas)
-    canvas.create_window((0,0), window=frame_interior, anchor="nw")
+    inner_frame = ttk.Frame(canvas)
+    canvas.create_window((0,0), window=inner_frame, anchor="nw")
 
-    # ------------------------ Función de manejo de errores ------------------------
-    def error(mensaje):
+    # ------------------------ Error handling function ------------------------
+    def show_error(message):
         """
-        Muestra un mensaje de error y termina la ejecución del programa.
+        Shows an error message and exits the program.
 
-        :param mensaje: Texto del mensaje de error.
+        :param message: Text of the error message.
         """
-        root_err = tk.Tk()
-        root_err.withdraw()
-        messagebox.showerror("Error", mensaje)
-        root_err.destroy()
+        error_root = tk.Tk()
+        error_root.withdraw()
+        messagebox.showerror("Error", message)
+        error_root.destroy()
         exit()
 
-    # ========================= ESTILOS MODERNOS =========================
+    # ========================= MODERN STYLES =========================
     style = ttk.Style()
-    style.theme_use('clam')  # Tema limpio y moderno
+    style.theme_use('clam')  # Clean, modern theme
 
-    # Frame redondeado y fondo blanco
+    # Rounded frame with white background
     style.configure("Rounded.TFrame",
                     background="white",
                     borderwidth=1,
                     relief="ridge")
     
-    # Configuración general de etiquetas
+    # General label style
     style.configure("TLabel",
                     background="white",
                     font=("Arial", 11))
     
-    # Botones normales
+    # Normal buttons
     style.configure("TButton",
                     font=("Arial", 11),
                     padding=6,
                     borderwidth=0,
                     relief="flat",
                     foreground="white",
-                    background="#4C7AAF")  # Azul moderno
+                    background="#4C7AAF")  # Modern blue
     style.map("TButton",
               background=[("active", "#204E99")])
 
-    # Botón grande estilo "Generar"
+    # Large "Generate" button style
     style.configure("Big.TButton",
                     font=("Arial", 12, "bold"),
                     padding=10,
@@ -89,15 +89,15 @@ def rendergui():
               background=[("active", "#204E99")])
 
     # ========================= FRAMES =========================
-    print("Renderizando frames dentro de root")
-    frame_base_templates = ttk.Frame(frame_interior, padding=15, style="Rounded.TFrame")
-    frame_base_templates.pack(fill="x", pady=10, padx=10)
+    print("Rendering frames inside main window")
+    base_frame = ttk.Frame(inner_frame, padding=15, style="Rounded.TFrame")
+    base_frame.pack(fill="x", pady=10, padx=10)
 
-    # ========================= CONTENIDO DEL FRAME =========================
-    ttk.Label(frame_base_templates, text="Selección de las templates que se usarán").grid(row=0, column=0, columnspan=2, sticky="w", pady=(0,5))
+    # ========================= FRAME CONTENT =========================
+    ttk.Label(base_frame, text="Select the templates to use").grid(row=0, column=0, columnspan=2, sticky="w", pady=(0,5))
 
-    lista_archivos = tk.Listbox(
-        frame_base_templates,
+    listbox_files = tk.Listbox(
+        base_frame,
         width=100,
         height=8,
         bg="#f9f9f9",
@@ -105,80 +105,80 @@ def rendergui():
         highlightthickness=1,
         highlightbackground="#ddd"
     )
-    lista_archivos.grid(row=1, column=0, columnspan=2, pady=5)
+    listbox_files.grid(row=1, column=0, columnspan=2, pady=5)
 
-    ttk.Label(frame_base_templates, text="Directorio de salida").grid(row=2, column=0, columnspan=2, sticky="w", pady=(10, 0))
+    ttk.Label(base_frame, text="Output directory").grid(row=2, column=0, columnspan=2, sticky="w", pady=(10, 0))
 
-    # ========================= FUNCIONES INTERNAS =========================
-    def seleccionar_archivos():
+    # ========================= INTERNAL FUNCTIONS =========================
+    def select_files():
         """
-        Permite seleccionar archivos JSON mediante un diálogo de archivos.
-        Evita duplicados y normaliza nombres.
-        Actualiza los parámetros y dependencias de los archivos seleccionados.
+        Allows selecting JSON files via a file dialog.
+        Prevents duplicates and normalizes filenames.
+        Updates parameters and dependencies of selected files.
         """
         nonlocal params_for_file
-        nonlocal depends_on
+        nonlocal dependencies
 
-        nuevos = list(filedialog.askopenfilenames(
+        new_files = list(filedialog.askopenfilenames(
             filetypes=[("JSON files", "*.json")],
-            title="Selecciona archivos JSON"
+            title="Select JSON files"
         ))
-        if nuevos:
-            for index, archivo in enumerate(nuevos):
-                print(f"Seleccionado archivo {archivo}")
-                nuevos[index] = functions.normalizeFileNames(archivo)
+        if new_files:
+            for index, file in enumerate(new_files):
+                print(f"Selected file {file}")
+                new_files[index] = functions.normalizeFileNames(file)
 
-            for archivo in nuevos:
-                if archivo not in archivos:  # evitar duplicados
-                    functions.deleteprefix(archivo)
-                    archivos.append(archivo)
-                    lista_archivos.insert(tk.END, archivo)
-                    print(f"archivo {archivo} añadido con éxito")
+            for file in new_files:
+                if file not in file_list:  # Avoid duplicates
+                    functions.deleteprefix(file)
+                    file_list.append(file)
+                    listbox_files.insert(tk.END, file)
+                    print(f"File {file} successfully added")
         
-        # Parametrizar y buscar dependencias
-        params_for_file = parametrize.parametrizeFiles(archivos)
-        depends_on = parametrize.parametrizeDependsOn(archivos)
+        # Parametrize and search for dependencies
+        params_for_file = parametrize.parametrize_files(file_list)
+        dependencies = parametrize.parametrize_dependencies(file_list)
 
-        # Validación de dependencias
-        print("Eliminando dependencias repetidas")
-        for file in depends_on:
-            for dependency in depends_on[file]:
+        # Dependency validation
+        print("Removing repeated dependencies")
+        for file_name in dependencies:
+            for dependency in dependencies[file_name]:
                 if dependency not in params_for_file.keys():
-                    error(f"Workflow {dependency} de archivo {file} no encontrado en los otros archivos seleccionados. Revisa si se ha seleccionado o se ha cambiado el nombre")
+                    show_error(f"Workflow {dependency} in file {file_name} not found in other selected files. Check if it was selected or renamed.")
 
-    def eliminar_seleccionados():
+    def remove_selected():
         """
-        Elimina los archivos seleccionados en la lista de archivos y actualiza la lista interna.
+        Removes the selected files from the list and updates the internal list.
         """
-        print("Eliminando el archivo seleccionado")
-        seleccion = lista_archivos.curselection()
-        if not seleccion:
-            messagebox.showinfo("Info", "Selecciona un archivo para eliminar.")
+        print("Removing selected file")
+        selection = listbox_files.curselection()
+        if not selection:
+            messagebox.showinfo("Info", "Select a file to remove.")
             return
         
-        for i in reversed(seleccion):
-            archivos.pop(i)
-            lista_archivos.delete(i)
+        for i in reversed(selection):
+            file_list.pop(i)
+            listbox_files.delete(i)
 
-    # ========================= BOTONES =========================
-    print("Renderizando botones de añadir / eliminar JSON")
-    ttk.Button(frame_base_templates, text="Añadir JSON", command=seleccionar_archivos).grid(row=4, column=0, pady=10, sticky="w")
-    ttk.Button(frame_base_templates, text="Eliminar seleccionado", command=eliminar_seleccionados).grid(row=4, column=1, pady=10, sticky="e")
+    # ========================= BUTTONS =========================
+    print("Rendering buttons to add / remove JSON files")
+    ttk.Button(base_frame, text="Add JSON", command=select_files).grid(row=4, column=0, pady=10, sticky="w")
+    ttk.Button(base_frame, text="Remove selected", command=remove_selected).grid(row=4, column=1, pady=10, sticky="e")
 
-    def salir():
+    def exit_gui():
         """
-        Finaliza la GUI y llama a la función `generate_master` para crear el Master Template.
+        Closes the GUI and calls `generate_master` to create the Master Template.
         """
-        nonlocal dirin
-        if archivos:
-            dirin = os.path.dirname(archivos[0])
+        nonlocal input_dir
+        if file_list:
+            input_dir = os.path.dirname(file_list[0])
 
-        print("saliendo de la GUI")
+        print("Exiting GUI")
         root.destroy()
-        generate.generate_master(params_for_file, depends_on, dirin)
+        generate.generate_master(params_for_file, dependencies, input_dir)
 
-    print("Renderizando botón generar")
-    ttk.Button(frame_base_templates, text="Generar", command=salir, style="Big.TButton").grid(row=5, column=0, pady=15, sticky="w")
+    print("Rendering generate button")
+    ttk.Button(base_frame, text="Generate", command=exit_gui, style="Big.TButton").grid(row=5, column=0, pady=15, sticky="w")
 
     root.mainloop()
-    return dirin
+    return input_dir

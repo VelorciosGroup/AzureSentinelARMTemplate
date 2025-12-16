@@ -4,24 +4,24 @@ import os
 
 # ----------------------------------------- PARAMETERS -----------------------------------------
 
-def searchKeyvaultParams(lines):
+def search_keyvault_params(lines):
     """
-    Busca los parámetros que provienen de KeyVault dentro de un conjunto de líneas de un archivo JSON.
+    Searches for parameters coming from KeyVault within a set of lines from a JSON file.
     
-    Este método detecta patrones específicos donde se utilizan variables o parámetros de KeyVault.
-    Por ejemplo, si en un playbook se utiliza:
+    This method detects specific patterns where KeyVault variables or parameters are used.
+    For example, if a playbook contains:
         "/secrets/@{encodeURIComponent(variables('ClientID'))}/value"
-    se extraerá 'ClientID' como parámetro de KeyVault.
+    it will extract 'ClientID' as a KeyVault parameter.
     
-    :param lines: Lista de strings que representan las líneas de un archivo JSON.
-    :return: Lista de parámetros encontrados que requieren KeyVault, con el prefijo "keyvault_".
+    :param lines: List of strings representing the lines of a JSON file.
+    :return: List of found parameters that require KeyVault, prefixed with "keyvault_".
     """
-    # Patrón regex para detectar variables o parámetros dentro de la ruta de KeyVault
+    # Regex pattern to detect variables or parameters in the KeyVault path
     pattern = r"/secrets/@{encodeURIComponent\((variables|parameters)\('([^']+)'\)"
     
     matches = []
 
-    # Recorremos cada línea buscando coincidencias
+    # Iterate over each line looking for matches
     for line in lines:
         match = re.search(pattern, line)
         if match:
@@ -30,74 +30,74 @@ def searchKeyvaultParams(lines):
     return matches
 
 
-def parametrizeFiles(files):
+def parametrize_files(file_paths):
     """
-    Lee archivos JSON de playbooks y genera un diccionario con todos los parámetros que estos contienen,
-    incluyendo los parámetros que provienen de KeyVault.
+    Reads JSON playbook files and generates a dictionary with all the parameters they contain,
+    including parameters coming from KeyVault.
 
-    Además, imprime en consola los parámetros encontrados y sus valores por defecto.
+    Also prints the found parameters and their default values to the console.
     
-    :param files: Lista de rutas a archivos JSON de playbooks.
-    :return: Diccionario con la siguiente estructura:
+    :param file_paths: List of paths to JSON playbook files.
+    :return: Dictionary structured as follows:
         {
-            "nombre_playbook": {
-                "parametro1": {"defaultValue": ..., "type": ...},
-                "parametro2": {"defaultValue": ..., "type": ...},
-                "keyvault_parametro": {"defaultValue": ..., "type": "string"},
+            "playbook_name": {
+                "parameter1": {"defaultValue": ..., "type": ...},
+                "parameter2": {"defaultValue": ..., "type": ...},
+                "keyvault_parameter": {"defaultValue": ..., "type": "string"},
                 ...
             },
             ...
         }
     """
-    print("Parametrizando archivos añadidos")
+    print("Parametrizing added files")
     params_for_file = {}
 
-    for file in files:
-        print(f"\n\nParámetros para el archivo {os.path.basename(file)}:")
+    for file_path in file_paths:
+        print(f"\n\nParameters for file {os.path.basename(file_path)}:")
         
-        # Extraigo el nombre del archivo sin extensión
-        filename = os.path.splitext(os.path.basename(file))[0]
+        # Extract the file name without extension
+        filename = os.path.splitext(os.path.basename(file_path))[0]
         params_for_file[filename] = {}
 
-        # Leo las líneas del archivo
-        with open(file, "r") as read_file:
+        # Read all lines from the file
+        with open(file_path, "r") as read_file:
             lines = read_file.readlines()
             keyvault_params = {}
-            keyvault_params[filename] = searchKeyvaultParams(lines)
+            keyvault_params[filename] = search_keyvault_params(lines)
 
-        # Cargo el JSON completo para acceder a los parámetros
+        # Load the complete JSON to access parameters
         json_string = "".join(lines)
         data = json.loads(json_string)
 
         for param in data['parameters']:
-            # Agrego todos los parámetros al diccionario
+            # Add all parameters to the dictionary
             params_for_file[filename][param] = data['parameters'][param]
             print(data['parameters'][param]['defaultValue'])
 
-            # Agrego los parámetros de KeyVault con valores por defecto
+            # Add KeyVault parameters with default placeholder values
             if len(keyvault_params[filename]) > 0:
                 for item in keyvault_params[filename]:
                     params_for_file[filename][item] = {
-                        "defaultValue": f"Rellenar_{item}",
+                        "defaultValue": f"Fill_{item}",
                         "type": "string"
                     }
 
     return params_for_file
 
 
-# ----------------------------------------- DEPENDS ON -----------------------------------------
+# ----------------------------------------- DEPENDENCIES -----------------------------------------
 
-def searchDependsOn(lines):
+def search_dependencies(lines):
     """
-    Busca dependencias entre workflows dentro de un archivo JSON.
+    Searches for workflow dependencies within a JSON file.
     
-    Una dependencia se detecta buscando patrones que indiquen el uso de otro workflow:
-        "workflows_<nombre_workflow>_externalid"
+    A dependency is detected by looking for patterns indicating the use of another workflow:
+        "workflows_<workflow_name>_externalid"
     
-    :param lines: Lista de strings que representan las líneas de un archivo JSON.
-    :return: Lista de nombres de workflows de los que depende el archivo.
+    :param lines: List of strings representing the lines of a JSON file.
+    :return: List of workflow names that the file depends on.
     """
-    print("Buscando dependencias en archivos (workflows)")
+    print("Searching for dependencies in files (workflows)")
     matches = []
 
     pattern = r"workflows_(.*)_externalid"
@@ -105,32 +105,32 @@ def searchDependsOn(lines):
     for line in lines:
         match = re.search(pattern, line)
         if match and match.group(1) not in matches:
-            print(f"Dependencia encontrada: {match.group(1)}")
+            print(f"Dependency found: {match.group(1)}")
             matches.append(match.group(1))
             
     return matches
 
 
-def parametrizeDependsOn(files):
+def parametrize_dependencies(file_paths):
     """
-    Genera un diccionario con las dependencias de cada archivo JSON.
+    Generates a dictionary with the dependencies of each JSON file.
     
-    :param files: Lista de rutas a archivos JSON de playbooks.
-    :return: Diccionario con la siguiente estructura:
+    :param file_paths: List of paths to JSON playbook files.
+    :return: Dictionary structured as follows:
         {
-            "nombre_playbook": ["dependencia1", "dependencia2", ...],
+            "playbook_name": ["dependency1", "dependency2", ...],
             ...
         }
     """
-    dependsOn = {}
+    dependencies = {}
 
-    for file in files:
-        filename = os.path.splitext(os.path.basename(file))[0]
-        dependsOn[filename] = {}
+    for file_path in file_paths:
+        filename = os.path.splitext(os.path.basename(file_path))[0]
+        dependencies[filename] = {}
 
-        # Leo el archivo para buscar dependencias
-        with open(file, "r") as file:
-            lines = file.readlines()
-            dependsOn[filename] = searchDependsOn(lines)
+        # Read the file to search for dependencies
+        with open(file_path, "r") as json_file:
+            lines = json_file.readlines()
+            dependencies[filename] = search_dependencies(lines)
 
-    return dependsOn
+    return dependencies

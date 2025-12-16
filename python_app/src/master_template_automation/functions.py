@@ -1,84 +1,84 @@
 import re
 from pathlib import Path
 
-def normalizeFileNames(archivo):
+def normalize_file_names(file_path):
     """
-    Normaliza el nombre de un archivo JSON de playbook y renombra el archivo en disco.
+    Normalizes the name of a playbook JSON file and renames it on disk.
 
-    Funcionalidades:
-    - Reemplaza la palabra 'automation' por 'OrchestatorPart' en el nombre del archivo.
-    - Quita prefijos innecesarios antes de 'OrchestatorPart', 'Action' o 'Enrich'.
-    - Asegura que el archivo termine con "_Playbook.json".
-    - Renombra el archivo en la ruta original.
+    Features:
+    - Replaces the word 'automation' with 'OrchestatorPart' in the filename.
+    - Removes unnecessary prefixes before 'OrchestatorPart', 'Action', or 'Enrich'.
+    - Ensures the filename ends with "_Playbook.json".
+    - Renames the file at its original location.
 
-    :param archivo: Ruta del archivo a normalizar (str o Path).
-    :return: La nueva ruta del archivo normalizado (Path).
+    :param file_path: Path to the file to normalize (str or Path).
+    :return: The new normalized file path (Path).
     """
-    file_name = Path(archivo).name
-    path = Path(archivo)
+    file_name = Path(file_path).name
+    path = Path(file_path)
     
-    # Reemplazo de "automation" por "OrchestatorPart" (case-insensitive)
+    # Replace "automation" with "OrchestatorPart" (case-insensitive)
     file_name = re.sub(r"automation", "OrchestatorPart", file_name, flags=re.IGNORECASE)
     
-    # Quita prefijos antes de 'OrchestatorPart', 'Action' o 'Enrich'
+    # Remove unnecessary prefixes before 'OrchestatorPart', 'Action', or 'Enrich'
     file_name_array = file_name.split("_", 1)
     if file_name_array[1].startswith(("OrchestatorPart", "Action", "Enrich")):
         file_name = file_name_array[1]
     
-    # Asegura el sufijo correcto
+    # Ensure the correct suffix
     if not file_name.endswith("_Playbook.json"):
         file_name = file_name.replace(".json", "_Playbook.json")
     
-    # Renombra el archivo en disco
-    newpath = path.with_name(file_name)
-    path.rename(newpath)
-    print(f"Normalizando nombre de archivo a: {file_name} y cambiando ruta")
-    return newpath
+    # Rename the file on disk
+    new_path = path.with_name(file_name)
+    path.rename(new_path)
+    print(f"Normalized file name to: {file_name} and updated path")
+    return new_path
 
 
-def deleteprefix(archivo):
+def remove_prefixes(file_path):
     """
-    Limpia y normaliza las referencias de workflows dentro de un archivo JSON de playbook.
+    Cleans and normalizes workflow references inside a playbook JSON file.
 
-    Funcionalidades:
-    - Reemplaza la palabra 'Automation' por 'OrchestatorPart' dentro del contenido.
-    - Ajusta los nombres de playbooks para eliminar prefijos innecesarios.
-    - Asegura que los nombres terminen con "_Playbook".
+    Features:
+    - Replaces the word 'Automation' with 'OrchestatorPart' in the file content.
+    - Adjusts playbook names to remove unnecessary prefixes.
+    - Ensures names end with "_Playbook".
 
-    :param archivo: Ruta del archivo JSON a procesar (str o Path).
-    :return: None. Modifica el archivo directamente en disco.
+    :param file_path: Path to the JSON file to process (str or Path).
+    :return: None. Modifies the file directly on disk.
     """
-    # Leer todas las líneas del archivo
-    with open(archivo, "r") as input_file:
+    # Read all lines from the file
+    with open(file_path, "r") as input_file:
         lines = input_file.readlines()
     
-    # Patrones de búsqueda
-    pattern = r"\"workflows_(.*)_(name|externalid)\": {"
-    patternAutomation = r"Automation"
+    # Search patterns
+    workflow_pattern = r"\"workflows_(.*)_(name|externalid)\": {"
+    automation_pattern = r"Automation"
 
-    # Reemplazo de "Automation" por "OrchestatorPart" en todas las líneas
+    # Replace "Automation" with "OrchestatorPart" in all lines
     for index, _ in enumerate(lines):
-        lines[index] = re.sub(patternAutomation, "OrchestatorPart", lines[index])
+        lines[index] = re.sub(automation_pattern, "OrchestatorPart", lines[index])
 
-    # Normaliza los nombres de los workflows encontrados
+    # Normalize workflow names found
     for line in lines:
-        match = re.search(pattern, line)
+        match = re.search(workflow_pattern, line)
         if match:
-            playbook = match.group(1)
-            name_list = playbook.split("_", 1)
+            playbook_name = match.group(1)
+            name_list = playbook_name.split("_", 1)
             if name_list[1].startswith(("OrchestatorPart", "Action", "Enrich", "Automation")):
-                playbook = name_list[1]
+                playbook_name = name_list[1]
             
-            # Asegura sufijo correcto
-            if playbook.endswith("_playbook"):
-                playbook = playbook.replace("_playbook", "_Playbook")
-            if not playbook.endswith("_Playbook"):
-                playbook += "_Playbook"
+            # Ensure correct suffix
+            if playbook_name.endswith("_playbook"):
+                playbook_name = playbook_name.replace("_playbook", "_Playbook")
+            if not playbook_name.endswith("_Playbook"):
+                playbook_name += "_Playbook"
 
-            # Sustituye el nombre antiguo por el nuevo en todas las líneas
+            # Replace old name with new one in all lines
             for index, _ in enumerate(lines):
-                lines[index] = re.sub(match.group(1), playbook, lines[index])
+                lines[index] = re.sub(match.group(1), playbook_name, lines[index])
 
-    # Escribe los cambios de vuelta en el archivo
-    with open(archivo, "w") as output_file:
+    # Write changes back to the file
+    with open(file_path, "w") as output_file:
         output_file.writelines(lines)
