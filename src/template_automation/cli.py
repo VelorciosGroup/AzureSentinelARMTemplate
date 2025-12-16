@@ -1,10 +1,10 @@
 """
-Módulo de línea de comandos.
+Command-line interface module.
 
-Se encarga de:
-- Parsear argumentos
-- Configurar logging
-- Llamar al pipeline principal de procesamiento
+Responsibilities:
+- Parse command-line arguments.
+- Configure logging.
+- Invoke the main processing pipeline.
 """
 
 from __future__ import annotations
@@ -17,11 +17,23 @@ from .core.transformer import run_automation
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """
+    Build and return the argument parser for the CLI.
+
+    Returns:
+        argparse.ArgumentParser: Configured parser for the `template_automation` CLI.
+
+    Notes:
+        The parser includes arguments for:
+        - Master template JSON file
+        - Input directory of playbooks
+        - Output directory for transformed playbooks
+        - Verbosity level
+    """
     parser = argparse.ArgumentParser(
         prog="template_automation",
         description=(
-            "Herramienta para aplicar una master template sobre "
-            "un conjunto de playbooks JSON."
+            "Tool to apply a master template over a set of JSON playbooks."
         ),
     )
 
@@ -31,7 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
         dest="master_path",
         type=Path,
         required=True,
-        help="Ruta al fichero JSON de la master template (ej: Deploy_CrowdStrike.json).",
+        help="Path to the master template JSON file (e.g., Deploy_CrowdStrike.json).",
     )
 
     parser.add_argument(
@@ -40,7 +52,7 @@ def build_parser() -> argparse.ArgumentParser:
         dest="dir_in",
         type=Path,
         required=True,
-        help="Directorio de entrada con los playbooks a procesar.",
+        help="Input directory containing the playbooks to process.",
     )
 
     parser.add_argument(
@@ -49,7 +61,7 @@ def build_parser() -> argparse.ArgumentParser:
         dest="dir_out",
         type=Path,
         required=True,
-        help="Directorio de salida para escribir los playbooks transformados.",
+        help="Output directory to write the transformed playbooks.",
     )
 
     parser.add_argument(
@@ -57,17 +69,31 @@ def build_parser() -> argparse.ArgumentParser:
         "--verbose",
         action="count",
         default=0,
-        help="Aumenta el nivel de verbosidad (usa -v, -vv, ...).",
+        help="Increase verbosity level (use -v, -vv, etc.).",
     )
 
     return parser
 
 
 def main(argv: list[str] | None = None) -> int:
+    """
+    Main entry point for the CLI.
+
+    Args:
+        argv (list[str] | None, optional): List of command-line arguments.
+            If None, `sys.argv` is used. Defaults to None.
+
+    Returns:
+        int: Exit code (0 for success).
+
+    Notes:
+        - Configures logging according to the verbosity level.
+        - Executes the main automation pipeline by calling `run_automation`.
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
 
-    # Configurar logging según nivel de -v
+    # Configure logging based on -v level
     if args.verbose >= 2:
         level = "DEBUG"
     elif args.verbose == 1:
@@ -77,7 +103,7 @@ def main(argv: list[str] | None = None) -> int:
 
     setup_logging(level)
 
-    # Ejecutar pipeline principal
+    # Run main automation pipeline
     run_automation(
         master_path=args.master_path,
         dir_in=args.dir_in,

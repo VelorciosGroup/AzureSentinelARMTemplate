@@ -1,17 +1,15 @@
 """
-Configuración general y constantes del proyecto.
-"""
+General project configuration and constants.
 
+Constants:
+- JSON_EXTENSION (str): File extension to process (default: ".json").
+- DEFAULT_OUTPUT_DIR_NAME (str): Default subdirectory name for output (default: "out").
+- PROJECT_ROOT (Path): Project root directory, assuming a `src/` layout.
+"""
 from __future__ import annotations
 
 from pathlib import Path
 
-# Extensión de ficheros que vamos a procesar
-JSON_EXTENSION = ".json"
-
-# Nombre de subdirectorio por defecto para salida (por si lo necesitas después)
-DEFAULT_OUTPUT_DIR_NAME = "out"
-
-# Directorio base del proyecto (asumiendo layout src/)
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
+JSON_EXTENSION: str = ".json"
+DEFAULT_OUTPUT_DIR_NAME: str = "out"
+PROJECT_ROOT: Path = Path(__file__).resolve().parents[2]

@@ -1,5 +1,5 @@
 """
-Funciones para escribir los resultados transformados.
+Functions to write transformed playbooks to disk.
 """
 
 from __future__ import annotations
@@ -17,9 +17,21 @@ def write_playbook(
     playbook_data: Dict[str, Any],
 ) -> Path:
     """
-    Escribe el playbook transformado en output_dir, usando el mismo nombre de fichero.
+    Write the transformed playbook to the specified output directory.
 
-    Devuelve la ruta final al archivo escrito.
+    The output file will use the same name as the original input file.
+
+    Args:
+        output_dir (Path): Directory where the playbook will be written.
+        input_path (Path): Original path of the input playbook (used for naming).
+        playbook_data (Dict[str, Any]): The transformed playbook data to write.
+
+    Returns:
+        Path: Full path to the written output file.
+
+    Notes:
+        This function ensures that the output directory exists before writing.
+        The JSON file is written with indentation of 2 spaces and UTF-8 encoding.
     """
     ensure_dir_exists(output_dir)
 

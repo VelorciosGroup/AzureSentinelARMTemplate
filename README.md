@@ -1,18 +1,53 @@
-<table>
-  <tr>
-    <th>Integración</th>
-    <th>Deploy</th>
-    <th>Contenido</th>
-  </tr>
+Module template_automation.cli
+==============================
+Command-line interface module.
 
-  <!-- CROWDSTRIKE -->
-  <tr>
-    <td><b>CrowdStrike</b></td>
-    <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fplaybook_parse_automation%2Ftemplate_automation%2FOUTFINAL%2Fout%2Fresultado2.json"
-         rel="noopener noreferrer">
-          <img src="./Button.png" alt="Deploy to Azure" width="140px" />
-      </a>
-    </td>
-  </tr>
-</table>
+Responsibilities:
+- Parse command-line arguments.
+- Configure logging.
+- Invoke the main processing pipeline.
+
+Functions
+---------
+
+`build_parser() ‑> argparse.ArgumentParser`
+:   Build and return the argument parser for the CLI.
+    
+    Returns:
+        argparse.ArgumentParser: Configured parser for the `template_automation` CLI.
+    
+    Notes:
+        The parser includes arguments for:
+        - Master template JSON file
+        - Input directory of playbooks
+        - Output directory for transformed playbooks
+        - Verbosity level
+
+`main(argv: list[str] | None = None) ‑> int`
+:   Main entry point for the CLI.
+    
+    Args:
+        argv (list[str] | None, optional): List of command-line arguments.
+            If None, `sys.argv` is used. Defaults to None.
+    
+    Returns:
+        int: Exit code (0 for success).
+    
+    Notes:
+        - Configures logging according to the verbosity level.
+        - Executes the main automation pipeline by calling `run_automation`.Module template_automation.config
+=================================
+General project configuration and constants.
+
+Constants:
+- JSON_EXTENSION (str): File extension to process (default: ".json").
+- DEFAULT_OUTPUT_DIR_NAME (str): Default subdirectory name for output (default: "out").
+- PROJECT_ROOT (Path): Project root directory, assuming a `src/` layout.Module template_automation
+==========================
+
+Sub-modules
+-----------
+* template_automation.cli
+* template_automation.config
+* template_automation.core
+* template_automation.utils
