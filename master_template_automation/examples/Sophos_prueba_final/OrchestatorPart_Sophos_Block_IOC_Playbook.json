@@ -2,12 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
-            "defaultValue": "OrchestatorPart_Sophos_Block_IOC_Playbook",
+        "workflows_Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
+            "defaultValue": "Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook",
             "type": "String"
         },
-        "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Auth_Playbook",
+        "workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/Cliente_OrchestatorPart_Sophos_Auth_Playbook",
             "type": "String"
         }
     },
@@ -16,7 +16,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name')]",
+            "name": "[parameters('workflows_Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook_name')]",
             "location": "westeurope",
             "tags": {
                 "hidden-SentinelTemplateName": "Crowdstrike-Authentication",
@@ -40,10 +40,6 @@
                             "defaultValue": "sophos-velorcios-client-secret",
                             "type": "String"
                         },
-                        "api_block_tag": {
-                            "defaultValue": "sophos-velorcios-client-secret",
-                            "type": "String"
-                        },
                         "$connections": {
                             "defaultValue": {},
                             "type": "Object"
@@ -64,12 +60,12 @@
                                         "HTTP_POST_HASH": {
                                             "type": "Http",
                                             "inputs": {
-                                                "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/settings/blocked-items",
+                                                "uri": "@{body('Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/settings/blocked-items",
                                                 "method": "POST",
                                                 "headers": {
-                                                    "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}",
+                                                    "Authorization": "Bearer @{body('Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}",
                                                     "Accept": "application/json",
-                                                    "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
+                                                    "X-Tenant-ID": "@{body('Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
                                                     "Content-Type": "application/json"
                                                 },
                                                 "body": {
@@ -154,12 +150,12 @@
                                             "HTTP_POST_IP_DOMAIN": {
                                                 "type": "Http",
                                                 "inputs": {
-                                                    "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/settings/web-control/local-sites",
+                                                    "uri": "@{body('Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/settings/web-control/local-sites",
                                                     "method": "POST",
                                                     "headers": {
-                                                        "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}",
+                                                        "Authorization": "Bearer @{body('Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}",
                                                         "Accept": "application/json",
-                                                        "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
+                                                        "X-Tenant-ID": "@{body('Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
                                                         "Content-Type": "application/json"
                                                     },
                                                     "body": {
@@ -167,7 +163,7 @@
                                                         "tags": [
                                                             "@{variables('Category')}"
                                                         ],
-                                                        "comment": "parameters('api_block_tag')"
+                                                        "comment": "Bloqueado por SOC)"
                                                     }
                                                 },
                                                 "runtimeConfiguration": {
@@ -246,7 +242,7 @@
                         },
                         "Parse_JSON_List": {
                             "runAfter": {
-                                "Parse_OrchestatorPart_Sophos_Auth_Playbook": [
+                                "Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook": [
                                     "Succeeded"
                                 ]
                             },
@@ -332,27 +328,27 @@
                                 ]
                             }
                         },
-                        "OrchestatorPart_Sophos_Auth_Playbook": {
+                        "Cliente_OrchestatorPart_Sophos_Auth_Playbook": {
                             "runAfter": {},
                             "type": "Workflow",
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
                                     },
                                     "triggerName": "When_an_HTTP_request_is_received"
                                 }
                             }
                         },
-                        "Parse_OrchestatorPart_Sophos_Auth_Playbook": {
+                        "Parse_Cliente_OrchestatorPart_Sophos_Auth_Playbook": {
                             "runAfter": {
-                                "OrchestatorPart_Sophos_Auth_Playbook": [
+                                "Cliente_OrchestatorPart_Sophos_Auth_Playbook": [
                                     "Succeeded"
                                 ]
                             },
                             "type": "ParseJson",
                             "inputs": {
-                                "content": "@body('OrchestatorPart_Sophos_Auth_Playbook')",
+                                "content": "@body('Cliente_OrchestatorPart_Sophos_Auth_Playbook')",
                                 "schema": {
                                     "type": "object",
                                     "properties": {
