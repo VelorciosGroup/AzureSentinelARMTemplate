@@ -453,9 +453,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
-          },
           "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
           }
