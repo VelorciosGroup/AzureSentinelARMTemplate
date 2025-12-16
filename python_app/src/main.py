@@ -16,7 +16,7 @@ def main():
     4. Ejecuta el módulo `template_automation.__main__` usando subprocess para mantener los imports relativos.
     """
     # ========================= Lanzar GUI =========================
-    dirin = gui.rendergui()
+    dirin = gui.render_gui()
     print(f"Directorio de entrada: {dirin}")
 
     if not dirin:

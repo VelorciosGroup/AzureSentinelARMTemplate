@@ -126,11 +126,11 @@ def render_gui():
         if new_files:
             for index, file in enumerate(new_files):
                 print(f"Selected file {file}")
-                new_files[index] = functions.normalizeFileNames(file)
+                new_files[index] = functions.normalize_file_names(file)
 
             for file in new_files:
                 if file not in file_list:  # Avoid duplicates
-                    functions.deleteprefix(file)
+                    functions.remove_prefixes(file)
                     file_list.append(file)
                     listbox_files.insert(tk.END, file)
                     print(f"File {file} successfully added")
