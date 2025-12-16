@@ -1,1 +1,0 @@
-PYTHONPATH=src python3 -m template_automation   -master ./examples/master_templates/Deploy_Sophos.json  -dirin ./examples/bad_playbooks/Sophos_prueba_final/   -dirout ./out/
