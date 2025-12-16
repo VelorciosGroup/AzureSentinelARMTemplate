@@ -25,7 +25,6 @@ Thumbs.db
 
 # MkDocs build output
 site/
-pdocs/
 docs/reference/
 
 # Output of your automation scripts

@@ -9,10 +9,12 @@ src/template_automation.egg-info/SOURCES.txt
 src/template_automation.egg-info/dependency_links.txt
 src/template_automation.egg-info/entry_points.txt
 src/template_automation.egg-info/top_level.txt
+src/template_automation/core/__init__.py
 src/template_automation/core/master_loader.py
 src/template_automation/core/playbook_loader.py
 src/template_automation/core/transformer.py
 src/template_automation/core/writer.py
+src/template_automation/utils/__init__.py
 src/template_automation/utils/file_system.py
 src/template_automation/utils/logging_utils.py
 src/template_automation/utils/validation.py
