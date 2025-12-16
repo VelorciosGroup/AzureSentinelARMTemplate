@@ -1,0 +1,70 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+env/
+venv/
+.venv-mkdocs/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+*.whl
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# MkDocs build output
+site/
+docs/reference/
+
+# Output of your automation scripts
+out/
+
+# Editor backups
+*.swp
+*.swo
+*.sublime-workspace
+*.sublime-project
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+*.orig
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+
+# Pytest / coverage
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# Other
+*.egg-info/
+
+# Examples (do not track)
+examples/
