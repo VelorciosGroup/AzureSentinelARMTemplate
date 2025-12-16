@@ -1,0 +1,26 @@
+Metadata-Version: 2.4
+Name: template_automation
+Version: 0.1.0
+Summary: Program that automatizes parsing an ARM template with a master ARM template
+Author-email: Sergio Perera Márquez <sergio.pereram.dev@gmail.com>
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+
+<table>
+  <tr>
+    <th>Integración</th>
+    <th>Deploy</th>
+    <th>Contenido</th>
+  </tr>
+
+  <!-- CROWDSTRIKE -->
+  <tr>
+    <td><b>CrowdStrike</b></td>
+    <td>
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fplaybook_parse_automation%2Ftemplate_automation%2FOUTFINAL%2Fout%2Fresultado2.json"
+         rel="noopener noreferrer">
+          <img src="./Button.png" alt="Deploy to Azure" width="140px" />
+      </a>
+    </td>
+  </tr>
+</table>

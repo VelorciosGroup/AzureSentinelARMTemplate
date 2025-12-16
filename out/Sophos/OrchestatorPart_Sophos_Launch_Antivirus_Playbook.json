@@ -1,0 +1,354 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name": {
+      "defaultValue": "OrchestatorPart_Sophos_Launch_Antivirus_Playbook",
+      "type": "String"
+    },
+    "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Auth_Playbook",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name'))]",
+    "var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name')]",
+      "location": "westeurope",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name": {
+              "type": "String",
+              "defaultValue": "[parameters('workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name')]"
+            },
+            "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+              "type": "String",
+              "defaultValue": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+            },
+            "$connections": {
+              "type": "Object",
+              "defaultValue": {}
+            }
+          },
+          "triggers": {
+            "Manual": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "actions": {
+            "OrchestatorPart_Sophos_Auth_Playbook": {
+              "runAfter": {
+                "Hostname": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "host": {
+                  "workflow": {
+                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+                  },
+                  "triggerName": "When_an_HTTP_request_is_received"
+                }
+              }
+            },
+            "Parse_OrchestatorPart_Sophos_Auth_Playbook": {
+              "runAfter": {
+                "OrchestatorPart_Sophos_Auth_Playbook": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('OrchestatorPart_Sophos_Auth_Playbook')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "TenantRegion": {
+                      "type": "string"
+                    },
+                    "TenantID": {
+                      "type": "string"
+                    },
+                    "AccessToken": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "For_each": {
+              "foreach": "@triggerBody()?['hostnames']",
+              "actions": {
+                "GetDeviceID": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/endpoints?hostnameContains=@{items('For_each')}",
+                    "method": "GET",
+                    "headers": {
+                      "Content-Type": "application/json",
+                      "X-Tenant-ID": "",
+                      "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "contentTransfer": {
+                      "transferMode": "Chunked"
+                    }
+                  }
+                },
+                "Parse_JSON_GetDeviceID": {
+                  "runAfter": {
+                    "GetDeviceID": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": "@body('GetDeviceID')",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "hostname": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "type",
+                              "hostname"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "For_each-copy": {
+                  "foreach": "@body('Parse_JSON_GetDeviceID')?['items']",
+                  "actions": {
+                    "Condition": {
+                      "actions": {
+                        "PostScanDevice": {
+                          "runAfter": {
+                            "Set_variable_Scan_Device_ID": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "Http",
+                          "inputs": {
+                            "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/endpoints/@{body('Parse_JSON_for_each')?['id']}/scans",
+                            "method": "POST",
+                            "headers": {
+                              "Content-Type": "application/json",
+                              "X-Tenant-ID": "",
+                              "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}"
+                            },
+                            "body": {}
+                          },
+                          "runtimeConfiguration": {
+                            "contentTransfer": {
+                              "transferMode": "Chunked"
+                            }
+                          }
+                        },
+                        "Set_variable_Scan_Device_ID": {
+                          "type": "SetVariable",
+                          "inputs": {
+                            "name": "Scan Device ID",
+                            "value": "@body('Parse_JSON_for_each')?['id']"
+                          }
+                        }
+                      },
+                      "runAfter": {
+                        "Set_hostname_current_item": [
+                          "Succeeded"
+                        ]
+                      },
+                      "else": {
+                        "actions": {}
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "equals": [
+                              "@triggerBody()?['Entity']?['properties']?['HostName']",
+                              "@variables('Hostname')"
+                            ]
+                          }
+                        ]
+                      },
+                      "type": "If"
+                    },
+                    "Parse_JSON_for_each": {
+                      "type": "ParseJson",
+                      "inputs": {
+                        "content": "@items('For_each-copy')",
+                        "schema": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "hostname": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "Set_hostname_current_item": {
+                      "runAfter": {
+                        "Parse_JSON_for_each": [
+                          "Succeeded"
+                        ]
+                      },
+                      "type": "SetVariable",
+                      "inputs": {
+                        "name": "Hostname",
+                        "value": "@body('Parse_JSON_for_each')?['hostname']"
+                      }
+                    }
+                  },
+                  "runAfter": {
+                    "Parse_JSON_GetDeviceID": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Foreach",
+                  "runtimeConfiguration": {
+                    "concurrency": {
+                      "repetitions": 1
+                    }
+                  }
+                }
+              },
+              "runAfter": {
+                "Parse_OrchestatorPart_Sophos_Auth_Playbook": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach"
+            },
+            "Scan_Device_ID": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Scan Device ID",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "Hostname": {
+              "runAfter": {
+                "Scan_Device_ID": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Hostname",
+                    "type": "string"
+                  }
+                ]
+              }
+            },
+            "Response": {
+              "runAfter": {
+                "For_each": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 200,
+                "body": {
+                  "message": "scanned succesfully"
+                }
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azuresentinel": {
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('AzureSentinelConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[variables('AzureSentinelConnectionName')]",
+        "customParameterValues": {},
+        "parameterValueType": "Alternative",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+        }
+      }
+    }
+  ]
+}

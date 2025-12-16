@@ -1,0 +1,2 @@
+[console_scripts]
+template-automation = template_automation.__main__:main
