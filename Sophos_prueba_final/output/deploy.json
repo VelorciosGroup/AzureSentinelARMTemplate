@@ -1,0 +1,568 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "client_Name": {
+      "defaultValue": "CLIENTE",
+      "type": "string"
+    },
+    "keyvault_ClientID_Pack": {
+      "defaultValue": "Rellenar_keyvault_ClientID",
+      "type": "string"
+    },
+    "keyvault_ClientSecret_Pack": {
+      "defaultValue": "Rellenar_keyvault_ClientSecret",
+      "type": "string"
+    },
+    "keyvault_Name_Pack": {
+      "defaultValue": "MSSP-Desarrollo-SOC",
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_Domain_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_Domain_Alert_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Alert_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_Domain_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_Domain_Entity_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Entity_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_Domain_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_Domain_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Domain_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_Hash_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_Hash_Alert_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Alert_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_Hash_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_Hash_Entity_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Entity_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_Hash_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_Hash_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_Hash_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_IP_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_IP_Alert_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Alert_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_IP_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_IP_Entity_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Entity_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Block_IP_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Block_IOC_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Block_IP_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Block_IP_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Device_Isolation_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Device_Isolation_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Device_Isolation_Alert_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Alert_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Device_Isolation_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Device_Isolation_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Device_Isolation_Entity_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Entity_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Device_Isolation_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Device_Isolation_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Device_Isolation_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Device_Isolation_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Launch_Antivirus_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Launch_Antivirus_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Launch_Antivirus_Alert_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Alert_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Launch_Antivirus_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Launch_Antivirus_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Launch_Antivirus_Entity_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Entity_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_Sophos_Launch_Antivirus_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Launch_Antivirus_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Action_Sophos_Launch_Antivirus_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Action_Sophos_Launch_Antivirus_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Enrich_Sophos_Get_Device_Info_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Get_Device_Info_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Enrich_Sophos_Get_Device_Info_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Device_Info_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_Sophos_Auth_Playbook",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          },
+          "keyvault_ClientID": {
+            "value": "[parameters('keyvault_ClientID_Pack')]"
+          },
+          "keyvault_ClientSecret": {
+            "value": "[parameters('keyvault_ClientSecret_Pack')]"
+          },
+          "keyvault_Name": {
+            "value": "[parameters('keyvault_Name_Pack')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_Sophos_Block_IOC_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Auth_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Block_IOC_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_Sophos_Device_Isolation_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Auth_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Device_Isolation_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_Sophos_Get_Device_Info_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Auth_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Device_Info_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Auth_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_Sophos_Launch_Antivirus_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_Sophos_Auth_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Launch_Antivirus_Playbook')]"
+          },
+          "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "postDeployNote": {
+      "type": "string",
+      "value": "✅ Despliegue completado.\n⚠️ Ahora debes asignar permisos de comentarios a los playbooks: \n⚫ Cliente_Enrich_Sophos_Get_Device_Info_Playbook\n⚫ Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook\nY permisos de keyvault a los playbooks:\n⚫ Cliente_Enrich_Sophos_Get_Recent_Alert_Info_Playbook\n⚫ Cliente_Enrich_Sophos_Get_Device_Info_Playbook\n⚫ Cliente_OrchestatorPart_Sophos_Block_IOC_Playbook\n⚫ Cliente_Action_Sophos_Launch_Antivirus_Playbook\n⚫ Cliente_Action_Sophos_Device_Isolation_Playbook\n⚫ Cliente_Action_Sophos_Block_IP_Playbook\n"
+    },
+    "postDeployApiTagInstructions": {
+      "type": "string",
+      "value": "Para asignar correctamente el tag en las policy ⚠️: Acceder a Sophos Central → Mis productos → Endpoint → Policy → Configuración → Añadir nuevo. En el campo \"Etiqueta de sitio web\" hay que poner el tag escogido en el despliegue y en el campo \"Acción\" hay que poner la opción de bloquear"
+    }
+  }
+}

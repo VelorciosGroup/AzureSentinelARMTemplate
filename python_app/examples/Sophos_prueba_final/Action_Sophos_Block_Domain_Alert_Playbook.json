@@ -1,0 +1,173 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_Action_Sophos_Block_Domain_Alert_Playbook_name": {
+            "defaultValue": "Action_Sophos_Block_Domain_Alert_Playbook",
+            "type": "String"
+        },
+        "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Block_IOC_Playbook",
+            "type": "String"
+        },
+        "connections_azuresentinel_Cliente_Action_Sophos_Block_Domain_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Domain_Playbook",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_Action_Sophos_Block_Domain_Alert_Playbook_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Microsoft_Sentinel_alert": {
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "body": {
+                                    "callback_url": "@{listCallbackUrl()}"
+                                },
+                                "path": "/subscribe"
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Parse_JSON_Microsoft_Sentinel_alert": {
+                            "runAfter": {},
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@triggerBody()?['Entities']",
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "$id": {
+                                                "type": "string"
+                                            },
+                                            "HostName": {
+                                                "type": "string"
+                                            },
+                                            "Id": {
+                                                "type": "string"
+                                            },
+                                            "PartitionKey": {
+                                                "type": "string"
+                                            },
+                                            "Scope": {
+                                                "type": "string"
+                                            },
+                                            "Type": {
+                                                "type": "string"
+                                            },
+                                            "Address": {
+                                                "type": "string"
+                                            },
+                                            "Algorithm": {
+                                                "type": "string"
+                                            },
+                                            "Value": {
+                                                "type": "string"
+                                            },
+                                            "Url": {
+                                                "type": "string"
+                                            },
+                                            "DetonationVerdict": {
+                                                "type": "string"
+                                            },
+                                            "DetonationFinalUrl": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Filter_URL_entities": {
+                            "runAfter": {
+                                "Parse_JSON_Microsoft_Sentinel_alert": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Query",
+                            "inputs": {
+                                "from": "@body('Parse_JSON_Microsoft_Sentinel_alert')",
+                                "where": "@equals(item()?['Type'], 'url')"
+                            }
+                        },
+                        "Select_URL_strings": {
+                            "runAfter": {
+                                "Filter_URL_entities": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Select",
+                            "inputs": {
+                                "from": "@body('Filter_URL_entities')",
+                                "select": "@coalesce(item()?['Url'], item()?['DetonationFinalUrl'])"
+                            }
+                        },
+                        "Sophos_Block_IOC": {
+                            "runAfter": {
+                                "Select_URL_strings": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "manual"
+                                },
+                                "body": {
+                                    "type": "URL",
+                                    "content": "@body('Select_URL_strings')"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azuresentinel": {
+                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
+                                "connectionId": "[parameters('connections_azuresentinel_Cliente_Action_Sophos_Block_Domain_Playbook_externalid')]",
+                                "connectionName": "azuresentinel-Cliente_Action_Sophos_Block_Domain_Playbook",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,474 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name": {
+      "defaultValue": "OrchestatorPart_Sophos_Get_Device_Info_Playbook",
+      "type": "String"
+    },
+    "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Auth_Playbook",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name'))]",
+    "var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name')]",
+      "location": "westeurope",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
+            },
+            "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name": {
+              "type": "String",
+              "defaultValue": "[parameters('workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name')]"
+            },
+            "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+              "type": "String",
+              "defaultValue": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+            }
+          },
+          "triggers": {
+            "When_an_HTTP_request_is_received": {
+              "type": "Request",
+              "kind": "Http",
+              "inputs": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "incidentArmId": {
+                      "type": "string"
+                    },
+                    "hostnames": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "incidentArmId",
+                    "hostnames"
+                  ]
+                }
+              }
+            }
+          },
+          "actions": {
+            "Initialize_Variable_Final_Summary": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Final Summary",
+                    "type": "string",
+                    "value": ""
+                  }
+                ]
+              }
+            },
+            "Initialize_variables_Hostnames_and_Devices": {
+              "runAfter": {
+                "Initialize_Variable_Final_Summary": [
+                  "Succeeded"
+                ]
+              },
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "hostnames",
+                    "type": "array",
+                    "value": "@coalesce(triggerBody()?['hostnames'], createArray())"
+                  },
+                  {
+                    "name": "devices",
+                    "type": "array",
+                    "value": []
+                  }
+                ]
+              }
+            },
+            "OrchestatorPart_Sophos_Auth_Playbook": {
+              "runAfter": {
+                "Initialize_variables_Hostnames_and_Devices": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "host": {
+                  "workflow": {
+                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+                  },
+                  "triggerName": "When_an_HTTP_request_is_received"
+                }
+              }
+            },
+            "Parse_OrchestatorPart_Sophos_Auth_Playbook": {
+              "runAfter": {
+                "OrchestatorPart_Sophos_Auth_Playbook": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('OrchestatorPart_Sophos_Auth_Playbook')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "TenantRegion": {
+                      "type": "string"
+                    },
+                    "TenantID": {
+                      "type": "string"
+                    },
+                    "AccessToken": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            },
+            "For_each_Hostname": {
+              "foreach": "@variables('hostnames')",
+              "actions": {
+                "HTTP_GET_Devices_From_Hostname": {
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/endpoints?hostnameContains=@{encodeUriComponent(items('For_each_Hostname'))}",
+                    "method": "GET",
+                    "headers": {
+                      "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
+                      "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}",
+                      "Accept": "application/json"
+                    }
+                  },
+                  "runtimeConfiguration": {
+                    "contentTransfer": {
+                      "transferMode": "Chunked"
+                    }
+                  }
+                },
+                "Parse_JSON_All_Devices": {
+                  "runAfter": {
+                    "HTTP_GET_Devices_From_Hostname": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "ParseJson",
+                  "inputs": {
+                    "content": "@body('HTTP_GET_Devices_From_Hostname')",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "items": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "hostname": {
+                                "type": "string"
+                              },
+                              "health": {
+                                "type": "object",
+                                "properties": {
+                                  "overall": {
+                                    "type": "string"
+                                  },
+                                  "threats": {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "services": {
+                                    "type": "object",
+                                    "properties": {
+                                      "status": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  }
+                                }
+                              },
+                              "os": {
+                                "type": "object",
+                                "properties": {
+                                  "isServer": {
+                                    "type": "boolean"
+                                  },
+                                  "platform": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "majorVersion": {
+                                    "type": "integer"
+                                  },
+                                  "minorVersion": {
+                                    "type": "integer"
+                                  },
+                                  "build": {
+                                    "type": "integer"
+                                  }
+                                }
+                              },
+                              "ipv4Addresses": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "ipv6Addresses": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "macAddresses": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "mdrManaged": {
+                                "type": "boolean"
+                              },
+                              "associatedPerson": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "viaLogin": {
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "tamperProtectionEnabled": {
+                                "type": "boolean"
+                              },
+                              "lastSeenAt": {
+                                "type": "string"
+                              },
+                              "lockdown": {
+                                "type": "object",
+                                "properties": {
+                                  "status": {
+                                    "type": "string"
+                                  }
+                                }
+                              },
+                              "online": {
+                                "type": "boolean"
+                              },
+                              "isolation": {
+                                "type": "object",
+                                "properties": {
+                                  "status": {
+                                    "type": "string"
+                                  },
+                                  "adminIsolated": {
+                                    "type": "boolean"
+                                  },
+                                  "selfIsolated": {
+                                    "type": "boolean"
+                                  }
+                                }
+                              }
+                            },
+                            "required": []
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "Compose_union_devices": {
+                  "runAfter": {
+                    "Parse_JSON_All_Devices": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Compose",
+                  "inputs": "@union(variables('devices'), coalesce(body('Parse_JSON_All_Devices')?['items'], createArray()))"
+                },
+                "Set_variable_Devices": {
+                  "runAfter": {
+                    "Compose_union_devices": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "SetVariable",
+                  "inputs": {
+                    "name": "devices",
+                    "value": "@outputs('Compose_union_devices')"
+                  }
+                }
+              },
+              "runAfter": {
+                "Parse_OrchestatorPart_Sophos_Auth_Playbook": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Foreach",
+              "runtimeConfiguration": {
+                "concurrency": {
+                  "repetitions": 20
+                }
+              }
+            },
+            "Condition_devices_found": {
+              "actions": {
+                "For_each_Device": {
+                  "foreach": "@variables('devices')",
+                  "actions": {
+                    "Append_to_Final_Summary": {
+                      "type": "AppendToStringVariable",
+                      "inputs": {
+                        "name": "Final Summary",
+                        "value": "<h2>INFORMACIÓN ASOCIADA AL DISPOSITIVO @{items('For_each_Device')?['hostname']}:</h2>\n<b>id:</b> @{items('For_each_Device')?['id']}\n<b>tipo:</b> @{items('For_each_Device')?['type']}\n<b>hostname:</b> @{items('For_each_Device')?['hostname']}\n<b>Estado general de salud:</b> @{items('For_each_Device')?['health']?['overall']}\n\n<h3>SISTEMA OPERATIVO (OS):</h3>\n<b>Es servidor:</b> @{items('For_each_Device')?['os']?['isServer']}\n<b>Plataforma:</b> @{items('For_each_Device')?['os']?['platform']}\n<b>Nombre:</b> @{items('For_each_Device')?['os']?['name']}\n<b>Versión principal:</b> @{items('For_each_Device')?['os']?['majorVersion']}\n<b>Direcciones IPv4:</b> @{join(coalesce(items('For_each_Device')?['ipv4Addresses'], createArray()), ', ')}\n<b>Direcciones IPv6:</b> @{join(coalesce(items('For_each_Device')?['ipv6Addresses'], createArray()), ', ')}\n<b>Direcciones MAC:</b> @{join(coalesce(items('For_each_Device')?['macAddresses'], createArray()), ', ')}\n\n<h3>PERSONA ASOCIADA:</h3>\n<b>ID:</b> @{items('For_each_Device')?['associatedPerson']?['id']}\n<b>Nombre:</b> @{items('For_each_Device')?['associatedPerson']?['name']}\n<b>Login:</b> @{items('For_each_Device')?['associatedPerson']?['viaLogin']}\n\n<h3>PROTECCIÓN Y FECHAS:</h3>\n<b>Tamper Protection habilitado:</b> @{items('For_each_Device')?['tamperProtectionEnabled']}\n<b>Última conexión:</b> @{items('For_each_Device')?['lastSeenAt']}\n\n<h3>BLOQUEO (LOCKDOWN):</h3>\n<b>Estado:</b> @{items('For_each_Device')?['lockdown']?['status']}\n\n<h3>CONECTIVIDAD:</h3>\n<b>Online:</b> @{items('For_each_Device')?['online']}\n\n<h3>AISLAMIENTO:</h3>\n<b>Estado:</b> @{items('For_each_Device')?['isolation']?['status']}\n<b>Aislado por admin:</b> @{items('For_each_Device')?['isolation']?['adminIsolated']}\n<b>Autoaislado:</b> @{items('For_each_Device')?['isolation']?['selfIsolated']}\n<hr/>"
+                      }
+                    }
+                  },
+                  "type": "Foreach",
+                  "runtimeConfiguration": {
+                    "concurrency": {
+                      "repetitions": 1
+                    }
+                  }
+                }
+              },
+              "runAfter": {
+                "For_each_Hostname": [
+                  "Succeeded"
+                ]
+              },
+              "else": {
+                "actions": {
+                  "Append_not_found": {
+                    "type": "AppendToStringVariable",
+                    "inputs": {
+                      "name": "Final Summary",
+                      "value": "<h2>Dispositivos no encontrados en Sophos para los hostnames recibidos.</h2>"
+                    }
+                  }
+                }
+              },
+              "expression": {
+                "and": [
+                  {
+                    "not": {
+                      "equals": [
+                        "@length(variables('devices'))",
+                        0
+                      ]
+                    }
+                  }
+                ]
+              },
+              "type": "If"
+            },
+            "Agregar_un_comentario_al_incidente_(V3)": {
+              "runAfter": {
+                "Condition_devices_found": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "body": {
+                  "incidentArmId": "@triggerBody()?['incidentArmId']",
+                  "message": "<p class=\"editor-paragraph\">@{variables('Final Summary')}</p>"
+                },
+                "path": "/Incidents/Comment"
+              }
+            },
+            "Response": {
+              "runAfter": {
+                "Agregar_un_comentario_al_incidente_(V3)": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 200
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azuresentinel": {
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('AzureSentinelConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[variables('AzureSentinelConnectionName')]",
+        "customParameterValues": {},
+        "parameterValueType": "Alternative",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+        }
+      }
+    }
+  ]
+}
