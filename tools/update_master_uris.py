@@ -8,123 +8,140 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 
-DEPLOY_REGEX = re.compile(r"deploy", re.IGNORECASE)
+RE_DEPLOY = re.compile(r"deploy", re.IGNORECASE)  # master template contiene "deploy" en el filename
 
 
-def is_master_template(path: Path) -> bool:
-    """
-    Devuelve True si el fichero es una master template.
-    Criterio: el nombre contiene la palabra 'deploy' (case-insensitive)
-    """
-    return (
-        path.is_file()
-        and path.suffix.lower() == ".json"
-        and DEPLOY_REGEX.search(path.name) is not None
-    )
+def _repo_root() -> Path:
+    # En Actions, el repo se clona en el cwd normalmente. Aun así, soportamos GITHUB_WORKSPACE.
+    ws = os.environ.get("GITHUB_WORKSPACE")
+    if ws:
+        return Path(ws)
+    return Path.cwd()
 
 
-def update_master_template(
+def _raw_uri(owner: str, repo: str, branch: str, rel_path: str) -> str:
+    # rel_path debe usar "/" (no backslashes)
+    rel_path = rel_path.replace("\\", "/")
+    return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{rel_path}"
+
+
+def _find_deploy_templates(repo_root: Path) -> List[Path]:
+    # Busca *cualquier* json que tenga "deploy" en el nombre (deploy.json, Deploy_Sophos.json, etc.)
+    out: List[Path] = []
+    for p in repo_root.rglob("*.json"):
+        if RE_DEPLOY.search(p.name):
+            out.append(p)
+    return sorted(out)
+
+
+def _load_json(path: Path) -> Dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _save_json(path: Path, data: Dict[str, Any]) -> None:
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def _update_deploy_file(
     deploy_path: Path,
+    repo_root: Path,
     owner: str,
     repo: str,
     branch: str,
 ) -> Tuple[bool, List[str]]:
     """
-    Actualiza templateLink.uri en:
-      resources[*] donde type == Microsoft.Resources/deployments
+    Actualiza properties.templateLink.uri de cada Microsoft.Resources/deployments
+    para que apunte al raw de la rama actual.
 
-    URI final:
-      https://raw.githubusercontent.com/<owner>/<repo>/<branch>/<folder>/Cliente_<deploymentName>.json
+    Asume estructura:
+      <CarpetaEntidad>/<Deploy*.json>
+      <CarpetaEntidad>/<Cliente_*.json> (playbooks)
     """
-    changed = False
-    changes_log: List[str] = []
-
-    data: Dict[str, Any] = json.loads(deploy_path.read_text(encoding="utf-8"))
+    data = _load_json(deploy_path)
     resources = data.get("resources", [])
     if not isinstance(resources, list):
-        return False, changes_log
+        return False, []
 
-    folder_posix = deploy_path.parent.as_posix()
+    changes: List[str] = []
+    changed = False
 
-    for res in resources:
-        if not isinstance(res, dict):
+    for r in resources:
+        if not isinstance(r, dict):
             continue
-        if res.get("type") != "Microsoft.Resources/deployments":
-            continue
-
-        deployment_name = res.get("name")
-        if not isinstance(deployment_name, str) or not deployment_name:
+        if r.get("type") != "Microsoft.Resources/deployments":
             continue
 
-        props = res.get("properties")
+        name = r.get("name")
+        props = r.get("properties")
         if not isinstance(props, dict):
             continue
-
-        template_link = props.get("templateLink")
-        if not isinstance(template_link, dict):
+        tl = props.get("templateLink")
+        if not isinstance(tl, dict):
             continue
 
-        expected_path = f"{folder_posix}/Cliente_{deployment_name}.json"
-        expected_uri = (
-            f"https://raw.githubusercontent.com/"
-            f"{owner}/{repo}/{branch}/{expected_path}"
-        )
+        # Archivo esperado: carpeta del deploy + Cliente_<name>.json
+        # (si no existe, intentamos <name>.json)
+        folder = deploy_path.parent
+        candidate1 = folder / f"Cliente_{name}.json" if isinstance(name, str) else None
+        candidate2 = folder / f"{name}.json" if isinstance(name, str) else None
 
-        current_uri = template_link.get("uri")
-        if current_uri != expected_uri:
-            template_link["uri"] = expected_uri
+        target: Path | None = None
+        if candidate1 and candidate1.is_file():
+            target = candidate1
+        elif candidate2 and candidate2.is_file():
+            target = candidate2
+        else:
+            # Si no encontramos el playbook, no tocamos esa uri
+            continue
+
+        rel = target.resolve().relative_to(repo_root.resolve()).as_posix()
+        new_uri = _raw_uri(owner, repo, branch, rel)
+
+        old_uri = tl.get("uri")
+        if old_uri != new_uri:
+            tl["uri"] = new_uri
             changed = True
-            changes_log.append(
-                f"{deploy_path.as_posix()}: {deployment_name} -> {expected_uri}"
-            )
+            changes.append(f"{deploy_path}: {name} -> {new_uri}")
 
     if changed:
-        deploy_path.write_text(
-            json.dumps(data, indent=2, ensure_ascii=False) + "\n",
-            encoding="utf-8",
-        )
+        _save_json(deploy_path, data)
 
-    return changed, changes_log
+    return changed, changes
 
 
 def main() -> int:
+    repo_root = _repo_root()
+
     owner = os.environ.get("GITHUB_OWNER", "").strip()
     repo = os.environ.get("GITHUB_REPO", "").strip()
     branch = os.environ.get("GITHUB_BRANCH", "").strip()
 
     if not owner or not repo or not branch:
-        print("ERROR: faltan env vars GITHUB_OWNER / GITHUB_REPO / GITHUB_BRANCH")
-        return 2
+        print("ERROR: faltan env vars. Requiere: GITHUB_OWNER, GITHUB_REPO, GITHUB_BRANCH")
+        return 0  # no rompas el workflow
 
-    root = Path(".").resolve()
-
-    master_templates = [
-        p for p in root.rglob("*.json") if is_master_template(p)
-    ]
-
-    if not master_templates:
-        print("No se encontraron master templates (regex: /deploy/i).")
+    deploys = _find_deploy_templates(repo_root)
+    if not deploys:
+        print("No se encontraron deploy templates (archivos .json que contengan 'deploy' en el nombre).")
         return 0
 
     any_changed = False
-    all_logs: List[str] = []
+    all_changes: List[str] = []
 
-    for deploy_path in sorted(master_templates):
-        changed, logs = update_master_template(
-            deploy_path, owner, repo, branch
-        )
+    for d in deploys:
+        changed, changes = _update_deploy_file(d, repo_root, owner, repo, branch)
         if changed:
             any_changed = True
-            all_logs.extend(logs)
+            all_changes.extend(changes)
 
     if any_changed:
         print("URIs actualizadas:")
-        for line in all_logs:
-            print(" -", line)
-        return 1
+        for c in all_changes:
+            print(f" - {c}")
+    else:
+        print("No hubo cambios de URIs.")
 
-    print("Nada que actualizar.")
-    return 0
+    return 0  # IMPORTANTÍSIMO: nunca salir con 1 aquí
 
 
 if __name__ == "__main__":

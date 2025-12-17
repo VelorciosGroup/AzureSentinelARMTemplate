@@ -9,7 +9,8 @@ permissions:
 jobs:
   update-uris:
     # Evita bucle infinito cuando el bot hace el commit
-    if: github.actor != 'github-actions[bot]'
+    # y también si el commit lleva [skip ci]
+    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
 
     steps:
@@ -23,15 +24,14 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Update Deploy_* templateLink URIs for current branch
-        id: update
-        env:
-          GITHUB_OWNER: ${{ github.repository_owner }}
-          GITHUB_REPO: ${{ github.event.repository.name }}
-          GITHUB_BRANCH: ${{ github.ref_name }}
+      - name: Set repo vars
         run: |
-          python3 tools/update_master_uris.py
-          echo "exit_code=$?" >> $GITHUB_OUTPUT
+          echo "GITHUB_BRANCH=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "GITHUB_OWNER=${GITHUB_REPOSITORY_OWNER}" >> $GITHUB_ENV
+          echo "GITHUB_REPO=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
+
+      - name: Update Deploy* templateLink URIs for current branch
+        run: python3 tools/update_master_uris.py
 
       - name: Commit changes (if any)
         run: |
@@ -44,5 +44,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           git add -A
-          git commit -m "chore: update templateLink URIs for branch ${{ github.ref_name }} [skip ci]"
+          git commit -m "chore: update templateLink URIs for branch ${GITHUB_REF_NAME} [skip ci]"
           git push
