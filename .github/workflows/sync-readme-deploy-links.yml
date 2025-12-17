@@ -20,7 +20,10 @@ jobs:
       - name: Set branch name
         run: echo "GITHUB_BRANCH=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
-      - name: Update README deploy links
+      - name: Update README deploy links + contents
+        env:
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
         run: python3 tools/update_readme_deploy_links.py
 
       - name: Commit changes (if any)
