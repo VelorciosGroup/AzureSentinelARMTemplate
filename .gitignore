@@ -68,3 +68,5 @@ coverage.xml
 
 # Examples (do not track)
 examples/
+input/
+output/
