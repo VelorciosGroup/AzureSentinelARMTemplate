@@ -1,0 +1,48 @@
+name: Update ARM templateLink URIs
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  update-uris:
+    # Evita bucle infinito cuando el bot hace el commit
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Update Deploy_* templateLink URIs for current branch
+        id: update
+        env:
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          GITHUB_BRANCH: ${{ github.ref_name }}
+        run: |
+          python3 tools/update_master_uris.py
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+      - name: Commit changes (if any)
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          git commit -m "chore: update templateLink URIs for branch ${{ github.ref_name }} [skip ci]"
+          git push
