@@ -57,10 +57,10 @@ def main() -> int:
 
     if changed:
         print(f"README.md actualizado: {n} reemplazos a rama '{branch}'.")
-        return 1  # 1 = hubo cambios
     else:
         print("README.md: nada que actualizar.")
-        return 0
+
+    return 0  # 👈 SIEMPRE 0
 
 
 if __name__ == "__main__":
