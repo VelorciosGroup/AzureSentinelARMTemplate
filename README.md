@@ -9,7 +9,7 @@
   <tr>
     <td><b>Sophos</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2FDeploy_Sophos.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fworkflows%2FSophos%2FDeploy_Sophos.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
@@ -33,7 +33,7 @@
   <tr>
     <td><b>API Username Parser</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fworkflows%2FAPI_parser_usernames%2FDeploy_API_Parser.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
@@ -51,7 +51,7 @@
   <tr>
     <td><b>CrowdStrike</b></td>
     <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2FDeploy_CrowdStrike.json">
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fworkflows%2FCrowdStrike%2FDeploy_CrowdStrike.json">
         <img src="./Button.png" alt="Deploy to Azure" width="140px" />
       </a>
     </td>
