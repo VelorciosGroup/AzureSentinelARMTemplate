@@ -1,131 +1,140 @@
 {
-	"$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-	"contentVersion": "1.0.0.0",
-	"parameters": {
-		"client_Name": {
-			"defaultValue": "Cliente",
-			"type": "string"
-		}
-	},
-	"variables": {},
-	"resources": [
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
-			"name": "OrchestatorPart_API_Parser_Playbook",
-			"dependsOn": [],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_OrchestatorPart_API_Parser_Playbook.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
-			"name": "OrchestatorPart_API_Parser_Petition_Playbook",
-			"dependsOn": [],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_OrchestatorPart_API_Petition.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
-			"name": "Action_API_Parser_Account_Entity_Playbook",
-			"dependsOn": ["OrchestatorPart_API_Parser_Petition_Playbook", "OrchestatorPart_API_Parser_Playbook"],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_API_Parser_Account_Entity_Playbook.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Account_Entity')]"
-					},
-					"API_Parser_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
-					},
-					"API_Parser_Petition_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
-			"name": "Action_API_Parser_Alert_Playbook",
-			"dependsOn": ["OrchestatorPart_API_Parser_Petition_Playbook", "OrchestatorPart_API_Parser_Playbook"],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_API_Parser_Alert_Playbook.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Alert_Playbook')]"
-					},
-					"API_Parser_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
-					},
-					"API_Parser_Petition_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
-					}
-				}
-			}
-		},
-		{
-			"type": "Microsoft.Resources/deployments",
-			"apiVersion": "2025-03-01",
-			"name": "Action_API_Parser_Incident_Playbook",
-			"dependsOn": ["OrchestatorPart_API_Parser_Petition_Playbook", "OrchestatorPart_API_Parser_Playbook"],
-			"properties": {
-				"mode": "Incremental",
-				"templateLink": {
-					"uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_Action_API_Parser_Incident_Playbook.json",
-					"contentVersion": "1.0.0.0"
-				},
-				"parameters": {
-					"PlaybookName": {
-						"value": "[concat(parameters('client_Name'), '_Action_API_Parser_Incident')]"
-					},
-					"API_Parser_Playbook_Name": {
-						"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
-					},
-					"API_Parser_Petition_Playbook_Name": {
-            			"value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
-        			}
-				}
-			}
-		}
-	],
-	"outputs": {
-		"postDeployNote": {
-			"type": "string",
-			"value": "✅ Despliegue completado.\n⚠️ Ahora debes cambiar la conexión a la base de datos del playbook: \"OrchestatorPart_API_Parser_Playbook\""
-		},
-		"postDeployApiTagInstructions": {
-			"type": "string",
-			"value": "✅ Despliegue completado.\n⚠️ Ahora se debe cambiar la petición a la API del cliente en el playbook \"OrchestatorPart_API_Parser_Petition_Playbook\""
-		}
-	}
+  "$schema": "http://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "client_Name": {
+      "defaultValue": "Cliente",
+      "type": "string"
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_API_Parser_Playbook",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/workflows/API_parser_usernames/Cliente_OrchestatorPart_API_Parser_Playbook.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "PlaybookName": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "OrchestatorPart_API_Parser_Petition_Playbook",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/refs/heads/main/API_parser_usernames/Cliente_OrchestatorPart_API_Petition.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "PlaybookName": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_API_Parser_Account_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_API_Parser_Petition_Playbook",
+        "OrchestatorPart_API_Parser_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/workflows/API_parser_usernames/Cliente_Action_API_Parser_Account_Entity_Playbook.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "PlaybookName": {
+            "value": "[concat(parameters('client_Name'), '_Action_API_Parser_Account_Entity')]"
+          },
+          "API_Parser_Playbook_Name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
+          },
+          "API_Parser_Petition_Playbook_Name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_API_Parser_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_API_Parser_Petition_Playbook",
+        "OrchestatorPart_API_Parser_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/workflows/API_parser_usernames/Cliente_Action_API_Parser_Alert_Playbook.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "PlaybookName": {
+            "value": "[concat(parameters('client_Name'), '_Action_API_Parser_Alert_Playbook')]"
+          },
+          "API_Parser_Playbook_Name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
+          },
+          "API_Parser_Petition_Playbook_Name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-03-01",
+      "name": "Action_API_Parser_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_API_Parser_Petition_Playbook",
+        "OrchestatorPart_API_Parser_Playbook"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/workflows/API_parser_usernames/Cliente_Action_API_Parser_Incident_Playbook.json",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "PlaybookName": {
+            "value": "[concat(parameters('client_Name'), '_Action_API_Parser_Incident')]"
+          },
+          "API_Parser_Playbook_Name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Playbook')]"
+          },
+          "API_Parser_Petition_Playbook_Name": {
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_API_Parser_Petition_Playbook')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "postDeployNote": {
+      "type": "string",
+      "value": "✅ Despliegue completado.\n⚠️ Ahora debes cambiar la conexión a la base de datos del playbook: \"OrchestatorPart_API_Parser_Playbook\""
+    },
+    "postDeployApiTagInstructions": {
+      "type": "string",
+      "value": "✅ Despliegue completado.\n⚠️ Ahora se debe cambiar la petición a la API del cliente en el playbook \"OrchestatorPart_API_Parser_Petition_Playbook\""
+    }
+  }
 }
