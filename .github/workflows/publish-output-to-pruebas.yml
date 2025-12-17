@@ -1,0 +1,84 @@
+name: publish-output-to-pruebas
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-output:
+    # Evita bucle infinito cuando el bot hace el commit
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Si en tu repo "output/" ya está generado y commiteado, no necesitas generar nada.
+      # Si quieres generar output aquí, añade tu comando debajo (antes de publicar).
+      #
+      # - name: Generate output
+      #   run: |
+      #     python3 your_generator.py
+
+      - name: Ensure output exists
+        run: |
+          if [ ! -d "output" ]; then
+            echo "ERROR: folder 'output/' does not exist."
+            exit 1
+          fi
+          if [ -z "$(ls -A output 2>/dev/null)" ]; then
+            echo "ERROR: folder 'output/' is empty."
+            exit 1
+          fi
+
+      - name: Checkout target branch (pruebas) in a worktree
+        run: |
+          git fetch origin pruebas || true
+
+          # Crea worktree con la rama 'pruebas' (si no existe, la crea desde el commit actual)
+          if git show-ref --quiet refs/remotes/origin/pruebas; then
+            git worktree add _wt_pruebas origin/pruebas
+          else
+            git checkout -b pruebas
+            git push -u origin pruebas
+            git worktree add _wt_pruebas pruebas
+          fi
+
+      - name: Sync output/ into pruebas branch root
+        run: |
+          set -e
+
+          WT="_wt_pruebas"
+
+          # Por cada carpeta/archivo en output/*, elimina el equivalente en el root de pruebas
+          # (para evitar archivos antiguos dentro de esas carpetas),
+          # pero SIN tocar README/docs/etc si no vienen desde output.
+          for item in output/*; do
+            base="$(basename "$item")"
+            rm -rf "${WT:?}/${base}"
+          done
+
+          # Copia output/* al root de pruebas (crea Sophos/, CrowdStrike/, etc.)
+          rsync -a output/ "${WT}/"
+
+      - name: Commit and push (if any)
+        run: |
+          WT="_wt_pruebas"
+          cd "$WT"
+
+          if git diff --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -A
+          git commit -m "chore: publish generated output to pruebas [skip ci]"
+          git push origin HEAD:pruebas
