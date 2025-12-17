@@ -916,6 +916,27 @@ def _cleanup_unused_parameters(playbook: Dict[str, Any]) -> None:
         if not (changed_def or changed_root):
             break
 
+def _sanitize_workflow_parameters(playbook: Dict[str, Any]) -> None:
+    """
+    Sanitizes only root parameters whose name starts with 'workflows_'.
+
+    Rule:
+      - parameters["workflows_*"].defaultValue (string) -> "BORRAR"
+      - Everything else remains untouched
+    """
+    params = playbook.get("parameters")
+    if not isinstance(params, dict):
+        return
+
+    for pname, pdef in params.items():
+        if not isinstance(pname, str):
+            continue
+        if not pname.startswith("workflows_"):
+            continue
+        if not isinstance(pdef, dict):
+            continue
+        if isinstance(pdef.get("defaultValue"), str):
+            pdef["defaultValue"] = "BORRAR"
 
 # ---------------------------------------------------------------------------
 # Transformación principal
@@ -941,8 +962,8 @@ def transform_playbook(
 
     _remove_numbered_azuresentinel_connections(playbook)
 
-    # ✅ NUEVO: garantiza definition.parameters.$connections en todos los workflows
-    # _ensure_definition_connections_parameter(playbook)
+    # Final step: sanitize only workflows_* root parameters
+    _sanitize_workflow_parameters(playbook)
 
     _ensure_workflow_connection_blocks(playbook)
     _ensure_connection_resources(playbook)
