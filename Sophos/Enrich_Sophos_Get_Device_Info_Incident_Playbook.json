@@ -1,0 +1,153 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_Enrich_Sophos_Get_Device_Info_Incident_Playbook_name": {
+            "defaultValue": "Enrich_Sophos_Get_Device_Info_Incident_Playbook",
+            "type": "String"
+        },
+        "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Get_Device_Info_Playbook",
+            "type": "String"
+        },
+        "connections_azuresentinel_6_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-6",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_Enrich_Sophos_Get_Device_Info_Incident_Playbook_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Microsoft_Sentinel_incident": {
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "body": {
+                                    "callback_url": "@listCallbackUrl()"
+                                },
+                                "path": "/incident-creation"
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Entidades:_obtener_hosts": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "path": "/entities/host"
+                            }
+                        },
+                        "Initialize_hostnames": {
+                            "runAfter": {
+                                "Entidades:_obtener_hosts": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "hostnames",
+                                        "type": "array",
+                                        "value": []
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each_Sentinel_Host": {
+                            "foreach": "@coalesce(body('Entidades:_obtener_hosts')?['Hosts'], createArray())",
+                            "actions": {
+                                "Append_hostname": {
+                                    "type": "AppendToArrayVariable",
+                                    "inputs": {
+                                        "name": "hostnames",
+                                        "value": "@coalesce(items('For_each_Sentinel_Host')?['hostName'], items('For_each_Sentinel_Host')?['HostName'])"
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Initialize_hostnames": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach",
+                            "runtimeConfiguration": {
+                                "concurrency": {
+                                    "repetitions": 20
+                                }
+                            }
+                        },
+                        "OrchestatorPart_Sophos_Get_Device_Info_Playbook": {
+                            "runAfter": {
+                                "For_each_Sentinel_Host": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "When_an_HTTP_request_is_received"
+                                },
+                                "body": {
+                                    "incidentArmId": "@triggerBody()?['object']?['id']",
+                                    "hostnames": "@variables('hostnames')"
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "type": "Object",
+                        "value": {
+                            "azuresentinel": {
+                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
+                                "connectionId": "[parameters('connections_azuresentinel_6_externalid')]",
+                                "connectionName": "azuresentinel-6",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

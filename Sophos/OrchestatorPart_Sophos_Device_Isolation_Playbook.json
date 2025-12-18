@@ -1,0 +1,287 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name": {
+            "defaultValue": "OrchestatorPart_Sophos_Device_Isolation_Playbook",
+            "type": "String"
+        },
+        "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Auth_Playbook",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_an_HTTP_request_is_received": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "hostnames": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "HostName": {
+                            "runAfter": {
+                                "Parse_OrchestatorPart_Sophos_Auth_Playbook": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "HostName",
+                                        "type": "string",
+                                        "value": ""
+                                    }
+                                ]
+                            }
+                        },
+                        "OrchestatorPart_Sophos_Auth_Playbook": {
+                            "runAfter": {},
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "When_an_HTTP_request_is_received"
+                                }
+                            }
+                        },
+                        "Parse_OrchestatorPart_Sophos_Auth_Playbook": {
+                            "runAfter": {
+                                "OrchestatorPart_Sophos_Auth_Playbook": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('OrchestatorPart_Sophos_Auth_Playbook')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "TenantRegion": {
+                                            "type": "string"
+                                        },
+                                        "TenantID": {
+                                            "type": "string"
+                                        },
+                                        "AccessToken": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Isolation_Device_ID": {
+                            "runAfter": {
+                                "HostName": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Isolation Device ID",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "For_each_1": {
+                            "foreach": "@triggerBody()?['hostnames']",
+                            "actions": {
+                                "Set_HostName": {
+                                    "type": "SetVariable",
+                                    "inputs": {
+                                        "name": "HostName",
+                                        "value": "@{items('For_each_1')}"
+                                    }
+                                },
+                                "GetDeviceID": {
+                                    "runAfter": {
+                                        "Set_HostName": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/endpoints?hostnameContains=@{variables('HostName')}",
+                                        "method": "GET",
+                                        "headers": {
+                                            "Content-Type": "application/json",
+                                            "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
+                                            "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}"
+                                        }
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    }
+                                },
+                                "Parse_JSON": {
+                                    "runAfter": {
+                                        "GetDeviceID": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('GetDeviceID')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "items": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "hostname": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id",
+                                                            "hostname"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "For_each": {
+                                    "foreach": "@body('Parse_JSON')?['items']",
+                                    "actions": {
+                                        "Condition": {
+                                            "actions": {
+                                                "PostIsolateDevices": {
+                                                    "runAfter": {
+                                                        "Set_Isolation_Device_ID": [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type": "Http",
+                                                    "inputs": {
+                                                        "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/endpoints/isolation",
+                                                        "method": "POST",
+                                                        "headers": {
+                                                            "Content-Type": "application/json",
+                                                            "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
+                                                            "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}"
+                                                        },
+                                                        "body": {
+                                                            "enabled": true,
+                                                            "comment": "Isolating endpoints with suspicious health",
+                                                            "ids": [
+                                                                "@variables('Isolation Device ID')"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "runtimeConfiguration": {
+                                                        "contentTransfer": {
+                                                            "transferMode": "Chunked"
+                                                        }
+                                                    }
+                                                },
+                                                "Set_Isolation_Device_ID": {
+                                                    "type": "SetVariable",
+                                                    "inputs": {
+                                                        "name": "Isolation Device ID",
+                                                        "value": "@item()?['id']"
+                                                    }
+                                                }
+                                            },
+                                            "else": {
+                                                "actions": {}
+                                            },
+                                            "expression": {
+                                                "and": [
+                                                    {
+                                                        "equals": [
+                                                            "@item()?['hostname']",
+                                                            "@variables('HostName')"
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "type": "If"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Parse_JSON": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                }
+                            },
+                            "runAfter": {
+                                "Isolation_Device_ID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Foreach"
+                        },
+                        "Response": {
+                            "runAfter": {
+                                "For_each_1": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {}
+                    }
+                }
+            }
+        }
+    ]
+}
