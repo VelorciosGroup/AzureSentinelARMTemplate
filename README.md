@@ -23,37 +23,6 @@
   </tr>
 
   <tr>
-    <td><b>CrowdStrike</b></td>
-    <td>
-      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2Foutput%2Fdeploy.json">
-        <img src="./Button.png" alt="Deploy to Azure" width="140px" />
-      </a>
-    </td>
-    <td>
-      • <a href="./CrowdStrike/output/Action_Crowdstrike_Block_Hash_Alert_Playbook.json">Action_Crowdstrike_Block_Hash_Alert_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_Crowdstrike_Block_Hash_Entity_Playbook.json">Action_Crowdstrike_Block_Hash_Entity_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_Crowdstrike_Block_Hash_Incident_Playbook.json">Action_Crowdstrike_Block_Hash_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_CrowdStrike_Device_Isolation_Alert_Playbook.json">Action_CrowdStrike_Device_Isolation_Alert_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_CrowdStrike_Device_Isolation_Entity_Playbook.json">Action_CrowdStrike_Device_Isolation_Entity_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_CrowdStrike_Device_Isolation_Incident_Playbook.json">Action_CrowdStrike_Device_Isolation_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Alert_Playbook.json">Action_CrowdStrike_Launch_Antivirus_Alert_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Entity_Playbook.json">Action_CrowdStrike_Launch_Antivirus_Entity_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Incident_Playbook.json">Action_CrowdStrike_Launch_Antivirus_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Enrich_CrowdStrike_Device_Info_Incident_Playbook.json">Enrich_CrowdStrike_Device_Info_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Enrich_CrowdStrike_Recent_Alerts_Playbook.json">Enrich_CrowdStrike_Recent_Alerts_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Enrich_CrowdStrike_Recent_Incident_Playbook.json">Enrich_CrowdStrike_Recent_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Auth_Playbook.json">OrchestatorPart_CrowdStrike_Auth_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json">OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Device_Info_Playbook.json">OrchestatorPart_CrowdStrike_Device_Info_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Device_Isolation_Playbook.json">OrchestatorPart_CrowdStrike_Device_Isolation_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook.json">OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Recent_Incident_Playbook.json">OrchestatorPart_CrowdStrike_Recent_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook.json">OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/deploy.json">deploy.json</a
-    </td>
-  </tr>
-
-  <tr>
     <td><b>Sophos</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2Foutput%2Fdeploy.json">
@@ -89,6 +58,7 @@
   </tr>
 
 </table>
+
 
 
 
