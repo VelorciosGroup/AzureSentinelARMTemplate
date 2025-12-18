@@ -1,96 +1,121 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "workflows_PRUEBA_Action_Crowdstrike_Block_Hash_Entity_Playbook_name": {
-            "defaultValue": "PRUEBA_Action_Crowdstrike_Block_Hash_Entity_Playbook",
-            "type": "String"
-        },
-        "workflows_PRUEBA_Automation_Block_IOC_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_Block_IOC",
-            "type": "String"
-        },
-        "connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Action_Crowdstrike_Block_Hash",
-            "type": "String"
-        }
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workflows_Action_Crowdstrike_Block_Hash_Entity_Playbook_name": {
+      "defaultValue": "BORRAR",
+      "type": "String"
     },
-    "variables": {},
-    "resources": [
-        {
-            "type": "Microsoft.Logic/workflows",
-            "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_PRUEBA_Action_Crowdstrike_Block_Hash_Entity_Playbook_name')]",
-            "location": "westeurope",
-            "identity": {
-                "type": "SystemAssigned"
+    "workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid": {
+      "defaultValue": "BORRAR",
+      "type": "String"
+    }
+  },
+  "variables": {
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_Action_Crowdstrike_Block_Hash_Entity_Playbook_name'))]",
+    "var_workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid": "[concat('/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name ,'/providers/Microsoft.Logic/workflows/', parameters('workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Logic/workflows",
+      "apiVersion": "2017-07-01",
+      "name": "[parameters('workflows_Action_Crowdstrike_Block_Hash_Entity_Playbook_name')]",
+      "location": "westeurope",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "state": "Enabled",
+        "definition": {
+          "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "$connections": {
+              "defaultValue": {},
+              "type": "Object"
             },
-            "properties": {
-                "state": "Enabled",
-                "definition": {
-                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
-                    "contentVersion": "1.0.0.0",
-                    "parameters": {
-                        "$connections": {
-                            "defaultValue": {},
-                            "type": "Object"
-                        }
-                    },
-                    "triggers": {
-                        "Microsoft_Sentinel_entity": {
-                            "type": "ApiConnectionWebhook",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
-                                    }
-                                },
-                                "body": {
-                                    "callback_url": "@{listCallbackUrl()}"
-                                },
-                                "path": "/entity/@{encodeURIComponent('FileHash')}"
-                            }
-                        }
-                    },
-                    "actions": {
-                        "PRUEBA_Automation_Block_IOC": {
-                            "runAfter": {},
-                            "type": "Workflow",
-                            "inputs": {
-                                "host": {
-                                    "workflow": {
-                                        "id": "[parameters('workflows_PRUEBA_Automation_Block_IOC_externalid')]"
-                                    },
-                                    "triggerName": "Manual"
-                                },
-                                "body": {
-                                    "type": "sha256",
-                                    "content": [
-                                        "@triggerBody()?['Entity']?['properties']?['Value']"
-                                    ]
-                                }
-                            }
-                        }
-                    },
-                    "outputs": {}
-                },
-                "parameters": {
-                    "$connections": {
-                        "value": {
-                            "azuresentinel": {
-                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid')]",
-                                "connectionName": "[concat('azuresentinel-', parameters('workflows_PRUEBA_Action_Crowdstrike_Block_Hash_Entity_Playbook_name'))]",
-                                "connectionProperties": {
-                                    "authentication": {
-                                        "type": "ManagedServiceIdentity"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            "workflows_Action_Crowdstrike_Block_Hash_Entity_Playbook_name": {
+              "type": "String",
+              "defaultValue": "[parameters('workflows_Action_Crowdstrike_Block_Hash_Entity_Playbook_name')]"
+            },
+            "workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid": {
+              "type": "String",
+              "defaultValue": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
             }
+          },
+          "triggers": {
+            "Microsoft_Sentinel_entity": {
+              "type": "ApiConnectionWebhook",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "body": {
+                  "callback_url": "@{listCallbackUrl()}"
+                },
+                "path": "/entity/@{encodeURIComponent('FileHash')}"
+              }
+            }
+          },
+          "actions": {
+            "OrchestatorPart_Block_IOC_Playbook": {
+              "runAfter": {},
+              "type": "Workflow",
+              "inputs": {
+                "host": {
+                  "workflow": {
+                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
+                  },
+                  "triggerName": "Manual"
+                },
+                "body": {
+                  "type": "sha256",
+                  "content": [
+                    "@triggerBody()?['Entity']?['properties']?['Value']"
+                  ]
+                }
+              }
+            }
+          },
+          "outputs": {}
+        },
+        "parameters": {
+          "$connections": {
+            "value": {
+              "azuresentinel": {
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
+                "connectionName": "[variables('AzureSentinelConnectionName')]",
+                "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              }
+            }
+          }
         }
-    ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Web/connections",
+      "apiVersion": "2016-06-01",
+      "name": "[variables('AzureSentinelConnectionName')]",
+      "location": "[resourceGroup().location]",
+      "kind": "V1",
+      "properties": {
+        "displayName": "[variables('AzureSentinelConnectionName')]",
+        "customParameterValues": {},
+        "parameterValueType": "Alternative",
+        "api": {
+          "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]"
+        }
+      }
+    }
+  ]
 }

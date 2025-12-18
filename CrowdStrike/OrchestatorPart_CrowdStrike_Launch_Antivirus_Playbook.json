@@ -2,12 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_PRUEBA_OrchestatorPart_CrowdStrike_Launch_Antivirus_name": {
-            "defaultValue": "PRUEBA_OrchestatorPart_CrowdStrike_Launch_Antivirus",
+        "workflows_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_name": {
+            "defaultValue": "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook",
             "type": "String"
         },
-        "workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/PRUEBA_Automation_CrowdStrike_Auth_Playbook",
+        "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Auth_Playbook",
             "type": "String"
         }
     },
@@ -16,7 +16,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_PRUEBA_OrchestatorPart_CrowdStrike_Launch_Antivirus_name')]",
+            "name": "[parameters('workflows_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -52,7 +52,7 @@
                         }
                     },
                     "actions": {
-                        "PRUEBA_Automation_CrowdStrike_Auth_Playbook": {
+                        "OrchestatorPart_CrowdStrike_Auth_Playbook": {
                             "runAfter": {
                                 "Initialize_variables_response_output": [
                                     "Succeeded"
@@ -62,7 +62,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_PRUEBA_Automation_CrowdStrike_Auth_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 }
@@ -70,13 +70,13 @@
                         },
                         "Parse_JSON_AUTH": {
                             "runAfter": {
-                                "PRUEBA_Automation_CrowdStrike_Auth_Playbook": [
+                                "OrchestatorPart_CrowdStrike_Auth_Playbook": [
                                     "Succeeded"
                                 ]
                             },
                             "type": "ParseJson",
                             "inputs": {
-                                "content": "@body('PRUEBA_Automation_CrowdStrike_Auth_Playbook')",
+                                "content": "@body('OrchestatorPart_CrowdStrike_Auth_Playbook')",
                                 "schema": {
                                     "type": "object",
                                     "properties": {
