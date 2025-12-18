@@ -25,7 +25,9 @@
   <tr>
     <td><b>CrowdStrike</b></td>
     <td>
-      <i>No deploy.json</i>
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FCrowdStrike%2Foutput%2FDeploy_CrowdStrike.json">
+        <img src="./Button.png" alt="Deploy to Azure" width="140px" />
+      </a>
     </td>
     <td>
       • <a href="./CrowdStrike/output/Action_Crowdstrike_Block_Hash_Alert_Playbook.json">Action_Crowdstrike_Block_Hash_Alert_Playbook.json</a><br>
@@ -45,7 +47,8 @@
       • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Device_Isolation_Playbook.json">OrchestatorPart_CrowdStrike_Device_Isolation_Playbook.json</a><br>
       • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Launch_Antivirus.json">OrchestatorPart_CrowdStrike_Launch_Antivirus.json</a><br>
       • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Recent_Incident_Playbook.json">OrchestatorPart_CrowdStrike_Recent_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook.json">OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook.json</a
+      • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook.json">OrchestatorPart_CrowdStrike_Sync_Incidents_Playbook.json</a><br>
+      • <a href="./CrowdStrike/output/Deploy_CrowdStrike.json">Deploy_CrowdStrike.json</a
     </td>
   </tr>
 
@@ -85,6 +88,7 @@
   </tr>
 
 </table>
+
 
 
 
