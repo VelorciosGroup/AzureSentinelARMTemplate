@@ -346,7 +346,7 @@
         },
         "parameters": {
           "workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_PRUEBA_OrchestatorPart_Block_IOaaaaaaaaaaaaaaaaaaaaC')]"
+            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Block_IOC_Playbook')]"
           },
           "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
             "value": "[concat(parameters('client_Name'), '_OrchestatorPart_CrowdStrike_Auth_Playbook')]"
