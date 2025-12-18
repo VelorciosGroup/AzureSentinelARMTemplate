@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -20,14 +20,27 @@ jobs:
       - name: Set branch name
         run: echo "GITHUB_BRANCH=${GITHUB_REF_NAME}" >> $GITHUB_ENV
 
+      # 1️⃣ Reset total del workspace del bot y sync con remoto
+      - name: Hard reset to remote branch
+        run: |
+          set -e
+          git fetch origin "${GITHUB_REF_NAME}"
+          git checkout "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+          git clean -fdx
+
+      # 2️⃣ Ejecutar script de sincronización del README
       - name: Update README deploy links + contents
         env:
           GITHUB_OWNER: ${{ github.repository_owner }}
           GITHUB_REPO: ${{ github.event.repository.name }}
         run: python3 tools/update_readme_deploy_links.py
 
+      # 3️⃣ Commit y push SOLO si hay cambios reales
       - name: Commit changes (if any)
         run: |
+          set -e
+
           if git diff --quiet; then
             echo "No changes to commit."
             exit 0
@@ -38,4 +51,4 @@ jobs:
 
           git add README.md
           git commit -m "chore: sync README deploy links to branch ${GITHUB_REF_NAME} [skip ci]"
-          git push
+          git push origin "${GITHUB_REF_NAME}"
