@@ -2,12 +2,8 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name": {
+    "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
-    },
-    "connections_keyvault_3_externalid": {
-      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault-3",
       "type": "String"
     },
     "keyvault_ClientID": {
@@ -24,14 +20,14 @@
     }
   },
   "variables": {
-    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name'))]",
-    "keyvault_Connection_Name": "[concat('keyvault-', parameters('workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name'))]"
+    "AzureSentinelConnectionName": "[concat('azuresentinel-', parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_name'))]",
+    "keyvault_Connection_Name": "[concat('keyvault-', parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_name'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Logic/workflows",
       "apiVersion": "2017-07-01",
-      "name": "[parameters('workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name')]",
+      "name": "[parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_name')]",
       "location": "westeurope",
       "identity": {
         "type": "SystemAssigned"
@@ -45,6 +41,10 @@
             "$connections": {
               "defaultValue": {},
               "type": "Object"
+            },
+            "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
+              "type": "String",
+              "defaultValue": "[parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_name')]"
             },
             "keyvault_ClientID": {
               "type": "String",
@@ -72,7 +72,7 @@
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['keyvault-1']['connectionId']"
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
                   }
                 },
                 "method": "get",
@@ -97,7 +97,7 @@
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['keyvault-1']['connectionId']"
+                    "name": "@parameters('$connections')['keyvault']['connectionId']"
                   }
                 },
                 "method": "get",
@@ -123,8 +123,7 @@
               "inputs": {
                 "statusCode": 200,
                 "body": {
-                  "TenantRegion": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
-                  "TenantID": "@{body('Parse_JSON_TenantID')?['id']}",
+                  "TenantID": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
                   "AccessToken": "@{body('Parse_JSON_JWT')?['access_token']}"
                 }
               }
@@ -235,10 +234,10 @@
         "parameters": {
           "$connections": {
             "value": {
-              "keyvault-1": {
-                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault",
-                "connectionId": "[parameters('connections_keyvault_3_externalid')]",
-                "connectionName": "keyvault-3",
+              "keyvault": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
+                "connectionName": "[variables('keyvault_Connection_Name')]",
                 "connectionProperties": {
                   "authentication": {
                     "type": "ManagedServiceIdentity"
@@ -249,16 +248,6 @@
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
                 "connectionName": "[variables('AzureSentinelConnectionName')]",
                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
-                "connectionProperties": {
-                  "authentication": {
-                    "type": "ManagedServiceIdentity"
-                  }
-                }
-              },
-              "keyvault": {
-                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
-                "connectionName": "[variables('keyvault_Connection_Name')]",
                 "connectionProperties": {
                   "authentication": {
                     "type": "ManagedServiceIdentity"
