@@ -6,7 +6,7 @@
 $RootDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 
 # Ruta a src
-$SrcDir = Join-Path $RootDir "python_app\src"
+$SrcDir = Join-Path $RootDir "src"
 
 # Navegar a src
 Set-Location $SrcDir
