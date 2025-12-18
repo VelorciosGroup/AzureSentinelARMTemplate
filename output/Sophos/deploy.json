@@ -148,9 +148,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
-            "value": "[concat(parameters('client_Name'), '_OrchestatorPart_Sophos_Auth_Playbook')]"
-          },
           "keyvault_ClientID": {
             "value": "[parameters('keyvault_ClientID_Pack')]"
           },
