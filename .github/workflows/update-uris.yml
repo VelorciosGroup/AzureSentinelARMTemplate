@@ -8,8 +8,6 @@ permissions:
 
 jobs:
   update-uris:
-    # Evita bucle infinito cuando el bot hace el commit
-    # y también si el commit lleva [skip ci]
     if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
 
@@ -30,11 +28,22 @@ jobs:
           echo "GITHUB_OWNER=${GITHUB_REPOSITORY_OWNER}" >> $GITHUB_ENV
           echo "GITHUB_REPO=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
+      # 🔥 Limpia todo lo local del bot y sincroniza con remoto
+      - name: Hard reset to remote branch
+        run: |
+          set -e
+          git fetch origin "${GITHUB_REF_NAME}"
+          git checkout "${GITHUB_REF_NAME}"
+          git reset --hard "origin/${GITHUB_REF_NAME}"
+          git clean -fdx
+
       - name: Update Deploy* templateLink URIs for current branch
         run: python3 tools/update_master_uris.py
 
       - name: Commit changes (if any)
         run: |
+          set -e
+
           if git diff --quiet; then
             echo "No changes to commit."
             exit 0
@@ -45,4 +54,8 @@ jobs:
 
           git add -A
           git commit -m "chore: update templateLink URIs for branch ${GITHUB_REF_NAME} [skip ci]"
-          git push
+
+          # Por si alguien pusheó mientras el job corría
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+
+          git push origin "${GITHUB_REF_NAME}"

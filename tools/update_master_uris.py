@@ -8,11 +8,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Tuple
 
 
-RE_DEPLOY = re.compile(r"deploy", re.IGNORECASE)  # master template contiene "deploy" en el filename
+RE_DEPLOY = re.compile(r"deploy", re.IGNORECASE)  # deploy.json, Deploy_Sophos.json, etc.
 
 
 def _repo_root() -> Path:
-    # En Actions, el repo se clona en el cwd normalmente. Aun así, soportamos GITHUB_WORKSPACE.
     ws = os.environ.get("GITHUB_WORKSPACE")
     if ws:
         return Path(ws)
@@ -20,17 +19,24 @@ def _repo_root() -> Path:
 
 
 def _raw_uri(owner: str, repo: str, branch: str, rel_path: str) -> str:
-    # rel_path debe usar "/" (no backslashes)
     rel_path = rel_path.replace("\\", "/")
     return f"https://raw.githubusercontent.com/{owner}/{repo}/{branch}/{rel_path}"
 
 
 def _find_deploy_templates(repo_root: Path) -> List[Path]:
-    # Busca *cualquier* json que tenga "deploy" en el nombre (deploy.json, Deploy_Sophos.json, etc.)
+    """
+    NUEVA ESTRUCTURA:
+      <Integración>/output/deploy.json  (o cualquier *deploy*.json dentro de output)
+
+    Solo consideramos deploys cuya carpeta padre sea exactamente 'output'.
+    """
     out: List[Path] = []
     for p in repo_root.rglob("*.json"):
-        if RE_DEPLOY.search(p.name):
-            out.append(p)
+        if not RE_DEPLOY.search(p.name):
+            continue
+        if p.parent.name != "output":
+            continue
+        out.append(p)
     return sorted(out)
 
 
@@ -53,9 +59,10 @@ def _update_deploy_file(
     Actualiza properties.templateLink.uri de cada Microsoft.Resources/deployments
     para que apunte al raw de la rama actual.
 
-    Asume estructura:
-      <CarpetaEntidad>/<Deploy*.json>
-      <CarpetaEntidad>/<Cliente_*.json> (playbooks)
+    Ahora asume:
+      <Entidad>/output/<deploy*.json>
+      <Entidad>/output/<playbooks json>
+    (y mantiene fallback por compatibilidad)
     """
     data = _load_json(deploy_path)
     resources = data.get("resources", [])
@@ -64,6 +71,10 @@ def _update_deploy_file(
 
     changes: List[str] = []
     changed = False
+
+    # carpeta donde están los playbooks según la nueva estructura
+    folder = deploy_path.parent  # .../output
+    fallback_folder = folder.parent  # .../<Entidad>
 
     for r in resources:
         if not isinstance(r, dict):
@@ -78,20 +89,29 @@ def _update_deploy_file(
         tl = props.get("templateLink")
         if not isinstance(tl, dict):
             continue
+        if not isinstance(name, str) or not name.strip():
+            continue
 
-        # Archivo esperado: carpeta del deploy + Cliente_<name>.json
-        # (si no existe, intentamos <name>.json)
-        folder = deploy_path.parent
-        candidate1 = folder / f"Cliente_{name}.json" if isinstance(name, str) else None
-        candidate2 = folder / f"{name}.json" if isinstance(name, str) else None
+        # Intentos en orden:
+        # 1) output/Cliente_<name>.json
+        # 2) output/<name>.json
+        # 3) <Entidad>/Cliente_<name>.json   (compat)
+        # 4) <Entidad>/<name>.json           (compat)
+        candidates = [
+            folder / f"Cliente_{name}.json",
+            folder / f"{name}.json",
+            fallback_folder / f"Cliente_{name}.json",
+            fallback_folder / f"{name}.json",
+        ]
 
         target: Path | None = None
-        if candidate1 and candidate1.is_file():
-            target = candidate1
-        elif candidate2 and candidate2.is_file():
-            target = candidate2
-        else:
-            # Si no encontramos el playbook, no tocamos esa uri
+        for c in candidates:
+            if c.is_file():
+                target = c
+                break
+
+        if target is None:
+            # no tocamos esa uri si no encontramos el JSON objetivo
             continue
 
         rel = target.resolve().relative_to(repo_root.resolve()).as_posix()
@@ -122,7 +142,7 @@ def main() -> int:
 
     deploys = _find_deploy_templates(repo_root)
     if not deploys:
-        print("No se encontraron deploy templates (archivos .json que contengan 'deploy' en el nombre).")
+        print("No se encontraron deploy templates dentro de carpetas 'output/'.")
         return 0
 
     any_changed = False
@@ -141,7 +161,7 @@ def main() -> int:
     else:
         print("No hubo cambios de URIs.")
 
-    return 0  # IMPORTANTÍSIMO: nunca salir con 1 aquí
+    return 0
 
 
 if __name__ == "__main__":
