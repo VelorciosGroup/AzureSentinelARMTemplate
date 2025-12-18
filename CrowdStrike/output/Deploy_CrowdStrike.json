@@ -33,7 +33,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/Cliente_OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Auth_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -184,7 +184,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/Cliente_Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Enrich_CrowdStrike_Recent_Alerts_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
