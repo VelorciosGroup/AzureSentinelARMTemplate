@@ -1,0 +1,235 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name": {
+            "defaultValue": "Cliente_OrchestatorPart_Sophos_Auth_Playbook",
+            "type": "String"
+        },
+        "connections_keyvault_3_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault-3",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name')]",
+            "location": "westeurope",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "ClientID": {
+                            "defaultValue": "sophos-velorcios-client-id",
+                            "type": "String"
+                        },
+                        "ClientSecret": {
+                            "defaultValue": "sophos-velorcios-client-secret",
+                            "type": "String"
+                        },
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_an_HTTP_request_is_received": {
+                            "type": "Request",
+                            "kind": "Http"
+                        }
+                    },
+                    "actions": {
+                        "Obtener_secreto_Client_ID": {
+                            "runAfter": {},
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['keyvault-1']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/secrets/@{encodeURIComponent(parameters('ClientID'))}/value"
+                            },
+                            "runtimeConfiguration": {
+                                "secureData": {
+                                    "properties": [
+                                        "inputs",
+                                        "outputs"
+                                    ]
+                                }
+                            }
+                        },
+                        "Obtener_secreto_Client_Secret": {
+                            "runAfter": {
+                                "Obtener_secreto_Client_ID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['keyvault-1']['connectionId']"
+                                    }
+                                },
+                                "method": "get",
+                                "path": "/secrets/@{encodeURIComponent(parameters('ClientSecret'))}/value"
+                            },
+                            "runtimeConfiguration": {
+                                "secureData": {
+                                    "properties": [
+                                        "inputs",
+                                        "outputs"
+                                    ]
+                                }
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {
+                                "Parse_JSON_TenantID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200,
+                                "body": {
+                                    "TenantRegion": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
+                                    "TenantID": "@{body('Parse_JSON_TenantID')?['id']}",
+                                    "AccessToken": "@{body('Parse_JSON_JWT')?['access_token']}"
+                                }
+                            }
+                        },
+                        "Petición_de_JWT": {
+                            "runAfter": {
+                                "Obtener_secreto_Client_Secret": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "https://id.sophos.com/api/v2/oauth2/token",
+                                "method": "POST",
+                                "headers": {
+                                    "Content-Type": " application/x-www-form-urlencoded"
+                                },
+                                "body": "grant_type=client_credentials&client_id=@{body('Obtener_secreto_Client_ID')?['value']}&client_secret=@{body('Obtener_secreto_Client_Secret')?['value']}&scope=token"
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "Parse_JSON_JWT": {
+                            "runAfter": {
+                                "Petición_de_JWT": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('Petición_de_JWT')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer"
+                                        },
+                                        "token_type": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "GetTenantID": {
+                            "runAfter": {
+                                "Parse_JSON_JWT": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "https://api.central.sophos.com/whoami/v1",
+                                "method": "GET",
+                                "headers": {
+                                    "Authorization": "Bearer @{body('Parse_JSON_JWT')?['access_token']}",
+                                    "Accept": "application/json"
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "Parse_JSON_TenantID": {
+                            "runAfter": {
+                                "GetTenantID": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('GetTenantID')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "string"
+                                        },
+                                        "idType": {
+                                            "type": "string"
+                                        },
+                                        "apiHosts": {
+                                            "type": "object",
+                                            "properties": {
+                                                "global": {
+                                                    "type": "string"
+                                                },
+                                                "dataRegion": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "keyvault-1": {
+                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault",
+                                "connectionId": "[parameters('connections_keyvault_3_externalid')]",
+                                "connectionName": "keyvault-3",
+                                "connectionProperties": {
+                                    "authentication": {
+                                        "type": "ManagedServiceIdentity"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}
