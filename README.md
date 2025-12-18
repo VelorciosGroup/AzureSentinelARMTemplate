@@ -1,115 +1,128 @@
 AzureSentinelARMTemplate
 
-Repositorio para la automatización de playbooks de Azure Sentinel y plantillas ARM, incluyendo integración con Sophos y CrowdStrike.
+Repositorio para la automatización de playbooks y plantillas ARM de Azure Sentinel, orientado a entornos SOC.
 
----
+-------------------------------------------------------------------------------
 
-Contenido del Repositorio
+DESCRIPCIÓN GENERAL DEL PROYECTO
 
-- Sophos_prueba_final/
-  Contiene playbooks de Sophos listos para deploy y un directorio output/ con los resultados transformados.
+El objetivo principal de este proyecto es reducir el esfuerzo manual en la creación, adaptación y despliegue de playbooks de Azure Sentinel, proporcionando un flujo automatizado completo que permite generar, transformar y preparar playbooks compatibles con despliegues ARM de Azure.
 
-- python_app/
-  Aplicación en Python para automatizar la creación y transformación de plantillas y playbooks.
-  - src/ → Código fuente de la aplicación.
-  - examples/ → Ejemplos de playbooks y plantillas listas para probar.
-  - requirements.txt → Dependencias necesarias para ejecutar la aplicación.
-  - resultado.json → Ejemplo de salida generada por la aplicación.
+La solución está diseñada para ser reutilizable, escalable y fácilmente mantenible, permitiendo retomar el trabajo pasado un tiempo sin necesidad de contexto previo.
 
-- script-automate-templates.ps1
-  Script de PowerShell para ejecutar la automatización de plantillas.
+-------------------------------------------------------------------------------
 
----
-
-Descripción
-
-Este repositorio permite:
-
-- Aplicar una plantilla maestra sobre un conjunto de playbooks JSON.
-- Generar automáticamente la salida transformada en un directorio de output.
-- Mantener ejemplos separados de Sophos y CrowdStrike para pruebas.
-- Automatizar despliegues de plantillas ARM y playbooks en Azure Sentinel.
-
----
-
-Instalación
-
+INSTALACIÓN
+Para instalar y ejecutar el proyecto, se requiere tener Python 3.8 o superior instalado en el sistema.
+Pasos para la instalación:
 1. Clonar el repositorio:
+   git clone https://github.com/VelorciosGroup/AzureSentinelARMTemplate/tree/python-app
+2. Navegar al directorio del proyecto:
+    cd AzureSentinelARMTemplate
+3. Ejecutar el script de bash: script_automate_templates.ps1
 
-git clone <url-del-repositorio>
-cd AzureSentinelARMTemplate/python_app
+-------------------------------------------------------------------------------
+COMPONENTES DEL PROYECTO
 
-2. Crear un entorno virtual (recomendado):
+El proyecto está compuesto por dos aplicaciones diferenciadas y un mecanismo de integración que permite su ejecución conjunta como una única solución.
 
-python3 -m venv venv
-source venv/bin/activate   # Linux/macOS
-venv\Scripts\activate      # Windows
+-------------------------------------------------------------------------------
 
-3. Instalar dependencias:
+APLICACIÓN GUI – GENERACIÓN DE MASTER TEMPLATE
 
-pip install -r requirements.txt
+La aplicación gráfica (GUI) es la encargada de analizar un conjunto de playbooks existentes y generar una plantilla maestra (master template) común.
 
-4. Instalar el módulo template_automation (opcional si quieres usarlo como paquete):
+Sus responsabilidades principales son:
+- Analizar la estructura de los playbooks de entrada.
+- Unificar y normalizar campos comunes.
+- Generar una master template reutilizable.
 
-cd src/template_automation
-pip install -e .
+Esta parte del proyecto ha sido desarrollada por Guillermo Plaza Gallán y representa el primer paso del flujo de automatización.
 
----
+Referencia:
+https://github.com/VelorciosGroup/AzureSentinelARMTemplate/tree/master_template_automation
 
-Uso
+La salida de esta aplicación es un archivo JSON que actúa como plantilla base para el resto del proceso.
 
-Desde línea de comandos
+-------------------------------------------------------------------------------
 
-python3 -m template_automation -master <ruta_master.json> -dirin <directorio_playbooks> -dirout <directorio_salida> [-v]
+APLICACIÓN CLI – TEMPLATE_AUTOMATION
 
-Opciones:
+La aplicación de línea de comandos (CLI), llamada template_automation, es la encargada de transformar playbooks utilizando una master template previamente generada.
 
-- -master, -m → Ruta al JSON de plantilla maestra.
-- -dirin, -i → Directorio que contiene los playbooks de entrada.
-- -dirout, -o → Directorio donde se escribirá la salida transformada.
-- -v → Incrementa el nivel de verbosidad (-v, -vv, etc.).
+Sus funciones principales son:
+- Cargar la master template.
+- Procesar múltiples playbooks JSON.
+- Adaptar y transformar los playbooks para que sean compatibles con plantillas ARM de Azure Sentinel.
+- Generar los playbooks finales listos para su despliegue.
 
-Ejemplo:
+Esta parte del proyecto ha sido desarrollada por Sergio Perera Márquez y actúa como el motor principal de automatización.
 
-python3 -m template_automation -m examples/Sophos_prueba_final/deploy.json -i examples/Sophos_prueba_final -o output
+Referencia:
+https://github.com/VelorciosGroup/AzureSentinelARMTemplate/tree/playbook_parse_automation
 
-PowerShell
+-------------------------------------------------------------------------------
 
-Se puede ejecutar directamente con el script:
+INTEGRACIÓN DEL FLUJO COMPLETO
 
-.\script-automate-templates.ps1 -Master "examples/Sophos_prueba_final/deploy.json" -DirIn "examples/Sophos_prueba_final" -DirOut "output"
+Para unificar el funcionamiento de ambas aplicaciones, se utiliza un script de ejecución que permite encadenar los procesos:
 
----
+1. Se ejecuta la GUI para generar la master template.
+2. Al finalizar, el script invoca automáticamente la CLI template_automation.
+3. La CLI aplica la master template sobre los playbooks de entrada.
+4. Se generan los playbooks finales compatibles con Azure Sentinel.
 
-Estructura de los Directorios
+Este enfoque permite ejecutar todo el proceso de principio a fin sin intervención manual entre fases.
 
-AzureSentinelARMTemplate/
-├─ Sophos_prueba_final/        # Playbooks Sophos
-│  ├─ output/                  # Playbooks generados
-├─ python_app/
-│  ├─ examples/                # Ejemplos de Sophos y CrowdStrike
-│  ├─ src/                     # Código fuente de la aplicación
-│  └─ requirements.txt
-├─ script-automate-templates.ps1
-└─ Button.png                  # Imagen del proyecto
+-------------------------------------------------------------------------------
 
----
+FUNCIONALIDADES PRINCIPALES
 
-Contribuciones
+El proyecto permite:
+- Generar plantillas maestras a partir de playbooks existentes.
+- Aplicar una plantilla común sobre múltiples playbooks.
+- Automatizar la transformación de playbooks a formato ARM.
+- Separar claramente las responsabilidades entre generación y transformación.
+- Reducir errores manuales y estandarizar despliegues.
+- Facilitar la migración y adaptación de playbooks entre distintas plataformas de seguridad.
 
-1. Crear una rama nueva para tus cambios.
-2. Hacer commit y push a tu rama.
-3. Abrir un Pull Request describiendo los cambios.
+-------------------------------------------------------------------------------
 
----
+USO DE LA APLICACIÓN CLI
 
-Licencia
+La aplicación template_automation se ejecuta desde línea de comandos con los siguientes parámetros principales:
+- Ruta a la master template.
+- Directorio de playbooks de entrada.
+- Directorio de salida para los playbooks transformados.
+- Nivel de verbosidad opcional.
+
+Ejemplo de ejecución:
+
+python3 -m template_automation -m <ruta_master.json> -i <directorio_playbooks> -o <directorio_salida> -v
+
+La ejecución puede realizarse manualmente o ser invocada automáticamente desde el script de integración tras finalizar el proceso de la GUI.
+
+-------------------------------------------------------------------------------
+
+CONSIDERACIONES IMPORTANTES
+
+- La master template es el elemento central del sistema y cualquier cambio en ella afecta a todos los playbooks generados.
+- La separación entre GUI y CLI facilita el mantenimiento y la evolución del proyecto.
+- Los playbooks generados son independientes y pueden desplegarse directamente en Azure Sentinel.
+- El diseño del proyecto permite futuras ampliaciones y nuevas integraciones.
+
+-------------------------------------------------------------------------------
+
+AUTORÍA
+
+GUI – Master Template Automation:
+Guillermo Plaza Gallán
+
+CLI – Template Automation:
+Sergio Perera Márquez
+
+-------------------------------------------------------------------------------
+
+LICENCIA
 
 Este repositorio es propiedad del autor y su uso está sujeto a las políticas internas de la organización.
-
----
-
-Notas
-
-- Todos los archivos en examples/ se pueden usar como referencia de la estructura esperada.
-- Los playbooks generados en output/ son independientes y se pueden desplegar en Azure Sentinel directamente.
