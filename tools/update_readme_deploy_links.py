@@ -150,8 +150,8 @@ def update_readme(readme_path: Path, new_table: str):
 
 def append_python_app_readme(root_readme: Path, python_app_readme: Path) -> None:
     """
-    Appendea el contenido de python_app/README.md al final del README raíz,
-    pero sin duplicarlo en ejecuciones sucesivas (usa marcadores BEGIN/END).
+    Appendea el contenido de python_app/README.md bajo el título
+    '## Python App' al final del README raíz, sin duplicarlo.
     """
     if not root_readme.exists() or not python_app_readme.exists():
         return
@@ -159,9 +159,13 @@ def append_python_app_readme(root_readme: Path, python_app_readme: Path) -> None
     root_text = root_readme.read_text(encoding="utf-8")
     py_text = python_app_readme.read_text(encoding="utf-8").rstrip()
 
-    block = f"{PYAPP_BEGIN}\n\n{py_text}\n\n{PYAPP_END}\n"
+    block = (
+        f"{PYAPP_BEGIN}\n\n"
+        f"## Python App\n\n"
+        f"{py_text}\n\n"
+        f"{PYAPP_END}\n"
+    )
 
-    # Si ya existe el bloque, lo reemplazamos (por si cambió python_app/README.md)
     if PYAPP_BEGIN in root_text and PYAPP_END in root_text:
         pattern = re.compile(
             re.escape(PYAPP_BEGIN) + r".*?" + re.escape(PYAPP_END),
@@ -169,14 +173,13 @@ def append_python_app_readme(root_readme: Path, python_app_readme: Path) -> None
         )
         new_root = pattern.sub(block.rstrip("\n"), root_text).rstrip() + "\n"
     else:
-        # Si no existe, lo anexamos al final
         new_root = root_text.rstrip() + "\n\n" + block
 
     if new_root != root_text:
         root_readme.write_text(new_root, encoding="utf-8")
-        print("Append de python_app/README.md aplicado")
+        print("Sección 'Python App' actualizada")
     else:
-        print("Append de python_app/README.md sin cambios")
+        print("Sección 'Python App' sin cambios")
 
 
 def main() -> int:
