@@ -25,6 +25,9 @@ DISPLAY_NAMES: Dict[str, str] = {
     "API_parser_usernames": "API Username Parser",
 }
 
+PYAPP_BEGIN = "<!-- BEGIN python_app/README.md -->"
+PYAPP_END = "<!-- END python_app/README.md -->"
+
 
 def _is_integration_dir(p: Path) -> bool:
     return (
@@ -145,6 +148,37 @@ def update_readme(readme_path: Path, new_table: str):
         print("README.md sin cambios")
 
 
+def append_python_app_readme(root_readme: Path, python_app_readme: Path) -> None:
+    """
+    Appendea el contenido de python_app/README.md al final del README raíz,
+    pero sin duplicarlo en ejecuciones sucesivas (usa marcadores BEGIN/END).
+    """
+    if not root_readme.exists() or not python_app_readme.exists():
+        return
+
+    root_text = root_readme.read_text(encoding="utf-8")
+    py_text = python_app_readme.read_text(encoding="utf-8").rstrip()
+
+    block = f"{PYAPP_BEGIN}\n\n{py_text}\n\n{PYAPP_END}\n"
+
+    # Si ya existe el bloque, lo reemplazamos (por si cambió python_app/README.md)
+    if PYAPP_BEGIN in root_text and PYAPP_END in root_text:
+        pattern = re.compile(
+            re.escape(PYAPP_BEGIN) + r".*?" + re.escape(PYAPP_END),
+            flags=re.DOTALL,
+        )
+        new_root = pattern.sub(block.rstrip("\n"), root_text).rstrip() + "\n"
+    else:
+        # Si no existe, lo anexamos al final
+        new_root = root_text.rstrip() + "\n\n" + block
+
+    if new_root != root_text:
+        root_readme.write_text(new_root, encoding="utf-8")
+        print("Append de python_app/README.md aplicado")
+    else:
+        print("Append de python_app/README.md sin cambios")
+
+
 def main() -> int:
     branch = os.getenv("GITHUB_BRANCH")
     owner = os.getenv("GITHUB_OWNER")
@@ -160,6 +194,9 @@ def main() -> int:
 
     table = build_table(owner, repo, branch, Path("."))
     update_readme(readme, table)
+
+    # ✅ Al final: append del README dentro de python_app
+    append_python_app_readme(readme, Path("python_app/README.md"))
 
     return 0
 
