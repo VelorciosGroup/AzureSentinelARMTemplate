@@ -507,12 +507,9 @@ def _ensure_definition_connections_parameter(playbook: Dict[str, Any]) -> None:
 # ---------------------------------------------------------------------------
 def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None:
     """
-    En cada workflow:
-      - Elimina entradas de:
-        properties.parameters.$connections.value
-        cuyas keys sean azuresentinel-<NUMERO>
-      - Reescribe referencias:
-        azuresentinel-<NUMERO> -> azuresentinel
+    En cada workflow, elimina entradas del bloque:
+      properties.parameters.$connections.value
+    cuyas keys sean: azuresentinel-<NUMERO> (ej: azuresentinel-1).
     """
     resources = playbook.get("resources", [])
     if not isinstance(resources, list):
@@ -530,29 +527,6 @@ def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None
         if not isinstance(props, dict):
             continue
 
-        # 🔹 Reescritura recursiva inline
-        stack = [props]
-        while stack:
-            current = stack.pop()
-
-            if isinstance(current, dict):
-                for k, v in current.items():
-                    if isinstance(v, str):
-                        current[k] = RE_AZURESENTINEL_NUMBERED_KEY.sub(
-                            "azuresentinel", v
-                        )
-                    elif isinstance(v, (dict, list)):
-                        stack.append(v)
-
-            elif isinstance(current, list):
-                for i, v in enumerate(current):
-                    if isinstance(v, str):
-                        current[i] = RE_AZURESENTINEL_NUMBERED_KEY.sub(
-                            "azuresentinel", v
-                        )
-                    elif isinstance(v, (dict, list)):
-                        stack.append(v)
-
         parameters = props.get("parameters")
         if not isinstance(parameters, dict):
             continue
@@ -566,7 +540,11 @@ def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None
             continue
 
         for k in list(value.keys()):
-            if isinstance(k, str) and RE_AZURESENTINEL_NUMBERED_KEY.fullmatch(k):
+            # 🔹 AÑADIDO: limpieza explícita de azuresentinel-<n>
+            if (
+                isinstance(k, str)
+                and RE_AZURESENTINEL_NUMBERED_KEY.fullmatch(k)
+            ):
                 del value[k]
                 removed_total += 1
 
