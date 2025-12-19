@@ -130,14 +130,7 @@
                           "Value": {
                             "type": "string"
                           }
-                        },
-                        "required": [
-                          "hashValue",
-                          "algorithm",
-                          "friendlyName",
-                          "Type",
-                          "Value"
-                        ]
+                        }
                       }
                     }
                   }

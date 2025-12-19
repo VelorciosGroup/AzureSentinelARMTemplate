@@ -123,14 +123,7 @@
                                                     "Value": {
                                                         "type": "string"
                                                     }
-                                                },
-                                                "required": [
-                                                    "hashValue",
-                                                    "algorithm",
-                                                    "friendlyName",
-                                                    "Type",
-                                                    "Value"
-                                                ]
+                                                }
                                             }
                                         }
                                     }
@@ -161,7 +154,7 @@
                                     "type": "AppendToArrayVariable",
                                     "inputs": {
                                         "name": "Hashes",
-                                        "value": "@body('Parse_JSON_Current_Hash')?['hashValue']"
+                                        "value": "@body('Parse_JSON_Current_Hash')?['Value']"
                                     }
                                 },
                                 "Parse_JSON_Current_Hash": {
