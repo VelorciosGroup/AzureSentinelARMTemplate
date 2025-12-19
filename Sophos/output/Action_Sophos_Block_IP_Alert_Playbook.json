@@ -179,7 +179,12 @@
                           "Type": {
                             "type": "string"
                           }
-                        }
+                        },
+                        "required": [
+                          "address",
+                          "friendlyName",
+                          "Type"
+                        ]
                       }
                     }
                   }

@@ -6,6 +6,10 @@
       "defaultValue": "BORRAR",
       "type": "String"
     },
+    "connections_keyvault_3_externalid": {
+      "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault-3",
+      "type": "String"
+    },
     "keyvault_ClientID": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_ClientID"
@@ -72,7 +76,7 @@
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                    "name": "@parameters('$connections')['keyvault-1']['connectionId']"
                   }
                 },
                 "method": "get",
@@ -97,7 +101,7 @@
               "inputs": {
                 "host": {
                   "connection": {
-                    "name": "@parameters('$connections')['keyvault']['connectionId']"
+                    "name": "@parameters('$connections')['keyvault-1']['connectionId']"
                   }
                 },
                 "method": "get",
@@ -122,11 +126,11 @@
               "kind": "Http",
               "inputs": {
                 "statusCode": 200,
-                    "body": {
-                        "TenantRegion": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
-                        "TenantID": "@{body('Parse_JSON_TenantID')?['id']}",
-                        "AccessToken": "@{body('Parse_JSON_JWT')?['access_token']}"
-                    }
+                "body": {
+                  "TenantRegion": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
+                  "TenantID": "@{body('Parse_JSON_TenantID')?['id']}",
+                  "AccessToken": "@{body('Parse_JSON_JWT')?['access_token']}"
+                }
               }
             },
             "Petición_de_JWT": {
@@ -235,10 +239,10 @@
         "parameters": {
           "$connections": {
             "value": {
-              "keyvault": {
-                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
-                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
-                "connectionName": "[variables('keyvault_Connection_Name')]",
+              "keyvault-1": {
+                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault",
+                "connectionId": "[parameters('connections_keyvault_3_externalid')]",
+                "connectionName": "keyvault-3",
                 "connectionProperties": {
                   "authentication": {
                     "type": "ManagedServiceIdentity"
@@ -249,6 +253,16 @@
                 "connectionId": "[resourceId('Microsoft.Web/connections', variables('AzureSentinelConnectionName'))]",
                 "connectionName": "[variables('AzureSentinelConnectionName')]",
                 "id": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/azuresentinel')]",
+                "connectionProperties": {
+                  "authentication": {
+                    "type": "ManagedServiceIdentity"
+                  }
+                }
+              },
+              "keyvault": {
+                "id": "[concat(subscription().id, '/providers/Microsoft.Web/locations/', resourceGroup().location, '/managedApis/', 'keyvault')]",
+                "connectionId": "[resourceId('Microsoft.Web/connections', variables('keyvault_Connection_Name'))]",
+                "connectionName": "[variables('keyvault_Connection_Name')]",
                 "connectionProperties": {
                   "authentication": {
                     "type": "ManagedServiceIdentity"

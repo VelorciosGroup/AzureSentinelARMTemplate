@@ -508,28 +508,17 @@ def _ensure_definition_connections_parameter(playbook: Dict[str, Any]) -> None:
 def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None:
     """
     En cada workflow:
-      1) Elimina entradas del bloque:
-         properties.parameters.$connections.value
-         cuyas keys sean: azuresentinel-<NUMERO>
-      2) Reescribe referencias ARM:
-         ['azuresentinel-<NUMERO>'] -> ['azuresentinel']
+      - Elimina entradas de:
+        properties.parameters.$connections.value
+        cuyas keys sean azuresentinel-<NUMERO>
+      - Reescribe referencias:
+        azuresentinel-<NUMERO> -> azuresentinel
     """
     resources = playbook.get("resources", [])
     if not isinstance(resources, list):
         return
 
     removed_total = 0
-
-    def _rewrite(obj: Any) -> Any:
-        if isinstance(obj, dict):
-            return {k: _rewrite(v) for k, v in obj.items()}
-        if isinstance(obj, list):
-            return [_rewrite(v) for v in obj]
-        if isinstance(obj, str):
-            return RE_AZURESENTINEL_NUMBERED_KEY.sub(
-                "azuresentinel", obj
-            )
-        return obj
 
     for res in resources:
         if not isinstance(res, dict):
@@ -541,8 +530,28 @@ def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None
         if not isinstance(props, dict):
             continue
 
-        # 🔹 Reescritura de referencias
-        res["properties"] = _rewrite(props)
+        # 🔹 Reescritura recursiva inline
+        stack = [props]
+        while stack:
+            current = stack.pop()
+
+            if isinstance(current, dict):
+                for k, v in current.items():
+                    if isinstance(v, str):
+                        current[k] = RE_AZURESENTINEL_NUMBERED_KEY.sub(
+                            "azuresentinel", v
+                        )
+                    elif isinstance(v, (dict, list)):
+                        stack.append(v)
+
+            elif isinstance(current, list):
+                for i, v in enumerate(current):
+                    if isinstance(v, str):
+                        current[i] = RE_AZURESENTINEL_NUMBERED_KEY.sub(
+                            "azuresentinel", v
+                        )
+                    elif isinstance(v, (dict, list)):
+                        stack.append(v)
 
         parameters = props.get("parameters")
         if not isinstance(parameters, dict):
@@ -566,7 +575,6 @@ def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None
             "Eliminadas %d entradas $connections.value tipo 'azuresentinel-<n>'.",
             removed_total,
         )
-
 
 # ---------------------------------------------------------------------------
 # Bloques $connections + dependsOn usando AzureSentinelConnectionName y keyvault_Connection_Name

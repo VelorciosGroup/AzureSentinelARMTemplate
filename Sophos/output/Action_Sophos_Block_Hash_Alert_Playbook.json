@@ -59,146 +59,91 @@
               }
             }
           },
-                  "actions": {
+          "actions": {
             "Entidades:_obtener_FileHashes": {
-                "runAfter": {
-                    "Initialize_variables": [
-                        "Succeeded"
-                    ]
+              "runAfter": {
+                "Initialize_variables": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
                 },
-                "type": "ApiConnection",
-                "inputs": {
-                    "host": {
-                        "connection": {
-                            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
-                        }
-                    },
-                    "method": "post",
-                    "body": "@triggerBody()?['Entities']",
-                    "path": "/entities/filehash"
-                }
+                "method": "post",
+                "body": "@triggerBody()?['Entities']",
+                "path": "/entities/filehash"
+              }
             },
             "Sophos_Block_IOC": {
-                "runAfter": {
-                    "For_each": [
-                        "Succeeded"
-                    ]
+              "runAfter": {
+                "For_each": [
+                  "Succeeded"
+                ]
+              },
+              "type": "Workflow",
+              "inputs": {
+                "host": {
+                  "workflow": {
+                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid')]"
+                  },
+                  "triggerName": "manual"
                 },
-                "type": "Workflow",
-                "inputs": {
-                    "host": {
-                        "workflow": {
-                            "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/velor_test_OrchestatorPart_Sophos_Block_IOC_Playbook"
-                        },
-                        "triggerName": "manual"
-                    },
-                    "body": {
-                        "type": "HASH",
-                        "content": "@variables('Hashes')"
-                    }
+                "body": {
+                  "type": "HASH",
+                  "content": "@variables('Hashes')"
                 }
+              }
             },
             "Parse_JSON_Hashes": {
-                "runAfter": {
-                    "Entidades:_obtener_FileHashes": [
-                        "Succeeded"
-                    ]
-                },
-                "type": "ParseJson",
-                "inputs": {
-                    "content": "@body('Entidades:_obtener_FileHashes')",
-                    "schema": {
+              "runAfter": {
+                "Entidades:_obtener_FileHashes": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ParseJson",
+              "inputs": {
+                "content": "@body('Entidades:_obtener_FileHashes')",
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "Filehashes": {
+                      "type": "array",
+                      "items": {
                         "type": "object",
                         "properties": {
-                            "Filehashes": {
-                                "type": "array",
-                                "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "hashValue": {
-                                            "type": "string"
-                                        },
-                                        "algorithm": {
-                                            "type": "string"
-                                        },
-                                        "friendlyName": {
-                                            "type": "string"
-                                        },
-                                        "Type": {
-                                            "type": "string"
-                                        },
-                                        "Value": {
-                                            "type": "string"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "Initialize_variables": {
-                "runAfter": {},
-                "type": "InitializeVariable",
-                "inputs": {
-                    "variables": [
-                        {
-                            "name": "Hashes",
-                            "type": "array"
-                        }
-                    ]
-                }
-            },
-            "For_each": {
-                "foreach": "@body('Parse_JSON_Hashes')?['Filehashes']",
-                "actions": {
-                    "Append_to_array_variable": {
-                        "runAfter": {
-                            "Parse_JSON_Current_Hash": [
-                                "Succeeded"
-                            ]
+                          "hashValue": {
+                            "type": "string"
+                          },
+                          "algorithm": {
+                            "type": "string"
+                          },
+                          "friendlyName": {
+                            "type": "string"
+                          },
+                          "Type": {
+                            "type": "string"
+                          },
+                          "Value": {
+                            "type": "string"
+                          }
                         },
-                        "type": "AppendToArrayVariable",
-                        "inputs": {
-                            "name": "Hashes",
-                            "value": "@body('Parse_JSON_Current_Hash')?['Value']"
-                        }
-                    },
-                    "Parse_JSON_Current_Hash": {
-                        "type": "ParseJson",
-                        "inputs": {
-                            "content": "@items('For_each')",
-                            "schema": {
-                                "type": "object",
-                                "properties": {
-                                    "hashValue": {
-                                        "type": "string"
-                                    },
-                                    "algorithm": {
-                                        "type": "string"
-                                    },
-                                    "friendlyName": {
-                                        "type": "string"
-                                    },
-                                    "Type": {
-                                        "type": "string"
-                                    },
-                                    "Value": {
-                                        "type": "string"
-                                    }
-                                }
-                            }
-                        }
+                        "required": [
+                          "hashValue",
+                          "algorithm",
+                          "friendlyName",
+                          "Type",
+                          "Value"
+                        ]
+                      }
                     }
-                },
-                "runAfter": {
-                    "Parse_JSON_Hashes": [
-                        "Succeeded"
-                    ]
-                },
-                "type": "Foreach"
-            }
-        },
+                  }
+                }
+              }
+            },
             "Initialize_variables": {
               "runAfter": {},
               "type": "InitializeVariable",

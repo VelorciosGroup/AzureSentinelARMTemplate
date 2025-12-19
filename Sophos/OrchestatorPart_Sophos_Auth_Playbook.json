@@ -2,8 +2,8 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name": {
-            "defaultValue": "Cliente_OrchestatorPart_Sophos_Auth_Playbook",
+        "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
+            "defaultValue": "OrchestatorPart_Sophos_Auth_Playbook",
             "type": "String"
         },
         "connections_keyvault_3_externalid": {
@@ -16,7 +16,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_Cliente_OrchestatorPart_Sophos_Auth_Playbook_name')]",
+            "name": "[parameters('workflows_OrchestatorPart_Sophos_Auth_Playbook_name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
