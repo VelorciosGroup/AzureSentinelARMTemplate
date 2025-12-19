@@ -562,7 +562,7 @@
     },
     "postDeployApiTagInstructions": {
       "type": "string",
-      "value": "Para asignar correctamente el tag en las policy ⚠️: Acceder a Sophos Central → Mis productos → Endpoint → Policy → Configuración → Añadir nuevo. En el campo \"Etiqueta de sitio web\" hay que poner el tag escogido en el despliegue y en el campo \"Acción\" hay que poner la opción de bloquear"
+      "value": "Para asignar correctamente el tag en las policy ⚠️: Acceder a Sophos Central → Mis productos → Endpoint → Policy → Configuración → Añadir nuevo. En el campo \"Etiqueta de sitio web\" hay que poner el tag "Blocked By API" y en el campo \"Acción\" hay que poner la opción de bloquear"
     }
   }
 }
