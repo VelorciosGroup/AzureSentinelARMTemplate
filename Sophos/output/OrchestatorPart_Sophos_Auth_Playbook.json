@@ -122,10 +122,11 @@
               "kind": "Http",
               "inputs": {
                 "statusCode": 200,
-                "body": {
-                  "TenantID": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
-                  "AccessToken": "@{body('Parse_JSON_JWT')?['access_token']}"
-                }
+                    "body": {
+                        "TenantRegion": "@{body('Parse_JSON_TenantID')?['apiHosts']?['dataRegion']}",
+                        "TenantID": "@{body('Parse_JSON_TenantID')?['id']}",
+                        "AccessToken": "@{body('Parse_JSON_JWT')?['access_token']}"
+                    }
               }
             },
             "Petición_de_JWT": {

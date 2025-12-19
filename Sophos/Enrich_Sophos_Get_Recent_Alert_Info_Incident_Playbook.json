@@ -58,16 +58,11 @@
                     },
                     "actions": {
                         "OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook": {
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
-                            },
                             "type": "Workflow",
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid')]"
+                                        "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/velor_test_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook"
                                     },
                                     "triggerName": "When_an_HTTP_request_is_received"
                                 },
@@ -75,10 +70,14 @@
                                     "hostnames": "@variables('hostnames')",
                                     "armID": "@triggerBody()?['object']?['id']"
                                 }
+                            },
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
                             }
                         },
                         "Initialize_variables_hostnames": {
-                            "runAfter": {},
                             "type": "InitializeVariable",
                             "inputs": {
                                 "variables": [
@@ -87,27 +86,11 @@
                                         "type": "array"
                                     }
                                 ]
-                            }
-                        },
-                        "Entidades:_obtener_hosts": {
-                            "runAfter": {
-                                "Initialize_variables_hostnames": [
-                                    "Succeeded"
-                                ]
                             },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
-                                    }
-                                },
-                                "method": "post",
-                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "path": "/entities/host"
-                            }
+                            "runAfter": {}
                         },
                         "For_each": {
+                            "type": "Foreach",
                             "foreach": "@body('Entidades:_obtener_hosts')?['Hosts']",
                             "actions": {
                                 "Append_to_array_variable": {
@@ -120,10 +103,27 @@
                             },
                             "runAfter": {
                                 "Entidades:_obtener_hosts": [
+                                    "SUCCEEDED"
+                                ]
+                            }
+                        },
+                        "Entidades:_obtener_hosts": {
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "path": "/entities/host"
+                            },
+                            "runAfter": {
+                                "Initialize_variables_hostnames": [
                                     "Succeeded"
                                 ]
-                            },
-                            "type": "Foreach"
+                            }
                         }
                     },
                     "outputs": {}

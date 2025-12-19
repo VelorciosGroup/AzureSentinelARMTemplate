@@ -65,24 +65,6 @@
                         }
                     },
                     "actions": {
-                        "Entidades:_obtener_hosts": {
-                            "runAfter": {
-                                "Initialize_variables_hostnames": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
-                                    }
-                                },
-                                "method": "post",
-                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "path": "/entities/host"
-                            }
-                        },
                         "Initialize_variables_hostnames": {
                             "runAfter": {},
                             "type": "InitializeVariable",
@@ -131,8 +113,27 @@
                                     "hostnames": "@variables('hostnames')"
                                 }
                             }
+                        },
+                        "Entidades:_obtener_hosts": {
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                                "path": "/entities/host"
+                            },
+                            "runAfter": {
+                                "Initialize_variables_hostnames": [
+                                    "Succeeded"
+                                ]
+                            }
                         }
                     },
+                    
                     "outputs": {}
                 },
                 "parameters": {
