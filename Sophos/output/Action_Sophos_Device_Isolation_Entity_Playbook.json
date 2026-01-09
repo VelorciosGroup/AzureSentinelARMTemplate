@@ -71,7 +71,7 @@
                   "triggerName": "When_an_HTTP_request_is_received"
                 },
                 "body": {
-                  "hostnames": "@{if(equals(triggerBody()?['Entity']?['kind'], 'Host'), createArray(triggerBody()?['Entity']?['properties']?['hostName']), createArray())}"
+                  "hostnames": "@triggerBody()?['Entity']?['properties']?['HostName']"
                 }
               }
             }
