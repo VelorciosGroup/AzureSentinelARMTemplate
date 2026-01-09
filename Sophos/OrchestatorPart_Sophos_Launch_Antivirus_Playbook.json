@@ -111,7 +111,7 @@
                                         "method": "GET",
                                         "headers": {
                                             "Content-Type": "application/json",
-                                            "X-Tenant-ID": "",
+                                            "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
                                             "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}"
                                         }
                                     },
@@ -176,7 +176,7 @@
                                                         "method": "POST",
                                                         "headers": {
                                                             "Content-Type": "application/json",
-                                                            "X-Tenant-ID": "",
+                                                            "X-Tenant-ID": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantID']}",
                                                             "Authorization": "Bearer @{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['AccessToken']}"
                                                         },
                                                         "body": {}
