@@ -65,7 +65,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables(var_workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid)]"
+                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid')]"
                   },
                   "triggerName": "When_an_HTTP_request_is_received"
                 },
