@@ -108,7 +108,11 @@
                             }
                         },
                         "Entidades:_obtener_hosts": {
-                            "runAfter": {},
+                            "runAfter": {
+                                "Initialize_variables_hostnames": [
+                                    "SUCCEEDED"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
