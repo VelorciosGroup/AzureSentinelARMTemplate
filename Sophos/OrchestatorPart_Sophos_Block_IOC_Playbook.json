@@ -167,7 +167,7 @@
                                                         "tags": [
                                                             "@{variables('Category')}"
                                                         ],
-                                                        "comment": "parameters('api_block_tag')"
+                                                        "comment": "blocked by SOC"
                                                     }
                                                 },
                                                 "runtimeConfiguration": {

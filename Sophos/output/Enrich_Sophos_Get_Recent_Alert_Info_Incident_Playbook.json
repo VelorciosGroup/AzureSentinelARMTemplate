@@ -111,6 +111,7 @@
               }
             },
             "Entidades:_obtener_hosts": {
+              "runAfter": {},
               "type": "ApiConnection",
               "inputs": {
                 "host": {
@@ -121,11 +122,6 @@
                 "method": "post",
                 "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
                 "path": "/entities/host"
-              },
-              "runAfter": {
-                "Initialize_variables_hostnames": [
-                  "Succeeded"
-                ]
               }
             }
           },

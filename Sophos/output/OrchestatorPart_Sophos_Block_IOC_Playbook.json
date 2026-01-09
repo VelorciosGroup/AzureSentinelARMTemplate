@@ -35,10 +35,6 @@
           "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
           "contentVersion": "1.0.0.0",
           "parameters": {
-            "api_block_tag": {
-              "defaultValue": "sophos-velorcios-client-secret",
-              "type": "String"
-            },
             "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name": {
               "type": "String",
               "defaultValue": "[parameters('workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_name')]"
@@ -170,7 +166,7 @@
                             "tags": [
                               "@{variables('Category')}"
                             ],
-                            "comment": "parameters('api_block_tag')"
+                            "comment": "blocked by SOC"
                           }
                         },
                         "runtimeConfiguration": {
