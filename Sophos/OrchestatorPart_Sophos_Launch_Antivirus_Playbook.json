@@ -207,7 +207,7 @@
                                                 "and": [
                                                     {
                                                         "equals": [
-                                                            "@triggerBody()?['Entity']?['properties']?['HostName']",
+                                                            "@items('For_each')",
                                                             "@variables('Hostname')"
                                                         ]
                                                     }
