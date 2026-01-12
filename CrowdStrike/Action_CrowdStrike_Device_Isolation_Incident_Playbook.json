@@ -54,25 +54,26 @@
                     },
                     "actions": {
                         "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": {
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
-                            },
                             "type": "Workflow",
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
+                                        "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/Velorcios_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook"
                                     },
                                     "triggerName": "manual"
                                 },
                                 "body": {
                                     "hostnames": "@variables('hostnames')"
                                 }
+                            },
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
                             }
                         },
                         "For_each": {
+                            "type": "Foreach",
                             "foreach": "@body('Entidades:_obtener_hosts')?['Hosts']",
                             "actions": {
                                 "Append_to_array_variable": {
@@ -87,15 +88,9 @@
                                 "Entidades:_obtener_hosts": [
                                     "Succeeded"
                                 ]
-                            },
-                            "type": "Foreach"
+                            }
                         },
                         "Entidades:_obtener_hosts": {
-                            "runAfter": {
-                                "Initialize_variables": [
-                                    "Succeeded"
-                                ]
-                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
@@ -106,10 +101,14 @@
                                 "method": "post",
                                 "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
                                 "path": "/entities/host"
+                            },
+                            "runAfter": {
+                                "Initialize_variables": [
+                                    "Succeeded"
+                                ]
                             }
                         },
                         "Initialize_variables": {
-                            "runAfter": {},
                             "type": "InitializeVariable",
                             "inputs": {
                                 "variables": [
@@ -117,6 +116,28 @@
                                         "name": "hostnames",
                                         "type": "array"
                                     }
+                                ]
+                            },
+                            "runAfter": {}
+                        },
+                        "Agregar_un_comentario_al_incidente_(V3)": {
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": {
+                                    "incidentArmId": "@triggerBody()?['object']?['id']",
+                                    "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_CrowdStrike_Device_Isolation_Playbook')}</p>"
+                                },
+                                "path": "/Incidents/Comment"
+                            },
+                            "runAfter": {
+                                "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": [
+                                    "SUCCEEDED"
                                 ]
                             }
                         }
