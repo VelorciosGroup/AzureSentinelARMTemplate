@@ -72,7 +72,7 @@
                   {
                     "name": "status",
                     "type": "string",
-                    "value": "@{if(  equals(triggerBody()?['object']?['properties']?['status'], 'active'),  'in_progress',  triggerBody()?['object']?['properties']?['status'])}"
+                    "value": "@{if(  equals(triggerBody()?['object']?['properties']?['status'], 'Active'),  'in_progress',  triggerBody()?['object']?['properties']?['status'])}"
                   }
                 ]
               }
