@@ -57,100 +57,121 @@
                         }
                     },
                     "actions": {
-                        "Initialize_variables": {
-                            "runAfter": {},
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "hashes",
-                                        "type": "array"
-                                    }
-                                ]
-                            }
-                        },
-                        "For_each": {
-                            "foreach": "@body('Entidades:_obtener_FileHashes')?['Filehashes']",
-                            "actions": {
-                                "Parse_JSON": {
-                                    "type": "ParseJson",
-                                    "inputs": {
-                                        "content": "@items('For_each')",
-                                        "schema": {
-                                            "type": "object",
-                                            "properties": {
-                                                "Name": {
-                                                    "type": "string"
-                                                },
-                                                "Algorithm": {
-                                                    "type": "string"
-                                                },
-                                                "Value": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "Append_to_array_variable": {
-                                    "runAfter": {
-                                        "Parse_JSON": [
-                                            "Succeeded"
-                                        ]
+            "Initialize_variables": {
+                "type": "InitializeVariable",
+                "inputs": {
+                    "variables": [
+                        {
+                            "name": "hashes",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "runAfter": {}
+            },
+            "For_each": {
+                "type": "Foreach",
+                "foreach": "@body('Entidades:_obtener_FileHashes')?['Filehashes']",
+                "actions": {
+                    "Parse_JSON": {
+                        "type": "ParseJson",
+                        "inputs": {
+                            "content": "@items('For_each')",
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "Name": {
+                                        "type": "string"
                                     },
-                                    "type": "AppendToArrayVariable",
-                                    "inputs": {
-                                        "name": "hashes",
-                                        "value": "@body('Parse_JSON')?['Value']"
-                                    }
-                                }
-                            },
-                            "runAfter": {
-                                "Entidades:_obtener_FileHashes": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Foreach"
-                        },
-                        "Entidades:_obtener_FileHashes": {
-                            "runAfter": {
-                                "Initialize_variables": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "ApiConnection",
-                            "inputs": {
-                                "host": {
-                                    "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
-                                    }
-                                },
-                                "method": "post",
-                                "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "path": "/entities/filehash"
-                            }
-                        },
-                        "OrchestatorPart_Block_IOC_Playbook": {
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Workflow",
-                            "inputs": {
-                                "host": {
-                                    "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
+                                    "Algorithm": {
+                                        "type": "string"
                                     },
-                                    "triggerName": "Manual"
-                                },
-                                "body": {
-                                    "type": "sha256",
-                                    "content": "@variables('hashes')"
+                                    "Value": {
+                                        "type": "string"
+                                    }
                                 }
                             }
                         }
                     },
+                    "Append_to_array_variable": {
+                        "type": "AppendToArrayVariable",
+                        "inputs": {
+                            "name": "hashes",
+                            "value": "@body('Parse_JSON')?['Value']"
+                        },
+                        "runAfter": {
+                            "Parse_JSON": [
+                                "Succeeded"
+                            ]
+                        }
+                    }
+                },
+                "runAfter": {
+                    "Entidades:_obtener_FileHashes": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "Entidades:_obtener_FileHashes": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
+                    "path": "/entities/filehash"
+                },
+                "runAfter": {
+                    "Initialize_variables": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "OrchestatorPart_Block_IOC_Playbook": {
+                "type": "Workflow",
+                "inputs": {
+                    "host": {
+                        "workflow": {
+                            "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/Velorcios_OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
+                        },
+                        "triggerName": "Manual"
+                    },
+                    "body": {
+                        "type": "sha256",
+                        "content": "@variables('hashes')"
+                    }
+                },
+                "runAfter": {
+                    "For_each": [
+                        "Succeeded"
+                    ]
+                }
+            },
+            "Agregar_un_comentario_al_incidente_(V3)": {
+                "type": "ApiConnection",
+                "inputs": {
+                    "host": {
+                        "connection": {
+                            "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                        }
+                    },
+                    "method": "post",
+                    "body": {
+                        "incidentArmId": "@triggerBody()?['object']?['id']",
+                        "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_Block_IOC_Playbook')}</p>"
+                    },
+                    "path": "/Incidents/Comment"
+                },
+                "runAfter": {
+                    "OrchestatorPart_Block_IOC_Playbook": [
+                        "Succeeded"
+                    ]
+                }
+            }
+        },
                     "outputs": {}
                 },
                 "parameters": {
@@ -182,4 +203,5 @@
             }
         }
     ]
+
 }
