@@ -4,7 +4,7 @@
   "parameters": {
     "workflows_OrchestatorPart_Sophos_Auth_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "keyvault_ClientID": {
       "type": "String",

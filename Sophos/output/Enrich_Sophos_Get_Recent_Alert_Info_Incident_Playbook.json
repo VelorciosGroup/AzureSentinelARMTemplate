@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_Enrich_Sophos_Get_Recent_Alert_Info_Incident_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
@@ -65,7 +65,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid')]"
+                    "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/velor_test_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook"
                   },
                   "triggerName": "When_an_HTTP_request_is_received"
                 },

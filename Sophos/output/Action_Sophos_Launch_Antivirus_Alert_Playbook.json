@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_Action_Sophos_Launch_Antivirus_Alert_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {

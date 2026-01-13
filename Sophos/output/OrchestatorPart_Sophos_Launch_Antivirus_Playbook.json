@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
@@ -107,7 +107,7 @@
             "For_each": {
               "foreach": "@triggerBody()?['hostnames']",
               "actions": {
-                "GetDeviceID": {
+                "HTTP_GET_DeviceID": {
                   "type": "Http",
                   "inputs": {
                     "uri": "@{body('Parse_OrchestatorPart_Sophos_Auth_Playbook')?['TenantRegion']}/endpoint/v1/endpoints?hostnameContains=@{items('For_each')}",
@@ -126,13 +126,13 @@
                 },
                 "Parse_JSON_GetDeviceID": {
                   "runAfter": {
-                    "GetDeviceID": [
+                    "HTTP_GET_DeviceID": [
                       "Succeeded"
                     ]
                   },
                   "type": "ParseJson",
                   "inputs": {
-                    "content": "@body('GetDeviceID')",
+                    "content": "@body('HTTP_GET_DeviceID')",
                     "schema": {
                       "type": "object",
                       "properties": {
@@ -167,7 +167,7 @@
                   "actions": {
                     "Condition": {
                       "actions": {
-                        "PostScanDevice": {
+                        "HTTP_POST_ScanDevice": {
                           "runAfter": {
                             "Set_variable_Scan_Device_ID": [
                               "Succeeded"
@@ -195,6 +195,32 @@
                           "inputs": {
                             "name": "Scan Device ID",
                             "value": "@body('Parse_JSON_for_each')?['id']"
+                          }
+                        },
+                        "Append_to_string_variable_2": {
+                          "runAfter": {
+                            "HTTP_POST_ScanDevice": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "output message",
+                            "value": "Se ha lanzado un escaneo exitosamente"
+                          }
+                        },
+                        "Append_to_string_variable_3": {
+                          "runAfter": {
+                            "HTTP_POST_ScanDevice": [
+                              "TimedOut",
+                              "Skipped",
+                              "Failed"
+                            ]
+                          },
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "output message",
+                            "value": "Fallo al ejecutar HTTP POST ScanDevice:\n\n@{body('HTTP_POST_ScanDevice')}\n"
                           }
                         }
                       },
@@ -259,6 +285,20 @@
                       "repetitions": 1
                     }
                   }
+                },
+                "Append_to_string_variable_1": {
+                  "runAfter": {
+                    "HTTP_GET_DeviceID": [
+                      "TimedOut",
+                      "Skipped",
+                      "Failed"
+                    ]
+                  },
+                  "type": "AppendToStringVariable",
+                  "inputs": {
+                    "name": "output message",
+                    "value": "Fallo al ejecutar HTTP GET DeviceID:\n\n@{body('HTTP_GET_DeviceID')}\n"
+                  }
                 }
               },
               "runAfter": {
@@ -269,7 +309,11 @@
               "type": "Foreach"
             },
             "Scan_Device_ID": {
-              "runAfter": {},
+              "runAfter": {
+                "Initialize_variables": [
+                  "Succeeded"
+                ]
+              },
               "type": "InitializeVariable",
               "inputs": {
                 "variables": [
@@ -307,7 +351,51 @@
               "inputs": {
                 "statusCode": 200,
                 "body": {
-                  "message": "scanned succesfully"
+                  "message": "@variables('output message')"
+                }
+              }
+            },
+            "Initialize_variables": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "output message",
+                    "type": "string",
+                    "value": "Ejecución playbook Launch Antivirus:\n\n"
+                  }
+                ]
+              }
+            },
+            "Append_to_string_variable": {
+              "runAfter": {
+                "OrchestatorPart_Sophos_Auth_Playbook": [
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "output message",
+                "value": "Fallo al ejecutar el workflow OrchestatorPart Sophos Auth Playbook\n\n"
+              }
+            },
+            "Response_1": {
+              "runAfter": {
+                "For_each": [
+                  "Failed",
+                  "Skipped",
+                  "TimedOut"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 400,
+                "body": {
+                  "message": "@variables('output message')"
                 }
               }
             }

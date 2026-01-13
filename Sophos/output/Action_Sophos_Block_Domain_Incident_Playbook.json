@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_Action_Sophos_Block_Domain_Incident_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
@@ -190,6 +190,30 @@
                 ]
               },
               "type": "Foreach"
+            },
+            "Agregar_un_comentario_al_incidente_(V3)": {
+              "runAfter": {
+                "Sophos_Block_IOC": [
+                  "Succeeded",
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "body": {
+                  "incidentArmId": "@triggerBody()?['object']?['id']",
+                  "message": "<p class=\"editor-paragraph\">@{body('Sophos_Block_IOC')?['message']}</p>"
+                },
+                "path": "/Incidents/Comment"
+              }
             }
           },
           "outputs": {}

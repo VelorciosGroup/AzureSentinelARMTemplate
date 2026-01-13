@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_OrchestatorPart_Sophos_Device_Isolation_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
@@ -81,7 +81,11 @@
               }
             },
             "OrchestatorPart_Sophos_Auth_Playbook": {
-              "runAfter": {},
+              "runAfter": {
+                "Initialize_variables": [
+                  "Succeeded"
+                ]
+              },
               "type": "Workflow",
               "inputs": {
                 "host": {
@@ -143,7 +147,7 @@
                     "value": "@{items('For_each_1')}"
                   }
                 },
-                "GetDeviceID": {
+                "HTTP_GET_DeviceID": {
                   "runAfter": {
                     "Set_HostName": [
                       "Succeeded"
@@ -167,13 +171,13 @@
                 },
                 "Parse_JSON": {
                   "runAfter": {
-                    "GetDeviceID": [
+                    "HTTP_GET_DeviceID": [
                       "Succeeded"
                     ]
                   },
                   "type": "ParseJson",
                   "inputs": {
-                    "content": "@body('GetDeviceID')",
+                    "content": "@body('HTTP_GET_DeviceID')",
                     "schema": {
                       "type": "object",
                       "properties": {
@@ -204,7 +208,7 @@
                   "actions": {
                     "Condition": {
                       "actions": {
-                        "PostIsolateDevices": {
+                        "HTTP_POST_IsolateDevices": {
                           "runAfter": {
                             "Set_Isolation_Device_ID": [
                               "Succeeded"
@@ -239,6 +243,32 @@
                             "name": "Isolation Device ID",
                             "value": "@item()?['id']"
                           }
+                        },
+                        "Append_to_string_variable_2": {
+                          "runAfter": {
+                            "HTTP_POST_IsolateDevices": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "Output message",
+                            "value": "Se ha aislado el host @{items('For_each_1')} exitosamente"
+                          }
+                        },
+                        "Append_to_string_variable_3": {
+                          "runAfter": {
+                            "HTTP_POST_IsolateDevices": [
+                              "Failed",
+                              "Skipped",
+                              "TimedOut"
+                            ]
+                          },
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "Output message",
+                            "value": "Fallo al ejecutar HTTP POST IsolateDevices:\n\n@{body('HTTP_POST_IsolateDevices')}\n\n"
+                          }
                         }
                       },
                       "else": {
@@ -263,6 +293,20 @@
                     ]
                   },
                   "type": "Foreach"
+                },
+                "Append_to_string_variable_1": {
+                  "runAfter": {
+                    "HTTP_GET_DeviceID": [
+                      "Failed",
+                      "Skipped",
+                      "TimedOut"
+                    ]
+                  },
+                  "type": "AppendToStringVariable",
+                  "inputs": {
+                    "name": "Output message",
+                    "value": "Fallo al ejecutar HTTP GET DeviceID:\n\n@{body('HTTP_GET_DeviceID')}\n\n"
+                  }
                 }
               },
               "runAfter": {
@@ -272,7 +316,7 @@
               },
               "type": "Foreach"
             },
-            "Response": {
+            "Response_200": {
               "runAfter": {
                 "For_each_1": [
                   "Succeeded"
@@ -281,7 +325,54 @@
               "type": "Response",
               "kind": "Http",
               "inputs": {
-                "statusCode": 200
+                "statusCode": 200,
+                "body": {
+                  "message": "@variables('Output message')"
+                }
+              }
+            },
+            "Initialize_variables": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "Output message",
+                    "type": "string",
+                    "value": "Ejecución playbook Device Isolation:\n\n"
+                  }
+                ]
+              }
+            },
+            "Append_to_string_variable": {
+              "runAfter": {
+                "OrchestatorPart_Sophos_Auth_Playbook": [
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "Output message",
+                "value": "Fallo al ejecutar el workflow OrchestatorPart Sophos Auth Playbook\n\n"
+              }
+            },
+            "Response_400": {
+              "runAfter": {
+                "For_each_1": [
+                  "Failed",
+                  "Skipped",
+                  "TimedOut"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 400,
+                "body": {
+                  "message": "@variables('Output message')"
+                }
               }
             }
           },
