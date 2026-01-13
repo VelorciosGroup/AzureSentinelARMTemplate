@@ -4,15 +4,15 @@
     "parameters": {
         "workflows_Action_Sophos_Block_IP_Alert_Playbook_name": {
             "defaultValue": "Action_Sophos_Block_IP_Alert_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_Sophos_Block_IOC_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Block_IOC_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_azuresentinel_Cliente_Action_Sophos_Block_Incident_IPs_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Block_Incident_IPs_Playbook",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},

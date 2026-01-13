@@ -4,19 +4,19 @@
     "parameters": {
         "workflows_Action_Sophos_Launch_Antivirus_Incident_Playbook_name": {
             "defaultValue": "Action_Sophos_Launch_Antivirus_Incident_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_Sophos_Launch_Antivirus_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Launch_Antivirus_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_azuresentinel_Cliente_Action_Sophos_Launch_Antivirus_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Action_Sophos_Launch_Antivirus_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},
@@ -115,6 +115,11 @@
                             }
                         },
                         "Entidades:_obtener_hosts": {
+                            "runAfter": {
+                                "Initialize_variables_hostnames": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
@@ -125,11 +130,30 @@
                                 "method": "post",
                                 "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
                                 "path": "/entities/host"
-                            },
+                            }
+                        },
+                        "Agregar_un_comentario_al_incidente_(V3)": {
                             "runAfter": {
-                                "Initialize_variables_hostnames": [
-                                    "Succeeded"
+                                "OrchestatorPart_Sophos_Launch_Antivirus_Playbook": [
+                                    "Succeeded",
+                                    "TimedOut",
+                                    "Skipped",
+                                    "Failed"
                                 ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": {
+                                    "incidentArmId": "@triggerBody()?['object']?['id']",
+                                    "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_Sophos_Launch_Antivirus_Playbook')?['message']}</p>"
+                                },
+                                "path": "/Incidents/Comment"
                             }
                         }
                     },

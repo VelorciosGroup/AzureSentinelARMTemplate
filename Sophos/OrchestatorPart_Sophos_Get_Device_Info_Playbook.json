@@ -4,15 +4,15 @@
     "parameters": {
         "workflows_OrchestatorPart_Sophos_Get_Device_Info_Playbook_name": {
             "defaultValue": "OrchestatorPart_Sophos_Get_Device_Info_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_Sophos_Auth_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Sophos_Auth_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_azuresentinel_Cliente_Enrich_Sophos_Get_Device_Info_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Cliente_Enrich_Sophos_Get_Device_Info_Playbook",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},
