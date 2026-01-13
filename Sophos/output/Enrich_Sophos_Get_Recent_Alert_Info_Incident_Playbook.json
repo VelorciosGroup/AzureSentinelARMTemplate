@@ -65,7 +65,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/velor_test_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook"
+                    "id": "[variables('var_workflows_OrchestatorPart_Sophos_Get_Recent_Alert_Info_Playbook_externalid')]"
                   },
                   "triggerName": "When_an_HTTP_request_is_received"
                 },
