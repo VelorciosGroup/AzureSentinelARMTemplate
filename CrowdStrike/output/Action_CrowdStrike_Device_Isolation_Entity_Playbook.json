@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {

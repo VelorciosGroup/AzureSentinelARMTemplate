@@ -4,15 +4,15 @@
     "parameters": {
         "workflows_Enrich_CrowdStrike_Recent_Alerts_Playbook_name": {
             "defaultValue": "Enrich_CrowdStrike_Recent_Alerts_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Auth_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_azuresentinel_Enrich_CrowdStrike_Recent_Alerts_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Enrich_CrowdStrike_Recent_Alerts_Playbook",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},

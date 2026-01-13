@@ -4,11 +4,11 @@
     "parameters": {
         "workflows_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_name": {
             "defaultValue": "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Auth_Playbook",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},
@@ -136,79 +136,6 @@
                                         }
                                     }
                                 },
-                                "HTTP_POST_Run_Script": {
-                                    "runAfter": {
-                                        "Parse_JSON_SessionID": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}​/real-time-response/entities/admin-command/v1",
-                                        "method": "POST",
-                                        "headers": {
-                                            "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
-                                            "Content-Type": "application/json",
-                                            "Accept": "application/json"
-                                        },
-                                        "body": {
-                                            "base_command": "runscript",
-                                            "command_string": "runscript -CloudFile=\"script-def.ps1\"",
-                                            "persist": true,
-                                            "device_id": "@body('Parse_JSON_SessionID')?['resources']?[0]?['device_id']",
-                                            "session_id": "@body('Parse_JSON_SessionID')?['resources']?[0]['session_id']"
-                                        }
-                                    },
-                                    "runtimeConfiguration": {
-                                        "contentTransfer": {
-                                            "transferMode": "Chunked"
-                                        }
-                                    }
-                                },
-                                "HTTP_GET_Output_Info": {
-                                    "runAfter": {
-                                        "Parse_JSON_Run_Script": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "Http",
-                                    "inputs": {
-                                        "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}/real-time-response/entities/command/v1?cloud_request_id=@{body('Parse_JSON_Run_Script')?['resources']?[0]?['cloud_request_id']}&sequence_id=0",
-                                        "method": "GET",
-                                        "headers": {
-                                            "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
-                                            "Content-Type": "application/json",
-                                            "Accept": "application/json"
-                                        }
-                                    },
-                                    "runtimeConfiguration": {
-                                        "contentTransfer": {
-                                            "transferMode": "Chunked"
-                                        }
-                                    }
-                                },
-                                "Parse_JSON_ID": {
-                                    "runAfter": {
-                                        "HTTP_GET_ID_From_Hostname": [
-                                            "Succeeded"
-                                        ]
-                                    },
-                                    "type": "ParseJson",
-                                    "inputs": {
-                                        "content": "@body('HTTP_GET_ID_From_Hostname')",
-                                        "schema": {
-                                            "type": "object",
-                                            "properties": {
-                                                "resources": {
-                                                    "type": "array",
-                                                    "items": {
-                                                        "type": "string"
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
                                 "Parse_JSON_SessionID": {
                                     "runAfter": {
                                         "HTTP_POST_Initialize_RTR_Session": [
@@ -240,6 +167,85 @@
                                                     }
                                                 }
                                             }
+                                        }
+                                    }
+                                },
+                                "Parse_JSON_ID": {
+                                    "runAfter": {
+                                        "HTTP_GET_ID_From_Hostname": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP_GET_ID_From_Hostname')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "resources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "Append_to_string_variable_1": {
+                                    "runAfter": {
+                                        "HTTP_GET_ID_From_Hostname": [
+                                            "TimedOut",
+                                            "Skipped",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "response_output",
+                                        "value": "Fallo al ejecutar HTTP GET ID From Hostname:\n\n@{body('HTTP_GET_ID_From_Hostname')}\n\n"
+                                    }
+                                },
+                                "Append_to_string_variable_2": {
+                                    "runAfter": {
+                                        "HTTP_POST_Initialize_RTR_Session": [
+                                            "TimedOut",
+                                            "Failed",
+                                            "Skipped"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "response_output",
+                                        "value": "Fallo al ejecutar HTTP POST Initialize RTR Session:\n\n@{body('HTTP_POST_Initialize_RTR_Session')}\n\n"
+                                    }
+                                },
+                                "HTTP_POST_Run_Script": {
+                                    "runAfter": {
+                                        "Parse_JSON_SessionID": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}​/real-time-response/entities/admin-command/v1",
+                                        "method": "POST",
+                                        "headers": {
+                                            "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
+                                            "Content-Type": "application/json",
+                                            "Accept": "application/json"
+                                        },
+                                        "body": {
+                                            "base_command": "runscript",
+                                            "command_string": "runscript -CloudFile=\"script-def.ps1\"",
+                                            "persist": true,
+                                            "device_id": "@body('Parse_JSON_SessionID')?['resources']?[0]?['device_id']",
+                                            "session_id": "@body('Parse_JSON_SessionID')?['resources']?[0]['session_id']"
+                                        }
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
                                         }
                                     }
                                 },
@@ -296,6 +302,42 @@
                                         }
                                     }
                                 },
+                                "Append_to_string_variable_3": {
+                                    "runAfter": {
+                                        "HTTP_POST_Run_Script": [
+                                            "TimedOut",
+                                            "Skipped",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "response_output",
+                                        "value": "Fallo al ejecutar HTTP POST Run Script:\n\n@{body('HTTP_POST_Run_Script')}\n\n"
+                                    }
+                                },
+                                "HTTP_GET_Output_Info": {
+                                    "runAfter": {
+                                        "Parse_JSON_Run_Script": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "@{body('Parse_JSON_AUTH')?['FalconHost']}/real-time-response/entities/command/v1?cloud_request_id=@{body('Parse_JSON_Run_Script')?['resources']?[0]?['cloud_request_id']}&sequence_id=0",
+                                        "method": "GET",
+                                        "headers": {
+                                            "Authorization": "@{body('Parse_JSON_AUTH')?['AccessToken']}",
+                                            "Content-Type": "application/json",
+                                            "Accept": "application/json"
+                                        }
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    }
+                                },
                                 "Append_to_string_variable": {
                                     "runAfter": {
                                         "HTTP_GET_Output_Info": [
@@ -305,7 +347,21 @@
                                     "type": "AppendToStringVariable",
                                     "inputs": {
                                         "name": "response_output",
-                                        "value": "dispositivo @{items('For_each')}: @{body('HTTP_GET_Output_Info')}"
+                                        "value": "Se ha lanzado un escaner en el dispositivo @{items('For_each')}\n\nOutput: @{body('HTTP_GET_Output_Info')}\n\n"
+                                    }
+                                },
+                                "Append_to_string_variable_4": {
+                                    "runAfter": {
+                                        "HTTP_GET_Output_Info": [
+                                            "TimedOut",
+                                            "Skipped",
+                                            "Failed"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "response_output",
+                                        "value": "Fallo al ejecutar HTTP GET Output Info\n\n@{body('HTTP_GET_Output_Info')}\n\n"
                                     }
                                 }
                             },
@@ -338,9 +394,27 @@
                                 "variables": [
                                     {
                                         "name": "response_output",
-                                        "type": "string"
+                                        "type": "string",
+                                        "value": "Ejecución de playbook Launch Antivirus:\n\n"
                                     }
                                 ]
+                            }
+                        },
+                        "Response_1": {
+                            "runAfter": {
+                                "For_each": [
+                                    "TimedOut",
+                                    "Skipped",
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": {
+                                    "message": "@variables('response_output')"
+                                }
                             }
                         }
                     },

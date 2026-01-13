@@ -53,373 +53,35 @@
                     },
                     "actions": {
                         "Call_OrchestatorPart_CrowdStrike_Auth_Playbook": {
-                            "type": "Workflow",
-                            "inputs": {
-                                "host": {
-                                    "workflow": {
-                                        "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/Velorcios_OrchestatorPart_CrowdStrike_Auth_Playbook"
-                                    },
-                                    "triggerName": "manual"
-                                }
-                            },
                             "runAfter": {
                                 "Initialize_variables": [
                                     "Succeeded"
                                 ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "manual"
+                                }
                             }
                         },
                         "For_each": {
-                            "type": "Foreach",
                             "foreach": "@triggerBody()?['hostnames']",
                             "actions": {
                                 "current_hostname": {
                                     "type": "Compose",
                                     "inputs": "@items('For_each')"
                                 },
-                                "Condition_status_code_menor_400": {
-                                    "type": "If",
-                                    "expression": {
-                                        "and": [
-                                            {
-                                                "less": [
-                                                    "@outputs('HTTP-GET_-_Get_device_id')?['statusCode']",
-                                                    400
-                                                ]
-                                            }
-                                        ]
-                                    },
-                                    "actions": {
-                                        "Parse_JSON_Get_device_id_response": {
-                                            "type": "ParseJson",
-                                            "description": "prepare json message for the device id response",
-                                            "inputs": {
-                                                "content": "@body('HTTP-GET_-_Get_device_id')",
-                                                "schema": {
-                                                    "type": "object",
-                                                    "properties": {
-                                                        "errors": {
-                                                            "type": "array"
-                                                        },
-                                                        "meta": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "pagination": {
-                                                                    "type": "object",
-                                                                    "properties": {
-                                                                        "limit": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "offset": {
-                                                                            "type": "integer"
-                                                                        },
-                                                                        "total": {
-                                                                            "type": "integer"
-                                                                        }
-                                                                    }
-                                                                },
-                                                                "powered_by": {
-                                                                    "type": "string"
-                                                                },
-                                                                "query_time": {
-                                                                    "type": "number"
-                                                                },
-                                                                "trace_id": {
-                                                                    "type": "string"
-                                                                }
-                                                            }
-                                                        },
-                                                        "resources": {
-                                                            "type": "array",
-                                                            "items": {
-                                                                "type": "string"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        "HTTP-GET_-_Get_Device_Info_By_ID": {
-                                            "type": "Http",
-                                            "description": "This gets the device id from crowdstrike by filtering on hostname",
-                                            "inputs": {
-                                                "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices/v2?ids=@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}",
-                                                "method": "GET",
-                                                "headers": {
-                                                    "Accept": "application/json",
-                                                    "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
-                                                    "Content-Type": "application/json"
-                                                }
-                                            },
-                                            "runAfter": {
-                                                "Parse_JSON_Get_device_id_response": [
-                                                    "Succeeded"
-                                                ]
-                                            }
-                                        },
-                                        "Condition_status_code": {
-                                            "type": "If",
-                                            "expression": {
-                                                "and": [
-                                                    {
-                                                        "less": [
-                                                            "@outputs('HTTP-GET_-_Get_Device_Info_By_ID')?['statusCode']",
-                                                            400
-                                                        ]
-                                                    }
-                                                ]
-                                            },
-                                            "actions": {
-                                                "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": {
-                                                    "type": "ParseJson",
-                                                    "inputs": {
-                                                        "content": "@body('HTTP-GET_-_Get_Device_Info_By_ID')",
-                                                        "schema": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "resources": {
-                                                                    "type": "array",
-                                                                    "items": {
-                                                                        "type": "object",
-                                                                        "properties": {
-                                                                            "device_id": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "agent_version": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "bios_manufacturer": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "bios_version": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "build_number": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "external_ip": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "mac_address": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "hostname": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "filesystem_containment_status": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "first_seen": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "last_login_timestamp": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "last_login_user": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "last_login_user_sid": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "last_seen": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "machine_domain": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "major_version": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "os_version": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "rtr_state": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "groups": {
-                                                                                "type": "array",
-                                                                                "items": {
-                                                                                    "type": "string"
-                                                                                }
-                                                                            },
-                                                                            "provision_status": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "serial_number": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "status": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "system_manufacturer": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "kernel_version": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "os_product_name": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "chassis_type_desc": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "last_reboot": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "connection_ip": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "default_gateway_ip": {
-                                                                                "type": "string"
-                                                                            },
-                                                                            "connection_mac_address": {
-                                                                                "type": "string"
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                "For_each_Device_Info": {
-                                                    "type": "Foreach",
-                                                    "foreach": "@body('Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID')?['resources']",
-                                                    "actions": {
-                                                        "Condition": {
-                                                            "type": "If",
-                                                            "expression": {
-                                                                "and": [
-                                                                    {
-                                                                        "equals": [
-                                                                            "@outputs('current_hostname')",
-                                                                            "@items('For_each_Device_Info')?['hostname']"
-                                                                        ]
-                                                                    }
-                                                                ]
-                                                            },
-                                                            "actions": {
-                                                                "HTTP-POST_-_IsolateDevice": {
-                                                                    "type": "Http",
-                                                                    "inputs": {
-                                                                        "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices-actions/v2?action_name=contain",
-                                                                        "method": "POST",
-                                                                        "headers": {
-                                                                            "Accept": "application/json",
-                                                                            "Content-Type": "application/json",
-                                                                            "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}"
-                                                                        },
-                                                                        "body": {
-                                                                            "enabled": true,
-                                                                            "comment": "Bloqueado por SOC",
-                                                                            "ids": [
-                                                                                "@items('For_each_Device_Info')?['device_id']\r\n"
-                                                                            ]
-                                                                        }
-                                                                    },
-                                                                    "runtimeConfiguration": {
-                                                                        "contentTransfer": {
-                                                                            "transferMode": "Chunked"
-                                                                        }
-                                                                    }
-                                                                },
-                                                                "Condition_status": {
-                                                                    "type": "If",
-                                                                    "expression": {
-                                                                        "and": [
-                                                                            {
-                                                                                "less": [
-                                                                                    "@outputs('HTTP-POST_-_IsolateDevice')?['statusCode']",
-                                                                                    400
-                                                                                ]
-                                                                            }
-                                                                        ]
-                                                                    },
-                                                                    "actions": {
-                                                                        "Append_to_string_variable_2": {
-                                                                            "type": "AppendToStringVariable",
-                                                                            "inputs": {
-                                                                                "name": "response_text",
-                                                                                "value": "Dispositivo aislado con éxito"
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "else": {
-                                                                        "actions": {
-                                                                            "Append_to_string_variable_3": {
-                                                                                "type": "AppendToStringVariable",
-                                                                                "inputs": {
-                                                                                    "name": "response_text",
-                                                                                    "value": "Fallo al ejecutar HTTP-POST - IsolateDevice"
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "runAfter": {
-                                                                        "HTTP-POST_-_IsolateDevice": [
-                                                                            "Succeeded",
-                                                                            "TimedOut",
-                                                                            "Skipped",
-                                                                            "Failed"
-                                                                        ]
-                                                                    }
-                                                                }
-                                                            },
-                                                            "else": {
-                                                                "actions": {}
-                                                            }
-                                                        }
-                                                    },
-                                                    "runAfter": {
-                                                        "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": [
-                                                            "Succeeded"
-                                                        ]
-                                                    }
-                                                }
-                                            },
-                                            "else": {
-                                                "actions": {
-                                                    "Append_to_string_variable_1": {
-                                                        "type": "AppendToStringVariable",
-                                                        "inputs": {
-                                                            "name": "response_text",
-                                                            "value": "Fallo al ejecutar HTTP - Get Device Info By ID"
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "runAfter": {
-                                                "HTTP-GET_-_Get_Device_Info_By_ID": [
-                                                    "Succeeded",
-                                                    "TimedOut",
-                                                    "Skipped",
-                                                    "Failed"
-                                                ]
-                                            }
-                                        }
-                                    },
-                                    "else": {
-                                        "actions": {
-                                            "Append_to_response_text": {
-                                                "type": "AppendToStringVariable",
-                                                "inputs": {
-                                                    "name": "response_text",
-                                                    "value": "Fallo al ejecutar HTTP-GET-device-id"
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "runAfter": {
-                                        "HTTP-GET_-_Get_device_id": [
-                                            "Succeeded",
-                                            "TimedOut",
-                                            "Skipped",
-                                            "Failed"
-                                        ]
-                                    }
-                                },
                                 "HTTP-GET_-_Get_device_id": {
+                                    "runAfter": {
+                                        "current_hostname": [
+                                            "Succeeded"
+                                        ]
+                                    },
                                     "type": "Http",
-                                    "description": "This gets the device id from crowdstrike by filtering on hostname",
                                     "inputs": {
                                         "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/queries/devices/v1?filter=hostname:'@{outputs('current_hostname')}'",
                                         "method": "GET",
@@ -429,10 +91,302 @@
                                             "Content-Type": "application/json"
                                         }
                                     },
+                                    "description": "This gets the device id from crowdstrike by filtering on hostname"
+                                },
+                                "HTTP-GET_-_Get_Device_Info_By_ID": {
                                     "runAfter": {
-                                        "current_hostname": [
+                                        "Parse_JSON_Get_device_id_response": [
                                             "Succeeded"
                                         ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices/v2?ids=@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}",
+                                        "method": "GET",
+                                        "headers": {
+                                            "Accept": "application/json",
+                                            "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
+                                            "Content-Type": "application/json"
+                                        }
+                                    },
+                                    "description": "This gets the device id from crowdstrike by filtering on hostname"
+                                },
+                                "For_each_Device_Info": {
+                                    "foreach": "@body('Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID')?['resources']",
+                                    "actions": {
+                                        "Condition": {
+                                            "actions": {
+                                                "HTTP-POST_-_IsolateDevice": {
+                                                    "type": "Http",
+                                                    "inputs": {
+                                                        "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices-actions/v2?action_name=contain",
+                                                        "method": "POST",
+                                                        "headers": {
+                                                            "Accept": "application/json",
+                                                            "Content-Type": "application/json",
+                                                            "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}"
+                                                        },
+                                                        "body": {
+                                                            "enabled": true,
+                                                            "comment": "Bloqueado por SOC",
+                                                            "ids": [
+                                                                "@item()?['device_id']"
+                                                            ]
+                                                        }
+                                                    },
+                                                    "runtimeConfiguration": {
+                                                        "contentTransfer": {
+                                                            "transferMode": "Chunked"
+                                                        }
+                                                    }
+                                                },
+                                                "Append_to_string_variable_2": {
+                                                    "runAfter": {
+                                                        "HTTP-POST_-_IsolateDevice": [
+                                                            "Succeeded"
+                                                        ]
+                                                    },
+                                                    "type": "AppendToStringVariable",
+                                                    "inputs": {
+                                                        "name": "response_text",
+                                                        "value": "Dispositivo con id [@{item()?['device_id']}] aislado con éxito\n"
+                                                    }
+                                                },
+                                                "Append_to_string_variable_3": {
+                                                    "runAfter": {
+                                                        "HTTP-POST_-_IsolateDevice": [
+                                                            "TimedOut",
+                                                            "Skipped",
+                                                            "Failed"
+                                                        ]
+                                                    },
+                                                    "type": "AppendToStringVariable",
+                                                    "inputs": {
+                                                        "name": "response_text",
+                                                        "value": "\nFallo al ejecutar HTTP-POST - IsolateDevice con el id [@{item()?['device_id']}]\n"
+                                                    }
+                                                }
+                                            },
+                                            "else": {
+                                                "actions": {}
+                                            },
+                                            "expression": {
+                                                "and": [
+                                                    {
+                                                        "equals": [
+                                                            "@item()?['hostname']",
+                                                            "@items('For_each_Device_Info')?['hostname']"
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            "type": "If"
+                                        }
+                                    },
+                                    "runAfter": {
+                                        "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Foreach"
+                                },
+                                "Append_to_response_text": {
+                                    "runAfter": {
+                                        "HTTP-GET_-_Get_device_id": [
+                                            "TimedOut",
+                                            "Failed",
+                                            "Skipped"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "response_text",
+                                        "value": "Fallo al ejecutar HTTP-GET - Get device id con el hostname [@{items('For_each')}]\n"
+                                    }
+                                },
+                                "Parse_JSON_Get_device_id_response": {
+                                    "runAfter": {
+                                        "HTTP-GET_-_Get_device_id": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP-GET_-_Get_device_id')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "errors": {
+                                                    "type": "array"
+                                                },
+                                                "meta": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "pagination": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "limit": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "offset": {
+                                                                    "type": "integer"
+                                                                },
+                                                                "total": {
+                                                                    "type": "integer"
+                                                                }
+                                                            }
+                                                        },
+                                                        "powered_by": {
+                                                            "type": "string"
+                                                        },
+                                                        "query_time": {
+                                                            "type": "number"
+                                                        },
+                                                        "trace_id": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "resources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "description": "prepare json message for the device id response"
+                                },
+                                "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": {
+                                    "runAfter": {
+                                        "HTTP-GET_-_Get_Device_Info_By_ID": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ParseJson",
+                                    "inputs": {
+                                        "content": "@body('HTTP-GET_-_Get_Device_Info_By_ID')",
+                                        "schema": {
+                                            "type": "object",
+                                            "properties": {
+                                                "resources": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "device_id": {
+                                                                "type": "string"
+                                                            },
+                                                            "agent_version": {
+                                                                "type": "string"
+                                                            },
+                                                            "bios_manufacturer": {
+                                                                "type": "string"
+                                                            },
+                                                            "bios_version": {
+                                                                "type": "string"
+                                                            },
+                                                            "build_number": {
+                                                                "type": "string"
+                                                            },
+                                                            "external_ip": {
+                                                                "type": "string"
+                                                            },
+                                                            "mac_address": {
+                                                                "type": "string"
+                                                            },
+                                                            "hostname": {
+                                                                "type": "string"
+                                                            },
+                                                            "filesystem_containment_status": {
+                                                                "type": "string"
+                                                            },
+                                                            "first_seen": {
+                                                                "type": "string"
+                                                            },
+                                                            "last_login_timestamp": {
+                                                                "type": "string"
+                                                            },
+                                                            "last_login_user": {
+                                                                "type": "string"
+                                                            },
+                                                            "last_login_user_sid": {
+                                                                "type": "string"
+                                                            },
+                                                            "last_seen": {
+                                                                "type": "string"
+                                                            },
+                                                            "machine_domain": {
+                                                                "type": "string"
+                                                            },
+                                                            "major_version": {
+                                                                "type": "string"
+                                                            },
+                                                            "os_version": {
+                                                                "type": "string"
+                                                            },
+                                                            "rtr_state": {
+                                                                "type": "string"
+                                                            },
+                                                            "groups": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "string"
+                                                                }
+                                                            },
+                                                            "provision_status": {
+                                                                "type": "string"
+                                                            },
+                                                            "serial_number": {
+                                                                "type": "string"
+                                                            },
+                                                            "status": {
+                                                                "type": "string"
+                                                            },
+                                                            "system_manufacturer": {
+                                                                "type": "string"
+                                                            },
+                                                            "kernel_version": {
+                                                                "type": "string"
+                                                            },
+                                                            "os_product_name": {
+                                                                "type": "string"
+                                                            },
+                                                            "chassis_type_desc": {
+                                                                "type": "string"
+                                                            },
+                                                            "last_reboot": {
+                                                                "type": "string"
+                                                            },
+                                                            "connection_ip": {
+                                                                "type": "string"
+                                                            },
+                                                            "default_gateway_ip": {
+                                                                "type": "string"
+                                                            },
+                                                            "connection_mac_address": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "Append_to_string_variable_1": {
+                                    "runAfter": {
+                                        "HTTP-GET_-_Get_Device_Info_By_ID": [
+                                            "Failed",
+                                            "Skipped",
+                                            "TimedOut"
+                                        ]
+                                    },
+                                    "type": "AppendToStringVariable",
+                                    "inputs": {
+                                        "name": "response_text",
+                                        "value": "Fallo al ejecutar HTTP - Get Device Info By ID con el id [@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}]"
                                     }
                                 }
                             },
@@ -440,9 +394,15 @@
                                 "Call_OrchestatorPart_CrowdStrike_Auth_Playbook": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Foreach"
                         },
-                        "Response": {
+                        "Response_OK": {
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "Response",
                             "kind": "Http",
                             "inputs": {
@@ -450,25 +410,37 @@
                                 "body": {
                                     "message": "@variables('response_text')"
                                 }
-                            },
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
                             }
                         },
                         "Initialize_variables": {
+                            "runAfter": {},
                             "type": "InitializeVariable",
                             "inputs": {
                                 "variables": [
                                     {
                                         "name": "response_text",
                                         "type": "string",
-                                        "value": "Ejecución de logic app Device Isolation"
+                                        "value": "Ejecución de logic app Device Isolation:\n\n"
                                     }
                                 ]
+                            }
+                        },
+                        "Response_ERROR": {
+                            "runAfter": {
+                                "For_each": [
+                                    "TimedOut",
+                                    "Skipped",
+                                    "Failed"
+                                ]
                             },
-                            "runAfter": {}
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": {
+                                    "message": "@variables('response_text')"
+                                }
+                            }
                         }
                     },
                     "outputs": {}

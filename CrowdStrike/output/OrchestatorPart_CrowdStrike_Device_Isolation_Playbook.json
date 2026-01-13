@@ -64,7 +64,11 @@
           },
           "actions": {
             "Call_OrchestatorPart_CrowdStrike_Auth_Playbook": {
-              "runAfter": {},
+              "runAfter": {
+                "Initialize_variables": [
+                  "Succeeded"
+                ]
+              },
               "type": "Workflow",
               "inputs": {
                 "host": {
@@ -78,6 +82,10 @@
             "For_each": {
               "foreach": "@triggerBody()?['hostnames']",
               "actions": {
+                "current_hostname": {
+                  "type": "Compose",
+                  "inputs": "@items('For_each')"
+                },
                 "HTTP-GET_-_Get_device_id": {
                   "runAfter": {
                     "current_hostname": [
@@ -95,6 +103,117 @@
                     }
                   },
                   "description": "This gets the device id from crowdstrike by filtering on hostname"
+                },
+                "HTTP-GET_-_Get_Device_Info_By_ID": {
+                  "runAfter": {
+                    "Parse_JSON_Get_device_id_response": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Http",
+                  "inputs": {
+                    "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices/v2?ids=@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}",
+                    "method": "GET",
+                    "headers": {
+                      "Accept": "application/json",
+                      "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
+                      "Content-Type": "application/json"
+                    }
+                  },
+                  "description": "This gets the device id from crowdstrike by filtering on hostname"
+                },
+                "For_each_Device_Info": {
+                  "foreach": "@body('Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID')?['resources']",
+                  "actions": {
+                    "Condition": {
+                      "actions": {
+                        "HTTP-POST_-_IsolateDevice": {
+                          "type": "Http",
+                          "inputs": {
+                            "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices-actions/v2?action_name=contain",
+                            "method": "POST",
+                            "headers": {
+                              "Accept": "application/json",
+                              "Content-Type": "application/json",
+                              "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}"
+                            },
+                            "body": {
+                              "enabled": true,
+                              "comment": "Bloqueado por SOC",
+                              "ids": [
+                                "@item()?['device_id']"
+                              ]
+                            }
+                          },
+                          "runtimeConfiguration": {
+                            "contentTransfer": {
+                              "transferMode": "Chunked"
+                            }
+                          }
+                        },
+                        "Append_to_string_variable_2": {
+                          "runAfter": {
+                            "HTTP-POST_-_IsolateDevice": [
+                              "Succeeded"
+                            ]
+                          },
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "response_text",
+                            "value": "Dispositivo con id [@{item()?['device_id']}] aislado con éxito\n"
+                          }
+                        },
+                        "Append_to_string_variable_3": {
+                          "runAfter": {
+                            "HTTP-POST_-_IsolateDevice": [
+                              "TimedOut",
+                              "Skipped",
+                              "Failed"
+                            ]
+                          },
+                          "type": "AppendToStringVariable",
+                          "inputs": {
+                            "name": "response_text",
+                            "value": "\nFallo al ejecutar HTTP-POST - IsolateDevice con el id [@{item()?['device_id']}]\n"
+                          }
+                        }
+                      },
+                      "else": {
+                        "actions": {}
+                      },
+                      "expression": {
+                        "and": [
+                          {
+                            "equals": [
+                              "@item()?['hostname']",
+                              "@items('For_each_Device_Info')?['hostname']"
+                            ]
+                          }
+                        ]
+                      },
+                      "type": "If"
+                    }
+                  },
+                  "runAfter": {
+                    "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": [
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "Foreach"
+                },
+                "Append_to_response_text": {
+                  "runAfter": {
+                    "HTTP-GET_-_Get_device_id": [
+                      "TimedOut",
+                      "Failed",
+                      "Skipped"
+                    ]
+                  },
+                  "type": "AppendToStringVariable",
+                  "inputs": {
+                    "name": "response_text",
+                    "value": "Fallo al ejecutar HTTP-GET - Get device id con el hostname [@{items('For_each')}]\n"
+                  }
                 },
                 "Parse_JSON_Get_device_id_response": {
                   "runAfter": {
@@ -149,24 +268,6 @@
                     }
                   },
                   "description": "prepare json message for the device id response"
-                },
-                "HTTP-GET_-_Get_Device_Info_By_ID": {
-                  "runAfter": {
-                    "Parse_JSON_Get_device_id_response": [
-                      "Succeeded"
-                    ]
-                  },
-                  "type": "Http",
-                  "inputs": {
-                    "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices/v2?ids=@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}",
-                    "method": "GET",
-                    "headers": {
-                      "Accept": "application/json",
-                      "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
-                      "Content-Type": "application/json"
-                    }
-                  },
-                  "description": "This gets the device id from crowdstrike by filtering on hostname"
                 },
                 "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": {
                   "runAfter": {
@@ -285,62 +386,19 @@
                     }
                   }
                 },
-                "For_each_Device_Info": {
-                  "foreach": "@body('Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID')?['resources']",
-                  "actions": {
-                    "Condition": {
-                      "actions": {
-                        "HTTP-POST_-_IsolateDevice": {
-                          "type": "Http",
-                          "inputs": {
-                            "uri": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['FalconHost']}/devices/entities/devices-actions/v2?action_name=contain",
-                            "method": "POST",
-                            "headers": {
-                              "Accept": "application/json",
-                              "Content-Type": "application/json",
-                              "Authorization": "@{body('Call_OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}"
-                            },
-                            "body": {
-                              "enabled": true,
-                              "comment": "Bloqueado por SOC",
-                              "ids": [
-                                "@items('For_each_Device_Info')?['device_id']\r\n"
-                              ]
-                            }
-                          },
-                          "runtimeConfiguration": {
-                            "contentTransfer": {
-                              "transferMode": "Chunked"
-                            }
-                          }
-                        }
-                      },
-                      "else": {
-                        "actions": {}
-                      },
-                      "expression": {
-                        "and": [
-                          {
-                            "equals": [
-                              "@outputs('current_hostname')",
-                              "@items('For_each_Device_Info')?['hostname']"
-                            ]
-                          }
-                        ]
-                      },
-                      "type": "If"
-                    }
-                  },
+                "Append_to_string_variable_1": {
                   "runAfter": {
-                    "Parse_JSON_HTTP-GET-_Get_Decive_Info_By_ID": [
-                      "Succeeded"
+                    "HTTP-GET_-_Get_Device_Info_By_ID": [
+                      "Failed",
+                      "Skipped",
+                      "TimedOut"
                     ]
                   },
-                  "type": "Foreach"
-                },
-                "current_hostname": {
-                  "type": "Compose",
-                  "inputs": "@items('For_each')"
+                  "type": "AppendToStringVariable",
+                  "inputs": {
+                    "name": "response_text",
+                    "value": "Fallo al ejecutar HTTP - Get Device Info By ID con el id [@{join(body('Parse_JSON_Get_device_id_response')?['resources'], '&ids=')}]"
+                  }
                 }
               },
               "runAfter": {
@@ -350,7 +408,7 @@
               },
               "type": "Foreach"
             },
-            "Response": {
+            "Response_OK": {
               "runAfter": {
                 "For_each": [
                   "Succeeded"
@@ -361,7 +419,37 @@
               "inputs": {
                 "statusCode": 200,
                 "body": {
-                  "message": "devices isolated succesfully"
+                  "message": "@variables('response_text')"
+                }
+              }
+            },
+            "Initialize_variables": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "response_text",
+                    "type": "string",
+                    "value": "Ejecución de logic app Device Isolation:\n\n"
+                  }
+                ]
+              }
+            },
+            "Response_ERROR": {
+              "runAfter": {
+                "For_each": [
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 400,
+                "body": {
+                  "message": "@variables('response_text')"
                 }
               }
             }

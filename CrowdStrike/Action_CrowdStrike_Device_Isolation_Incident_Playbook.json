@@ -4,15 +4,15 @@
     "parameters": {
         "workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name": {
             "defaultValue": "Action_CrowdStrike_Device_Isolation_Incident_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Device_Isolation_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},
@@ -54,26 +54,25 @@
                     },
                     "actions": {
                         "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": {
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "Workflow",
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "/subscriptions/2ba58427-900f-422f-9a83-2552a683d17f/resourceGroups/Blueteam/providers/Microsoft.Logic/workflows/Velorcios_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook"
+                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 },
                                 "body": {
                                     "hostnames": "@variables('hostnames')"
                                 }
-                            },
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
                             }
                         },
                         "For_each": {
-                            "type": "Foreach",
                             "foreach": "@body('Entidades:_obtener_hosts')?['Hosts']",
                             "actions": {
                                 "Append_to_array_variable": {
@@ -88,9 +87,15 @@
                                 "Entidades:_obtener_hosts": [
                                     "Succeeded"
                                 ]
-                            }
+                            },
+                            "type": "Foreach"
                         },
                         "Entidades:_obtener_hosts": {
+                            "runAfter": {
+                                "Initialize_variables": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
@@ -101,14 +106,10 @@
                                 "method": "post",
                                 "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
                                 "path": "/entities/host"
-                            },
-                            "runAfter": {
-                                "Initialize_variables": [
-                                    "Succeeded"
-                                ]
                             }
                         },
                         "Initialize_variables": {
+                            "runAfter": {},
                             "type": "InitializeVariable",
                             "inputs": {
                                 "variables": [
@@ -117,28 +118,28 @@
                                         "type": "array"
                                     }
                                 ]
-                            },
-                            "runAfter": {}
+                            }
                         },
                         "Agregar_un_comentario_al_incidente_(V3)": {
+                            "runAfter": {
+                                "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": [
+                                    "Succeeded",
+                                    "Failed"
+                                ]
+                            },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                     }
                                 },
                                 "method": "post",
                                 "body": {
                                     "incidentArmId": "@triggerBody()?['object']?['id']",
-                                    "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_CrowdStrike_Device_Isolation_Playbook')}</p>"
+                                    "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_CrowdStrike_Device_Isolation_Playbook')?['message']}</p>"
                                 },
                                 "path": "/Incidents/Comment"
-                            },
-                            "runAfter": {
-                                "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": [
-                                    "SUCCEEDED"
-                                ]
                             }
                         }
                     },

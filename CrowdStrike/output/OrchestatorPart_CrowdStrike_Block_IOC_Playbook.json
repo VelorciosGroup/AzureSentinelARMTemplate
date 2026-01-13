@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
@@ -108,7 +108,7 @@
                 }
               }
             },
-            "For_each": {
+            "For_each_Indicator": {
               "foreach": "@triggerBody()?['content']",
               "actions": {
                 "HTTP_POST_IOC_Indicators": {
@@ -129,7 +129,7 @@
                           "applied_globally": true,
                           "description": "Bloqueo de hash malicioso",
                           "type": "@triggerBody()?['type']",
-                          "value": "@items('For_each')",
+                          "value": "@items('For_each_Indicator')",
                           "severity": "medium",
                           "platforms": [
                             "windows",
@@ -146,44 +146,31 @@
                     }
                   }
                 },
-                "Condition": {
-                  "actions": {
-                    "Append_to_string_variable": {
-                      "type": "AppendToStringVariable",
-                      "inputs": {
-                        "name": "indicators_created",
-                        "value": "\nCreated indicator\n\n@{body('HTTP_POST_IOC_Indicators')}"
-                      }
-                    }
-                  },
+                "Append_to_string_variable": {
                   "runAfter": {
                     "HTTP_POST_IOC_Indicators": [
-                      "Succeeded",
+                      "Succeeded"
+                    ]
+                  },
+                  "type": "AppendToStringVariable",
+                  "inputs": {
+                    "name": "indicators_created",
+                    "value": "Se ha creado el indicador de compromiso\n\n@{body('HTTP_POST_IOC_Indicators')}\n\n"
+                  }
+                },
+                "Append_to_string_variable_1": {
+                  "runAfter": {
+                    "HTTP_POST_IOC_Indicators": [
+                      "TimedOut",
+                      "Skipped",
                       "Failed"
                     ]
                   },
-                  "else": {
-                    "actions": {
-                      "Append_to_string_variable_1": {
-                        "type": "AppendToStringVariable",
-                        "inputs": {
-                          "name": "indicators_created",
-                          "value": "\nCan't create indicator\n\n@{body('HTTP_POST_IOC_Indicators')}"
-                        }
-                      }
-                    }
-                  },
-                  "expression": {
-                    "and": [
-                      {
-                        "equals": [
-                          "@outputs('HTTP_POST_IOC_Indicators')?['statusCode']",
-                          201
-                        ]
-                      }
-                    ]
-                  },
-                  "type": "If"
+                  "type": "AppendToStringVariable",
+                  "inputs": {
+                    "name": "indicators_created",
+                    "value": "Error creando el indicador de compromiso:\n\n@{body('HTTP_POST_IOC_Indicators')}\n\n"
+                  }
                 }
               },
               "runAfter": {
@@ -205,17 +192,33 @@
                 ]
               }
             },
-            "Response_201_Created": {
+            "Response": {
               "runAfter": {
-                "For_each": [
-                  "Succeeded",
-                  "Failed"
+                "For_each_Indicator": [
+                  "Succeeded"
                 ]
               },
               "type": "Response",
               "kind": "Http",
               "inputs": {
                 "statusCode": 201,
+                "body": {
+                  "message": "@variables('indicators_created')"
+                }
+              }
+            },
+            "Response_1": {
+              "runAfter": {
+                "For_each_Indicator": [
+                  "TimedOut",
+                  "Failed",
+                  "Skipped"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 400,
                 "body": {
                   "message": "@variables('indicators_created')"
                 }

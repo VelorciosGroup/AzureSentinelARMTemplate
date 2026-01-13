@@ -4,19 +4,19 @@
     "parameters": {
         "workflows_Enrich_CrowdStrike_Device_Info_Incident_Playbook_name": {
             "defaultValue": "Enrich_CrowdStrike_Device_Info_Incident_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_CrowdStrike_Device_Info_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Device_Info_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_azuresentinel_PRUEBA_Enrich_CrowdStike_Device_Info_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Enrich_CrowdStike_Device_Info",
-            "type": "String"
+            "type": "string"
         },
         "connections_MSSPDev_Deshabilitar_Reglas_ApiConnection_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/MSSPDev_Deshabilitar_Reglas_ApiConnection",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},

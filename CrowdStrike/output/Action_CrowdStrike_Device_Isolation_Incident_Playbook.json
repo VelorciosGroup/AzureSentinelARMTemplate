@@ -4,11 +4,11 @@
   "parameters": {
     "workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     },
     "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
       "defaultValue": "BORRAR",
-      "type": "String"
+      "type": "string"
     }
   },
   "variables": {
@@ -125,6 +125,28 @@
                     "type": "array"
                   }
                 ]
+              }
+            },
+            "Agregar_un_comentario_al_incidente_(V3)": {
+              "runAfter": {
+                "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": [
+                  "Succeeded",
+                  "Failed"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "body": {
+                  "incidentArmId": "@triggerBody()?['object']?['id']",
+                  "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_CrowdStrike_Device_Isolation_Playbook')?['message']}</p>"
+                },
+                "path": "/Incidents/Comment"
               }
             }
           },

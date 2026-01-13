@@ -4,15 +4,15 @@
     "parameters": {
         "workflows_Action_Crowdstrike_Block_Hash_Entity_Playbook_name": {
             "defaultValue": "Action_Crowdstrike_Block_Hash_Entity_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_Block_IOC_Playbook",
-            "type": "String"
+            "type": "string"
         },
         "connections_azuresentinel_PRUEBA_Action_Crowdstrike_Block_Hash_externalid": {
             "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-PRUEBA_Action_Crowdstrike_Block_Hash",
-            "type": "String"
+            "type": "string"
         }
     },
     "variables": {},
