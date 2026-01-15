@@ -54,7 +54,12 @@ def remove_prefixes(file_path):
     
     # Search patterns
     workflow_pattern = r"\"workflows_(.*)_(name|externalid)\": {"
+    azure_pattern = r"\[azuresentinel-\d+\]"
     automation_pattern = r"Automation"
+
+    # Replace [azuresentinel-1] with "[azuresentinel]"
+    for index, _ in enumerate(lines):
+        lines[index] = re.sub(azure_pattern, "[azuresentinel]", lines[index])
 
     # Replace "Automation" with "OrchestatorPart" in all lines
     for index, _ in enumerate(lines):

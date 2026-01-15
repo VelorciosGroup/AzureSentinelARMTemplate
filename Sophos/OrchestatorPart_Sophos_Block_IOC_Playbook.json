@@ -231,7 +231,7 @@
                                     {
                                         "name": "Category",
                                         "type": "string",
-                                        "value": "Blocked by API"
+                                        "value": "Blocked by SOC"
                                     }
                                 ]
                             }
