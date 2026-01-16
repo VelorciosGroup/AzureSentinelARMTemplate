@@ -40,7 +40,6 @@
       • <a href="./CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Entity_Playbook.json">Action_CrowdStrike_Launch_Antivirus_Entity_Playbook.json</a><br>
       • <a href="./CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Incident_Playbook.json">Action_CrowdStrike_Launch_Antivirus_Incident_Playbook.json</a><br>
       • <a href="./CrowdStrike/output/Enrich_CrowdStrike_Device_Info_Incident_Playbook.json">Enrich_CrowdStrike_Device_Info_Incident_Playbook.json</a><br>
-      • <a href="./CrowdStrike/output/Enrich_CrowdStrike_Recent_Alerts_Playbook.json">Enrich_CrowdStrike_Recent_Alerts_Playbook.json</a><br>
       • <a href="./CrowdStrike/output/Enrich_CrowdStrike_Recent_Incident_Playbook.json">Enrich_CrowdStrike_Recent_Incident_Playbook.json</a><br>
       • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Auth_Playbook.json">OrchestatorPart_CrowdStrike_Auth_Playbook.json</a><br>
       • <a href="./CrowdStrike/output/OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json">OrchestatorPart_CrowdStrike_Block_IOC_Playbook.json</a><br>
@@ -89,6 +88,7 @@
   </tr>
 
 </table>
+
 
 
 
