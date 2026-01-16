@@ -123,10 +123,8 @@
                   "triggerName": "When_an_HTTP_request_is_received"
                 },
                 "body": {
-                  "hosts": {
-                    "hosts": "@variables('HostsArray')",
-                    "incident": "@triggerBody()?['object']?['id']"
-                  }
+                  "hosts": "@variables('HostsArray')",
+                  "incident": "@triggerBody()?['object']?['id']"
                 }
               }
             }

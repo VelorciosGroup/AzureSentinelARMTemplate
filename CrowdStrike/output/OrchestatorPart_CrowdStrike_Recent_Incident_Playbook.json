@@ -78,14 +78,18 @@
                 "method": "GET",
                 "headers": {
                   "Accept": "application/json",
-                  "Authorization": "",
+                  "Authorization": "@{body('OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
                   "Content-Type": "application/json"
                 }
               },
               "description": "This gets the device id from crowdstrike by filtering on hostname"
             },
             "Initialize_HostnamesArray": {
-              "runAfter": {},
+              "runAfter": {
+                "Initialize_variable_response_output": [
+                  "Succeeded"
+                ]
+              },
               "type": "InitializeVariable",
               "inputs": {
                 "variables": [
@@ -109,7 +113,7 @@
                 "method": "GET",
                 "headers": {
                   "Accept": "application/json",
-                  "Authorization": "",
+                  "Authorization": "@{body('OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
                   "Content-Type": "application/json"
                 }
               },
@@ -256,7 +260,7 @@
                 "method": "POST",
                 "headers": {
                   "Accept": "application/json",
-                  "Authorization": "",
+                  "Authorization": "@{body('OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
                   "Content-Type": "application/json"
                 },
                 "body": {
@@ -311,7 +315,7 @@
                 "method": "GET",
                 "headers": {
                   "Accept": "application/json",
-                  "Authorization": "",
+                  "Authorization": "@{body('OrchestatorPart_CrowdStrike_Auth_Playbook')?['AccessToken']}",
                   "Content-Type": "application/json"
                 }
               },
@@ -1457,6 +1461,105 @@
                   },
                   "triggerName": "manual"
                 }
+              }
+            },
+            "Append_to_string_variable": {
+              "runAfter": {
+                "HTTP-GET_-_Get_device_id": [
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "response_output",
+                "value": "Fallo en la ejecución de HTTP-GET - Get device id:\n\n@{body('HTTP-GET_-_Get_device_id')}\n"
+              }
+            },
+            "Initialize_variable_response_output": {
+              "runAfter": {},
+              "type": "InitializeVariable",
+              "inputs": {
+                "variables": [
+                  {
+                    "name": "response_output",
+                    "type": "string",
+                    "value": "Ejecución de Recent incident Playbook:\n\n"
+                  }
+                ]
+              }
+            },
+            "Append_to_string_variable_1": {
+              "runAfter": {
+                "HTTP-GET_-_Get_Device_Info_By_ID": [
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "response_output",
+                "value": "Fallo en la ejecución de HTTP-GET - Get Device Info By ID:\n\n@{body('HTTP-GET_-_Get_Device_Info_By_ID')}\n"
+              }
+            },
+            "Append_to_string_variable_2": {
+              "runAfter": {
+                "HTTP-GET_-_Get_Device_Alerts_by_Agent_id": [
+                  "Failed",
+                  "Skipped",
+                  "TimedOut"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "response_output",
+                "value": "Fallo en la ejecución de HTTP-GET - Get Device Alerts by Agent id:\n\n@{body('HTTP-GET_-_Get_Device_Alerts_by_Agent_id')}\n"
+              }
+            },
+            "Append_to_string_variable_3": {
+              "runAfter": {
+                "HTTP-GET_-_Get_Alert_Complete_Info": [
+                  "Failed",
+                  "Skipped",
+                  "TimedOut"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "response_output",
+                "value": "Fallo en la ejecución de HTTP-GET - Get Alert Complete Info:\n\n@{body('HTTP-GET_-_Get_Alert_Complete_Info')}\n"
+              }
+            },
+            "Agregar_un_comentario_al_incidente_(Error)": {
+              "runAfter": {
+                "Append_to_string_variable_3": [
+                  "Succeeded"
+                ],
+                "Append_to_string_variable_1": [
+                  "Succeeded"
+                ],
+                "Append_to_string_variable_2": [
+                  "Succeeded"
+                ],
+                "Append_to_string_variable": [
+                  "Succeeded"
+                ]
+              },
+              "type": "ApiConnection",
+              "inputs": {
+                "host": {
+                  "connection": {
+                    "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                  }
+                },
+                "method": "post",
+                "body": {
+                  "incidentArmId": "@triggerBody()?['incident']",
+                  "message": "<p class=\"editor-paragraph\">@{variables('response_output')}</p>"
+                },
+                "path": "/Incidents/Comment"
               }
             }
           },
