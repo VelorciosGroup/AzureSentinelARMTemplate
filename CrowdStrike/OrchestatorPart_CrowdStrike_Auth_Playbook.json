@@ -58,7 +58,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/secrets/@{encodeURIComponent(variables('ClientID'))}/value"
+                                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientID'))}/value"
                             },
                             "description": "This gets the secret Client Id from the keyvault",
                             "runtimeConfiguration": {
@@ -84,7 +84,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/secrets/@{encodeURIComponent(variables('ClientSecret'))}/value"
+                                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientSecret'))}/value"
                             },
                             "description": "This gets the Clientsecret from the keyvault",
                             "runtimeConfiguration": {
@@ -216,7 +216,7 @@
                                     }
                                 },
                                 "method": "get",
-                                "path": "/secrets/@{encodeURIComponent(variables('BaseUrl'))}/value"
+                                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_BaseUrl'))}/value"
                             },
                             "runtimeConfiguration": {
                                 "secureData": {
@@ -242,6 +242,23 @@
                                         "value": "BaseURL-Crowdstrike"
                                     }
                                 ]
+                            }
+                        },
+                        "Response_1": {
+                            "runAfter": {
+                                "HTTP_-_Get_Access_Token": [
+                                    "TimedOut",
+                                    "Skipped",
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": {
+                                    "message": "error intentanto obtener token"
+                                }
                             }
                         }
                     }

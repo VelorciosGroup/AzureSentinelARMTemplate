@@ -69,7 +69,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 }
@@ -275,7 +275,7 @@
                         },
                         "Initialize_variables_Device_Info": {
                             "runAfter": {
-                                "Initialize_variables": [
+                                "Initialize_variables_hostnames_array": [
                                     "Succeeded"
                                 ]
                             },
@@ -461,8 +461,12 @@
                                 "where": "@contains(variables('hostnames array'), item()['hostname'])"
                             }
                         },
-                        "Initialize_variables": {
-                            "runAfter": {},
+                        "Initialize_variables_hostnames_array": {
+                            "runAfter": {
+                                "Initialize_variables_response_message": [
+                                    "Succeeded"
+                                ]
+                            },
                             "type": "InitializeVariable",
                             "inputs": {
                                 "variables": [
@@ -471,6 +475,114 @@
                                         "type": "array"
                                     }
                                 ]
+                            }
+                        },
+                        "Append_to_string_variable_3": {
+                            "runAfter": {
+                                "HTTP_GET_IDs": [
+                                    "Failed"
+                                ]
+                            },
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "response_message",
+                                "value": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Info_Playbook_name'), ''' falló.\\nMotivo: Fallo en GET IDs.\\nAcción requerida: Revisión manual')]"
+                            }
+                        },
+                        "Append_to_string_variable_4": {
+                            "runAfter": {
+                                "HTTP_GET_Device_Information": [
+                                    "Failed"
+                                ]
+                            },
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "response_message",
+                                "value": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Info_Playbook_name'), ''' falló.\\nMotivo: Fallo en GET Device Information.\\nAcción requerida: Revisión manual')]"
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {
+                                "Agregar_un_comentario_al_incidente_(V3)": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200,
+                                "body": {
+                                    "message": "Ejecución correcta del playbook"
+                                }
+                            }
+                        },
+                        "Response_1": {
+                            "runAfter": {
+                                "Agregar_un_comentario_al_incidente_(V3)_(error)": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": {
+                                    "message": "@{variables('response_message')}"
+                                }
+                            }
+                        },
+                        "Initialize_variables_response_message": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "response_message",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        },
+                        "Agregar_un_comentario_al_incidente_(V3)_(error)": {
+                            "runAfter": {
+                                "Append_to_string_variable_4": [
+                                    "Succeeded",
+                                    "Skipped"
+                                ],
+                                "Append_to_string_variable_3": [
+                                    "Succeeded",
+                                    "Skipped"
+                                ],
+                                "Append_to_string_variable_5": [
+                                    "Succeeded",
+                                    "Skipped"
+                                ]
+                            },
+                            "type": "ApiConnection",
+                            "inputs": {
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                                    }
+                                },
+                                "method": "post",
+                                "body": {
+                                    "incidentArmId": "@triggerBody()?['armID']",
+                                    "message": "<p class=\"editor-paragraph\">@{variables('response_message')}</p>"
+                                },
+                                "path": "/Incidents/Comment"
+                            }
+                        },
+                        "Append_to_string_variable_5": {
+                            "runAfter": {
+                                "OrchestatorPart_CrowdStrike_Auth_Playbook": [
+                                    "Failed"
+                                ]
+                            },
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "response_message",
+                                "value": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Info_Playbook_name'), ''' falló.\\nMotivo: Fallo en auth.\\nAcción requerida: Revisión manual')]"
                             }
                         }
                     },

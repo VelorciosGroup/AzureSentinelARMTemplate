@@ -6,18 +6,6 @@
       "defaultValue": "BORRAR",
       "type": "string"
     },
-    "keyvault_ClientID": {
-      "type": "String",
-      "defaultValue": "BORRAR_keyvault_ClientID"
-    },
-    "keyvault_ClientSecret": {
-      "type": "String",
-      "defaultValue": "BORRAR_keyvault_ClientSecret"
-    },
-    "keyvault_BaseUrl": {
-      "type": "String",
-      "defaultValue": "BORRAR_keyvault_BaseUrl"
-    },
     "keyvault_Name": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_Name"
@@ -54,18 +42,6 @@
             "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name": {
               "type": "String",
               "defaultValue": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name')]"
-            },
-            "keyvault_ClientID": {
-              "type": "String",
-              "defaultValue": "[parameters('keyvault_ClientID')]"
-            },
-            "keyvault_ClientSecret": {
-              "type": "String",
-              "defaultValue": "[parameters('keyvault_ClientSecret')]"
-            },
-            "keyvault_BaseUrl": {
-              "type": "String",
-              "defaultValue": "[parameters('keyvault_BaseUrl')]"
             },
             "keyvault_Name": {
               "type": "String",
@@ -277,6 +253,23 @@
                     "value": "BaseURL-Crowdstrike"
                   }
                 ]
+              }
+            },
+            "Response_1": {
+              "runAfter": {
+                "HTTP_-_Get_Access_Token": [
+                  "TimedOut",
+                  "Skipped",
+                  "Failed"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 400,
+                "body": {
+                  "message": "error intentanto obtener token"
+                }
               }
             }
           }

@@ -49,7 +49,7 @@ def remove_prefixes(file_path):
     :return: None. Modifies the file directly on disk.
     """
     # Read all lines from the file
-    with open(file_path, "r") as input_file:
+    with open(file_path, "r", encoding="utf-8") as input_file:
         lines = input_file.readlines()
     
     # Search patterns
@@ -85,5 +85,5 @@ def remove_prefixes(file_path):
                 lines[index] = re.sub(match.group(1), playbook_name, lines[index])
 
     # Write changes back to the file
-    with open(file_path, "w") as output_file:
+    with open(file_path, "w", encoding="utf-8") as output_file:
         output_file.writelines(lines)

@@ -143,7 +143,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
+                    "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
                   },
                   "triggerName": "Manual"
                 },
@@ -172,7 +172,10 @@
                   "incidentArmId": "@triggerBody()?['object']?['id']",
                   "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_Block_IOC_Playbook')?['message']}</p>"
                 },
-                "path": "/Incidents/Comment"
+                "path": "/Incidents/Comment",
+                "retryPolicy": {
+                  "type": "none"
+                }
               }
             }
           },

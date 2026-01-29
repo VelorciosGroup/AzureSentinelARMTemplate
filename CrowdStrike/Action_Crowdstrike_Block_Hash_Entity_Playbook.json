@@ -59,7 +59,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
                                     },
                                     "triggerName": "Manual"
                                 },
@@ -68,6 +68,9 @@
                                     "content": [
                                         "@triggerBody()?['Entity']?['properties']?['Value']"
                                     ]
+                                },
+                                "retryPolicy": {
+                                    "type": "none"
                                 }
                             }
                         }

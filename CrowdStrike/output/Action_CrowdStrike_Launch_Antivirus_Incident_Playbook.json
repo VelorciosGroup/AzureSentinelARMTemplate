@@ -70,12 +70,15 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_externalid')]"
+                    "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_externalid')]"
                   },
                   "triggerName": "manual"
                 },
                 "body": {
                   "hostnames": "@variables('hostnames')"
+                },
+                "retryPolicy": {
+                  "type": "none"
                 }
               }
             },
@@ -130,7 +133,8 @@
             "Agregar_un_comentario_al_incidente_(V3)": {
               "runAfter": {
                 "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook": [
-                  "Succeeded"
+                  "Succeeded",
+                  "Failed"
                 ]
               },
               "type": "ApiConnection",
@@ -145,7 +149,10 @@
                   "incidentArmId": "@triggerBody()?['object']?['id']",
                   "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook')?['message']}</p>"
                 },
-                "path": "/Incidents/Comment"
+                "path": "/Incidents/Comment",
+                "retryPolicy": {
+                  "type": "none"
+                }
               }
             }
           },

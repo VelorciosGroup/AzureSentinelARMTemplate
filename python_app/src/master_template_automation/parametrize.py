@@ -60,7 +60,7 @@ def parametrize_files(file_paths):
         params_for_file[filename] = {}
 
         # Read all lines from the file
-        with open(file_path, "r") as read_file:
+        with open(file_path, "r", encoding="utf-8") as read_file:
             lines = read_file.readlines()
             keyvault_params = {}
             keyvault_params[filename] = search_keyvault_params(lines)

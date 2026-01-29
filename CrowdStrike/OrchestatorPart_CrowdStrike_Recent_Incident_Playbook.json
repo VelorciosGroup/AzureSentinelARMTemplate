@@ -1450,7 +1450,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 }
@@ -1459,15 +1459,13 @@
                         "Append_to_string_variable": {
                             "runAfter": {
                                 "HTTP-GET_-_Get_device_id": [
-                                    "TimedOut",
-                                    "Skipped",
                                     "Failed"
                                 ]
                             },
                             "type": "AppendToStringVariable",
                             "inputs": {
                                 "name": "response_output",
-                                "value": "Fallo en la ejecución de HTTP-GET - Get device id:\n\n@{body('HTTP-GET_-_Get_device_id')}\n"
+                                "value": "❌ Playbook 'MSSP_OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook' falló.\\nMotivo: Fallo en Get Device ID.\\nAcción requerida: Revisión manual"
                             }
                         },
                         "Initialize_variable_response_output": {
@@ -1477,8 +1475,7 @@
                                 "variables": [
                                     {
                                         "name": "response_output",
-                                        "type": "string",
-                                        "value": "Ejecución de Recent incident Playbook:\n\n"
+                                        "type": "string"
                                     }
                                 ]
                             }
@@ -1486,65 +1483,67 @@
                         "Append_to_string_variable_1": {
                             "runAfter": {
                                 "HTTP-GET_-_Get_Device_Info_By_ID": [
-                                    "TimedOut",
-                                    "Skipped",
                                     "Failed"
                                 ]
                             },
                             "type": "AppendToStringVariable",
                             "inputs": {
                                 "name": "response_output",
-                                "value": "Fallo en la ejecución de HTTP-GET - Get Device Info By ID:\n\n@{body('HTTP-GET_-_Get_Device_Info_By_ID')}\n"
+                                "value": "❌ Playbook 'MSSP_OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook' falló.\\nMotivo: Fallo en GET Device Info By ID.\\nAcción requerida: Revisión manual"
                             }
                         },
                         "Append_to_string_variable_2": {
                             "runAfter": {
                                 "HTTP-GET_-_Get_Device_Alerts_by_Agent_id": [
-                                    "Failed",
-                                    "Skipped",
-                                    "TimedOut"
+                                    "Failed"
                                 ]
                             },
                             "type": "AppendToStringVariable",
                             "inputs": {
                                 "name": "response_output",
-                                "value": "Fallo en la ejecución de HTTP-GET - Get Device Alerts by Agent id:\n\n@{body('HTTP-GET_-_Get_Device_Alerts_by_Agent_id')}\n"
+                                "value": "❌ Playbook 'MSSP_OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook' falló.\\nMotivo: Fallo en Get Device Alerts by ID.\\nAcción requerida: Revisión manual"
                             }
                         },
                         "Append_to_string_variable_3": {
                             "runAfter": {
                                 "HTTP-GET_-_Get_Alert_Complete_Info": [
-                                    "Failed",
-                                    "Skipped",
-                                    "TimedOut"
+                                    "Failed"
                                 ]
                             },
                             "type": "AppendToStringVariable",
                             "inputs": {
                                 "name": "response_output",
-                                "value": "Fallo en la ejecución de HTTP-GET - Get Alert Complete Info:\n\n@{body('HTTP-GET_-_Get_Alert_Complete_Info')}\n"
+                                "value": "❌ Playbook 'MSSP_OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook' falló.\\nMotivo: Fallo en Get Alert Complete Info.\\nAcción requerida: Revisión manual"
                             }
                         },
                         "Agregar_un_comentario_al_incidente_(Error)": {
                             "runAfter": {
                                 "Append_to_string_variable_3": [
-                                    "Succeeded"
+                                    "Succeeded",
+                                    "Skipped"
                                 ],
                                 "Append_to_string_variable_1": [
-                                    "Succeeded"
+                                    "Succeeded",
+                                    "Skipped"
                                 ],
                                 "Append_to_string_variable_2": [
-                                    "Succeeded"
+                                    "Succeeded",
+                                    "Skipped"
                                 ],
                                 "Append_to_string_variable": [
-                                    "Succeeded"
+                                    "Succeeded",
+                                    "Skipped"
+                                ],
+                                "Append_to_string_variable_4": [
+                                    "Succeeded",
+                                    "Skipped"
                                 ]
                             },
                             "type": "ApiConnection",
                             "inputs": {
                                 "host": {
                                     "connection": {
-                                        "name": "@parameters('$connections')['azuresentinel']['connectionId']"
+                                        "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
                                     }
                                 },
                                 "method": "post",
@@ -1553,6 +1552,49 @@
                                     "message": "<p class=\"editor-paragraph\">@{variables('response_output')}</p>"
                                 },
                                 "path": "/Incidents/Comment"
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {
+                                "Agregar_un_comentario_al_incidente_(V3)": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200,
+                                "body": {
+                                    "message": "Ejecución correcta del playbook"
+                                }
+                            }
+                        },
+                        "Response_1": {
+                            "runAfter": {
+                                "Agregar_un_comentario_al_incidente_(Error)": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": {
+                                    "message": "error en la ejecución del playbook",
+                                    "error": "@{variables('response_output')}"
+                                }
+                            }
+                        },
+                        "Append_to_string_variable_4": {
+                            "runAfter": {
+                                "OrchestatorPart_CrowdStrike_Auth_Playbook": [
+                                    "Failed"
+                                ]
+                            },
+                            "type": "AppendToStringVariable",
+                            "inputs": {
+                                "name": "response_output",
+                                "value": "\n❌ Playbook 'MSSP_OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook' falló.\\nMotivo: Fallo en auth playbook.\\nAcción requerida: Revisión manual\n"
                             }
                         }
                     },

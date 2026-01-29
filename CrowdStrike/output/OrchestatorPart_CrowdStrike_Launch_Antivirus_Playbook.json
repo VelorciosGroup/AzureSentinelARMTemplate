@@ -73,7 +73,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
+                    "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
                   },
                   "triggerName": "manual"
                 }
@@ -203,34 +203,6 @@
                     }
                   }
                 },
-                "Append_to_string_variable_1": {
-                  "runAfter": {
-                    "HTTP_GET_ID_From_Hostname": [
-                      "TimedOut",
-                      "Skipped",
-                      "Failed"
-                    ]
-                  },
-                  "type": "AppendToStringVariable",
-                  "inputs": {
-                    "name": "response_output",
-                    "value": "Fallo al ejecutar HTTP GET ID From Hostname:\n\n@{body('HTTP_GET_ID_From_Hostname')}\n\n"
-                  }
-                },
-                "Append_to_string_variable_2": {
-                  "runAfter": {
-                    "HTTP_POST_Initialize_RTR_Session": [
-                      "TimedOut",
-                      "Failed",
-                      "Skipped"
-                    ]
-                  },
-                  "type": "AppendToStringVariable",
-                  "inputs": {
-                    "name": "response_output",
-                    "value": "Fallo al ejecutar HTTP POST Initialize RTR Session:\n\n@{body('HTTP_POST_Initialize_RTR_Session')}\n\n"
-                  }
-                },
                 "HTTP_POST_Run_Script": {
                   "runAfter": {
                     "Parse_JSON_SessionID": [
@@ -313,20 +285,6 @@
                     }
                   }
                 },
-                "Append_to_string_variable_3": {
-                  "runAfter": {
-                    "HTTP_POST_Run_Script": [
-                      "TimedOut",
-                      "Skipped",
-                      "Failed"
-                    ]
-                  },
-                  "type": "AppendToStringVariable",
-                  "inputs": {
-                    "name": "response_output",
-                    "value": "Fallo al ejecutar HTTP POST Run Script:\n\n@{body('HTTP_POST_Run_Script')}\n\n"
-                  }
-                },
                 "HTTP_GET_Output_Info": {
                   "runAfter": {
                     "Parse_JSON_Run_Script": [
@@ -358,21 +316,7 @@
                   "type": "AppendToStringVariable",
                   "inputs": {
                     "name": "response_output",
-                    "value": "Se ha lanzado un escaner en el dispositivo @{items('For_each')}\n\nOutput: @{body('HTTP_GET_Output_Info')}\n\n"
-                  }
-                },
-                "Append_to_string_variable_4": {
-                  "runAfter": {
-                    "HTTP_GET_Output_Info": [
-                      "TimedOut",
-                      "Skipped",
-                      "Failed"
-                    ]
-                  },
-                  "type": "AppendToStringVariable",
-                  "inputs": {
-                    "name": "response_output",
-                    "value": "Fallo al ejecutar HTTP GET Output Info\n\n@{body('HTTP_GET_Output_Info')}\n\n"
+                    "value": "✅ Se ha lanzado un escaner en el dispositivo @{items('For_each')}"
                   }
                 }
               },
@@ -405,18 +349,21 @@
                 "variables": [
                   {
                     "name": "response_output",
-                    "type": "string",
-                    "value": "Ejecución de playbook Launch Antivirus:\n\n"
+                    "type": "string"
                   }
                 ]
               }
             },
             "Response_1": {
               "runAfter": {
-                "For_each": [
-                  "TimedOut",
+                "Append_to_string_variable_5": [
+                  "Succeeded",
                   "Skipped",
+                  "TimedOut",
                   "Failed"
+                ],
+                "Append_to_string_variable_1": [
+                  "Succeeded"
                 ]
               },
               "type": "Response",
@@ -424,8 +371,36 @@
               "inputs": {
                 "statusCode": 400,
                 "body": {
-                  "message": "@variables('response_output')"
+                  "message": "@{variables('response_output')}"
                 }
+              }
+            },
+            "Append_to_string_variable_5": {
+              "runAfter": {
+                "OrchestatorPart_CrowdStrike_Auth_Playbook": [
+                  "Failed",
+                  "TimedOut",
+                  "Skipped"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "response_output",
+                "value": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_name'), ''' falló.\\nMotivo: Fallo en auth.\\nAcción requerida: Revisión manual\n')]"
+              }
+            },
+            "Append_to_string_variable_1": {
+              "runAfter": {
+                "For_each": [
+                  "Failed",
+                  "TimedOut",
+                  "Skipped"
+                ]
+              },
+              "type": "AppendToStringVariable",
+              "inputs": {
+                "name": "response_output",
+                "value": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook_name'), ''' falló.\\nMotivo: Fallo en una de las peticiones.\\nAcción requerida: Revisión manual')]"
               }
             }
           },

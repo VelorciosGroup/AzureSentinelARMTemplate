@@ -118,13 +118,16 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Device_Info_Playbook_externalid')]"
+                    "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Info_Playbook_externalid')]"
                   },
                   "triggerName": "manual"
                 },
                 "body": {
                   "hostnames": "@variables('hostnames')",
                   "armID": "@triggerBody()?['object']?['id']"
+                },
+                "retryPolicy": {
+                  "type": "none"
                 }
               }
             }

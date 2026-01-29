@@ -80,7 +80,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
+                    "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]"
                   },
                   "triggerName": "manual"
                 }
@@ -157,20 +157,6 @@
                     "name": "indicators_created",
                     "value": "Se ha creado el indicador de compromiso\n\n@{body('HTTP_POST_IOC_Indicators')}\n\n"
                   }
-                },
-                "Append_to_string_variable_1": {
-                  "runAfter": {
-                    "HTTP_POST_IOC_Indicators": [
-                      "TimedOut",
-                      "Skipped",
-                      "Failed"
-                    ]
-                  },
-                  "type": "AppendToStringVariable",
-                  "inputs": {
-                    "name": "indicators_created",
-                    "value": "Error creando el indicador de compromiso:\n\n@{body('HTTP_POST_IOC_Indicators')}\n\n"
-                  }
                 }
               },
               "runAfter": {
@@ -220,7 +206,24 @@
               "inputs": {
                 "statusCode": 400,
                 "body": {
-                  "message": "@variables('indicators_created')"
+                  "message": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_name'), ' '' falló.\nMotivo: Fallo en POST IOC Indicators.\nAcción requerida: Revisión manual')]"
+                }
+              }
+            },
+            "Response_2": {
+              "runAfter": {
+                "OrchestatorPart_CrowdStrike_Auth_Playbook": [
+                  "Failed",
+                  "TimedOut",
+                  "Skipped"
+                ]
+              },
+              "type": "Response",
+              "kind": "Http",
+              "inputs": {
+                "statusCode": 400,
+                "body": {
+                  "message": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_name'), ' '' falló.\nMotivo: Fallo en auth.\nAcción requerida: Revisión manual')]"
                 }
               }
             }

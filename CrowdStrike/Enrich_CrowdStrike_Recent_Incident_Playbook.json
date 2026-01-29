@@ -111,13 +111,16 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid')]"
                                     },
                                     "triggerName": "When_an_HTTP_request_is_received"
                                 },
                                 "body": {
                                     "hosts": "@variables('HostsArray')",
                                     "incident": "@triggerBody()?['object']?['id']"
+                                },
+                                "retryPolicy": {
+                                    "type": "none"
                                 }
                             }
                         }

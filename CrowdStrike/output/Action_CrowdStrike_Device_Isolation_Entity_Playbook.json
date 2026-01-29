@@ -66,7 +66,7 @@
               "inputs": {
                 "host": {
                   "workflow": {
-                    "id": "[variables('var_workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
+                    "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
                   },
                   "triggerName": "manual"
                 },
@@ -74,6 +74,9 @@
                   "hostnames": [
                     "@triggerBody()?['Entity']?['properties']?['HostName']"
                   ]
+                },
+                "retryPolicy": {
+                  "type": "none"
                 }
               }
             }
