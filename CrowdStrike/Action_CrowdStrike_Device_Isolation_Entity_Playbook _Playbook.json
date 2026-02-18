@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name": {
-            "defaultValue": "MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook",
+        "workflows_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name": {
+            "defaultValue": "Action_CrowdStrike_Device_Isolation_Entity_Playbook",
             "type": "String"
         },
-        "workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/MSSP_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook",
+        "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Device_Isolation_Playbook",
             "type": "String"
         },
-        "connections_azuresentinel_MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook",
+        "connections_azuresentinel_Action_CrowdStrike_Device_Isolation_Entity_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Action_CrowdStrike_Device_Isolation_Entity_Playbook",
             "type": "String"
         }
     },
@@ -20,7 +20,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name')]",
+            "name": "[parameters('workflows_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -32,11 +32,11 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "workflows_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name": {
-                            "defaultValue": "[parameters('workflows_MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name')]",
+                            "defaultValue": "[parameters('workflows_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name')]",
                             "type": "String"
                         },
                         "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
-                            "defaultValue": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]",
+                            "defaultValue": "[parameters('workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]",
                             "type": "String"
                         },
                         "$connections": {
@@ -67,7 +67,7 @@
                             "inputs": {
                                 "host": {
                                     "workflow": {
-                                        "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
+                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
                                     },
                                     "triggerName": "manual"
                                 },
@@ -89,8 +89,8 @@
                         "value": {
                             "azuresentinel": {
                                 "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook_externalid')]",
-                                "connectionName": "[concat('azuresentinel-', parameters('workflows_MSSP_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name'))]",
+                                "connectionId": "[parameters('connections_azuresentinel_Action_CrowdStrike_Device_Isolation_Entity_Playbook_externalid')]",
+                                "connectionName": "[concat('azuresentinel-', parameters('workflows_Action_CrowdStrike_Device_Isolation_Entity_Playbook_name'))]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"

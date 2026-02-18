@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook_name": {
-            "defaultValue": "MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook",
+        "workflows_Enrich_CrowdStrike_Recent_Incident_Playbook_name": {
+            "defaultValue": "Enrich_CrowdStrike_Recent_Incident_Playbook",
             "type": "String"
         },
-        "workflows_MSSP_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/MSSP_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook",
+        "workflows_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Recent_Incident_Playbook",
             "type": "String"
         },
-        "connections_azuresentinel_MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook",
+        "connections_azuresentinel_Enrich_CrowdStrike_Recent_Incident_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Enrich_CrowdStrike_Recent_Incident_Playbook",
             "type": "String"
         },
         "connections_azuresentinel_MSSP_Action_Crowdstrike_Block_Hash_Entity_Playbook_externalid": {
@@ -24,7 +24,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook_name')]",
+            "name": "[parameters('workflows_Enrich_CrowdStrike_Recent_Incident_Playbook_name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -36,11 +36,11 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "workflows_Enrich_CrowdStrike_Recent_Incident_Playbook_name": {
-                            "defaultValue": "[parameters('workflows_MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook_name')]",
+                            "defaultValue": "[parameters('workflows_Enrich_CrowdStrike_Recent_Incident_Playbook_name')]",
                             "type": "String"
                         },
                         "workflows_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid": {
-                            "defaultValue": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid')]",
+                            "defaultValue": "[parameters('workflows_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid')]",
                             "type": "String"
                         },
                         "$connections": {
@@ -104,7 +104,7 @@
                                     "inputs": {
                                         "host": {
                                             "workflow": {
-                                                "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid')]"
+                                                "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Recent_Incident_Playbook_externalid')]"
                                             },
                                             "triggerName": "When_an_HTTP_request_is_received"
                                         },
@@ -127,7 +127,7 @@
                                     "inputs": {
                                         "host": {
                                             "connection": {
-                                                "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                                                "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                             }
                                         },
                                         "method": "post",
@@ -149,7 +149,7 @@
                                     "inputs": {
                                         "host": {
                                             "connection": {
-                                                "name": "@parameters('$connections')['azuresentinel-1']['connectionId']"
+                                                "name": "@parameters('$connections')['azuresentinel']['connectionId']"
                                             }
                                         },
                                         "method": "post",
@@ -207,18 +207,8 @@
                         "value": {
                             "azuresentinel": {
                                 "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook_externalid')]",
-                                "connectionName": "[concat('azuresentinel-', parameters('workflows_MSSP_Enrich_CrowdStrike_Recent_Incident_Playbook_name'))]",
-                                "connectionProperties": {
-                                    "authentication": {
-                                        "type": "ManagedServiceIdentity"
-                                    }
-                                }
-                            },
-                            "azuresentinel-1": {
-                                "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_MSSP_Action_Crowdstrike_Block_Hash_Entity_Playbook_externalid')]",
-                                "connectionName": "azuresentinel-MSSP_Action_Crowdstrike_Block_Hash_Entity_Playbook",
+                                "connectionId": "[parameters('connections_azuresentinel_Enrich_CrowdStrike_Recent_Incident_Playbook_externalid')]",
+                                "connectionName": "[concat('azuresentinel-', parameters('workflows_Enrich_CrowdStrike_Recent_Incident_Playbook_name'))]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"

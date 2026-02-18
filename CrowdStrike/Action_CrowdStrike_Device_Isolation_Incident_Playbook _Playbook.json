@@ -2,16 +2,16 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook_name": {
-            "defaultValue": "MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook",
+        "workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name": {
+            "defaultValue": "Action_CrowdStrike_Device_Isolation_Incident_Playbook",
             "type": "String"
         },
-        "workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook",
+        "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_CrowdStrike_Device_Isolation_Playbook",
             "type": "String"
         },
-        "connections_azuresentinel_MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook",
+        "connections_azuresentinel_Action_CrowdStrike_Device_Isolation_Incident_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/azuresentinel-Action_CrowdStrike_Device_Isolation_Incident_Playbook",
             "type": "String"
         }
     },
@@ -20,7 +20,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook_name')]",
+            "name": "[parameters('workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name')]",
             "location": "westeurope",
             "identity": {
                 "type": "SystemAssigned"
@@ -31,12 +31,12 @@
                     "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
                     "contentVersion": "1.0.0.0",
                     "parameters": {
-                        "workflows_Action_Crowdstrike_Block_Hash_Incident_Playbook_name": {
-                            "defaultValue": "[parameters('workflows_MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook_name')]",
+                        "workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name": {
+                            "defaultValue": "[parameters('workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name')]",
                             "type": "String"
                         },
-                        "workflows_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid": {
-                            "defaultValue": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]",
+                        "workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid": {
+                            "defaultValue": "[parameters('workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]",
                             "type": "String"
                         },
                         "$connections": {
@@ -54,69 +54,51 @@
                                     }
                                 },
                                 "body": {
-                                    "callback_url": "@{listCallbackUrl()}"
+                                    "callback_url": "@listCallbackUrl()"
                                 },
                                 "path": "/incident-creation"
                             }
                         }
                     },
                     "actions": {
-                        "Initialize_variables": {
-                            "runAfter": {},
-                            "type": "InitializeVariable",
-                            "inputs": {
-                                "variables": [
-                                    {
-                                        "name": "hashes",
-                                        "type": "array"
-                                    }
+                        "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": {
+                            "runAfter": {
+                                "For_each": [
+                                    "Succeeded"
                                 ]
+                            },
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_OrchestatorPart_CrowdStrike_Device_Isolation_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "manual"
+                                },
+                                "body": {
+                                    "hostnames": "@variables('hostnames')"
+                                }
                             }
                         },
                         "For_each": {
-                            "foreach": "@body('Entidades:_obtener_FileHashes')?['Filehashes']",
+                            "foreach": "@body('Entidades:_obtener_hosts')?['Hosts']",
                             "actions": {
-                                "Parse_JSON": {
-                                    "type": "ParseJson",
-                                    "inputs": {
-                                        "content": "@items('For_each')",
-                                        "schema": {
-                                            "type": "object",
-                                            "properties": {
-                                                "Name": {
-                                                    "type": "string"
-                                                },
-                                                "Algorithm": {
-                                                    "type": "string"
-                                                },
-                                                "Value": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
                                 "Append_to_array_variable": {
-                                    "runAfter": {
-                                        "Parse_JSON": [
-                                            "Succeeded"
-                                        ]
-                                    },
                                     "type": "AppendToArrayVariable",
                                     "inputs": {
-                                        "name": "hashes",
-                                        "value": "@body('Parse_JSON')?['Value']"
+                                        "name": "hostnames",
+                                        "value": "@items('For_each')?['hostname']"
                                     }
                                 }
                             },
                             "runAfter": {
-                                "Entidades:_obtener_FileHashes": [
+                                "Entidades:_obtener_hosts": [
                                     "Succeeded"
                                 ]
                             },
                             "type": "Foreach"
                         },
-                        "Entidades:_obtener_FileHashes": {
+                        "Entidades:_obtener_hosts": {
                             "runAfter": {
                                 "Initialize_variables": [
                                     "Succeeded"
@@ -131,32 +113,24 @@
                                 },
                                 "method": "post",
                                 "body": "@triggerBody()?['object']?['properties']?['relatedEntities']",
-                                "path": "/entities/filehash"
+                                "path": "/entities/host"
                             }
                         },
-                        "OrchestatorPart_Block_IOC_Playbook": {
-                            "runAfter": {
-                                "For_each": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Workflow",
+                        "Initialize_variables": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
                             "inputs": {
-                                "host": {
-                                    "workflow": {
-                                        "id": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Block_IOC_Playbook_externalid')]"
-                                    },
-                                    "triggerName": "Manual"
-                                },
-                                "body": {
-                                    "type": "sha256",
-                                    "content": "@variables('hashes')"
-                                }
+                                "variables": [
+                                    {
+                                        "name": "hostnames",
+                                        "type": "array"
+                                    }
+                                ]
                             }
                         },
                         "Agregar_un_comentario_al_incidente_(V3)": {
                             "runAfter": {
-                                "OrchestatorPart_Block_IOC_Playbook": [
+                                "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook": [
                                     "Succeeded",
                                     "Failed"
                                 ]
@@ -171,7 +145,7 @@
                                 "method": "post",
                                 "body": {
                                     "incidentArmId": "@triggerBody()?['object']?['id']",
-                                    "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_Block_IOC_Playbook')?['message']}</p>"
+                                    "message": "<p class=\"editor-paragraph\">@{body('OrchestatorPart_CrowdStrike_Device_Isolation_Playbook')?['message']}</p>"
                                 },
                                 "path": "/Incidents/Comment",
                                 "retryPolicy": {
@@ -187,8 +161,8 @@
                         "value": {
                             "azuresentinel": {
                                 "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/azuresentinel",
-                                "connectionId": "[parameters('connections_azuresentinel_MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook_externalid')]",
-                                "connectionName": "[concat('azuresentinel-', parameters('workflows_MSSP_Action_Crowdstrike_Block_Hash_Incident_Playbook_name'))]",
+                                "connectionId": "[parameters('connections_azuresentinel_Action_CrowdStrike_Device_Isolation_Incident_Playbook_externalid')]",
+                                "connectionName": "[concat('azuresentinel-', parameters('workflows_Action_CrowdStrike_Device_Isolation_Incident_Playbook_name'))]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"

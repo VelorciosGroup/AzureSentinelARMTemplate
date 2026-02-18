@@ -2,12 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_name": {
-            "defaultValue": "MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook",
+        "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name": {
+            "defaultValue": "OrchestatorPart_CrowdStrike_Auth_Playbook",
             "type": "String"
         },
-        "connections_keyvault_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
-            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault-MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook",
+        "connections_keyvault_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Web/connections/keyvault-OrchestatorPart_CrowdStrike_Auth_Playbook",
             "type": "String"
         }
     },
@@ -16,7 +16,7 @@
         {
             "type": "Microsoft.Logic/workflows",
             "apiVersion": "2017-07-01",
-            "name": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_name')]",
+            "name": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name')]",
             "location": "westeurope",
             "tags": {
                 "hidden-SentinelTemplateName": "Crowdstrike-Authentication",
@@ -33,7 +33,7 @@
                     "contentVersion": "1.0.0.0",
                     "parameters": {
                         "workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name": {
-                            "defaultValue": "[parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_name')]",
+                            "defaultValue": "[parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name')]",
                             "type": "String"
                         },
                         "keyvault_ClientID": {
@@ -277,7 +277,7 @@
                             "inputs": {
                                 "statusCode": 400,
                                 "body": {
-                                    "message": "[concat('❌ Playbook ''', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_name'), ''' falló.\nMotivo: Fallo en Get Access Token.\nAcción requerida: Revisión manual')]"
+                                    "message": "[concat('❌ Playbook ''', parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name'), ''' falló.\nMotivo: Fallo en Get Access Token.\nAcción requerida: Revisión manual')]"
                                 }
                             }
                         }
@@ -288,8 +288,8 @@
                         "value": {
                             "keyvault": {
                                 "id": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/providers/Microsoft.Web/locations/westeurope/managedApis/keyvault",
-                                "connectionId": "[parameters('connections_keyvault_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]",
-                                "connectionName": "[concat('keyvault-', parameters('workflows_MSSP_OrchestatorPart_CrowdStrike_Auth_Playbook_name'))]",
+                                "connectionId": "[parameters('connections_keyvault_OrchestatorPart_CrowdStrike_Auth_Playbook_externalid')]",
+                                "connectionName": "[concat('keyvault-', parameters('workflows_OrchestatorPart_CrowdStrike_Auth_Playbook_name'))]",
                                 "connectionProperties": {
                                     "authentication": {
                                         "type": "ManagedServiceIdentity"
