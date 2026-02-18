@@ -129,7 +129,7 @@ def parametrize_dependencies(file_paths):
         dependencies[filename] = {}
 
         # Read the file to search for dependencies
-        with open(file_path, "r") as json_file:
+        with open(file_path, "r", encoding="utf-8") as json_file:
             lines = json_file.readlines()
             dependencies[filename] = search_dependencies(lines)
 

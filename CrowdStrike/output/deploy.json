@@ -28,12 +28,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "Action_Crowdstrike_Block_Hash_Alert_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "Action_Crowdstrike_Block_Hash_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_Crowdstrike_Block_Hash_Alert_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -49,12 +51,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "Action_Crowdstrike_Block_Hash_Entity_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "Action_Crowdstrike_Block_Hash_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_Crowdstrike_Block_Hash_Entity_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -70,12 +74,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "Action_Crowdstrike_Block_Hash_Incident_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "Action_Crowdstrike_Block_Hash_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Block_IOC_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_Crowdstrike_Block_Hash_Incident_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -91,12 +97,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "Action_CrowdStrike_Device_Isolation_Alert_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "Action_CrowdStrike_Device_Isolation_Alert_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_CrowdStrike_Device_Isolation_Alert_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -112,12 +120,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "Action_CrowdStrike_Device_Isolation_Entity_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "Action_CrowdStrike_Device_Isolation_Entity_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_CrowdStrike_Device_Isolation_Entity_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -133,12 +143,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "Action_CrowdStrike_Device_Isolation_Incident_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "Action_CrowdStrike_Device_Isolation_Incident_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_CrowdStrike_Device_Isolation_Incident_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -155,11 +167,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "Action_CrowdStrike_Launch_Antivirus_Alert_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Alert_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -176,11 +190,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "Action_CrowdStrike_Launch_Antivirus_Entity_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Entity_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -197,11 +213,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "Action_CrowdStrike_Launch_Antivirus_Incident_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Action_CrowdStrike_Launch_Antivirus_Incident_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -218,11 +236,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "Enrich_CrowdStrike_Device_Info_Incident_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Device_Info_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Enrich_CrowdStrike_Device_Info_Incident_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -239,11 +259,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "Enrich_CrowdStrike_Recent_Incident_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Recent_Incident_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/Enrich_CrowdStrike_Recent_Incident_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -264,7 +286,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Auth_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -280,12 +302,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "OrchestatorPart_CrowdStrike_Block_IOC_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "OrchestatorPart_CrowdStrike_Block_IOC_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Auth_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Block_IOC_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -302,11 +326,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "OrchestatorPart_CrowdStrike_Device_Info_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Auth_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Device_Info_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -322,12 +348,14 @@
     {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
-      "name": "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook _Playbook",
-      "dependsOn": [],
+      "name": "OrchestatorPart_CrowdStrike_Device_Isolation_Playbook",
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Auth_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Device_Isolation_Playbook _Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -344,11 +372,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Auth_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Launch_Antivirus_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -365,11 +395,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "OrchestatorPart_CrowdStrike_Recent_Incident_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Auth_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_CrowdStrike_Recent_Incident_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -386,11 +418,13 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-03-01",
       "name": "OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook",
-      "dependsOn": [],
+      "dependsOn": [
+        "OrchestatorPart_CrowdStrike_Auth_Playbook"
+      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/CrowdStrike/output/OrchestatorPart_Crowdstrike_Sync_Incidents_Playbook.json",
+          "uri": "",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
