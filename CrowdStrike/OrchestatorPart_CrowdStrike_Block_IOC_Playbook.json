@@ -194,8 +194,7 @@
                             "runAfter": {
                                 "For_each_Indicator": [
                                     "TimedOut",
-                                    "Failed",
-                                    "Skipped"
+                                    "Failed"
                                 ]
                             },
                             "type": "Response",
@@ -211,8 +210,7 @@
                             "runAfter": {
                                 "OrchestatorPart_CrowdStrike_Auth_Playbook": [
                                     "Failed",
-                                    "TimedOut",
-                                    "Skipped"
+                                    "TimedOut"
                                 ]
                             },
                             "type": "Response",
