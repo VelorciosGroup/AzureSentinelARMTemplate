@@ -152,7 +152,6 @@
                                                     "runAfter": {
                                                         "HTTP-POST_-_IsolateDevice": [
                                                             "TimedOut",
-                                                            "Skipped",
                                                             "Failed"
                                                         ]
                                                     },
@@ -373,7 +372,6 @@
                                     "runAfter": {
                                         "HTTP-GET_-_Get_device_id": [
                                             "TimedOut",
-                                            "Skipped",
                                             "Failed"
                                         ]
                                     },
@@ -387,7 +385,6 @@
                                     "runAfter": {
                                         "HTTP-GET_-_Get_Device_Info_By_ID": [
                                             "TimedOut",
-                                            "Skipped",
                                             "Failed"
                                         ]
                                     },
@@ -436,7 +433,6 @@
                             "runAfter": {
                                 "For_each": [
                                     "TimedOut",
-                                    "Skipped",
                                     "Failed"
                                 ]
                             },
@@ -453,7 +449,6 @@
                             "runAfter": {
                                 "Call_OrchestatorPart_CrowdStrike_Auth_Playbook": [
                                     "TimedOut",
-                                    "Skipped",
                                     "Failed"
                                 ]
                             },
