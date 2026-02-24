@@ -9,6 +9,18 @@
     "keyvault_Name": {
       "type": "String",
       "defaultValue": "BORRAR_keyvault_Name"
+    },
+    "keyvault_ClientID": {
+      "defaultValue": "Azure-AD-ClientID",
+      "type": "String"
+    },
+    "keyvault_SecretID": {
+      "defaultValue": "Azure-AD-SecretID",
+      "type": "String"
+    },
+    "keyvault_TenantID": {
+      "defaultValue": "Azure-AD-TenantID",
+      "type": "String"
     }
   },
   "variables": {
@@ -41,6 +53,18 @@
             "keyvault_Name": {
               "type": "String",
               "defaultValue": "[parameters('keyvault_Name')]"
+            },
+            "keyvault_ClientID": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_ClientID')]"
+            },
+            "keyvault_SecretID": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_SecretID')]"
+            },
+            "keyvault_TenantID": {
+              "type": "String",
+              "defaultValue": "[parameters('keyvault_TenantID')]"
             }
           },
           "triggers": {
@@ -66,7 +90,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent('Azure-AD-ClientID')}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_ClientID'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {
@@ -91,7 +115,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent('Azure-AD-SecretID')}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_SecretID'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {
@@ -116,7 +140,7 @@
                   }
                 },
                 "method": "get",
-                "path": "/secrets/@{encodeURIComponent('Azure-AD-TenantID')}/value"
+                "path": "/secrets/@{encodeURIComponent(parameters('keyvault_TenantID'))}/value"
               },
               "runtimeConfiguration": {
                 "secureData": {

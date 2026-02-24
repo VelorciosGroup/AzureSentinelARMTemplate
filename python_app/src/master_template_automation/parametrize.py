@@ -17,7 +17,7 @@ def search_keyvault_params(lines):
     :return: List of found parameters that require KeyVault, prefixed with "keyvault_".
     """
     # Regex pattern to detect variables or parameters in the KeyVault path
-    pattern = r"/secrets/@{encodeURIComponent\((variables|parameters)\('([^']+)'\)"
+    pattern = r"/secrets/@{encodeURIComponent\((?:(?:variables|parameters)\('([^']+)'\)|'([^']+)')\)"
     
     matches = []
 
@@ -25,7 +25,8 @@ def search_keyvault_params(lines):
     for line in lines:
         match = re.search(pattern, line)
         if match:
-            matches.append(f"keyvault_{match.group(2)}")
+            nombre = match.group(1) or match.group(2)
+            matches.append(f"keyvault_{nombre}")
     
     return matches
 

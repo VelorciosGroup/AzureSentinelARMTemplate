@@ -9,6 +9,18 @@
     "keyvault_Name_Pack": {
       "defaultValue": "MSSP-Development-SOC",
       "type": "string"
+    },
+    "keyvault_ClientID_Pack": {
+      "defaultValue": "Azure-AD-ClientID",
+      "type": "string"
+    },
+    "keyvault_SecretID_Pack": {
+      "defaultValue": "Azure-AD-SecretID",
+      "type": "string"
+    },
+    "keyvault_TenantID_Pack": {
+      "defaultValue": "Azure-AD-TenantID",
+      "type": "string"
     }
   },
   "variables": {},
@@ -329,6 +341,15 @@
           },
           "keyvault_Name": {
             "value": "[parameters('keyvault_Name_Pack')]"
+          },
+          "keyvault_ClientID": {
+            "value": "[parameters('keyvault_ClientID_Pack')]"
+          },
+          "keyvault_SecretID": {
+            "value": "[parameters('keyvault_SecretID_Pack')]"
+          },
+          "keyvault_TenantID": {
+            "value": "[parameters('keyvault_TenantID_Pack')]"
           }
         }
       }

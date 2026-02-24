@@ -14,7 +14,7 @@ def normalize_file_names(file_path):
     :param file_path: Path to the file to normalize (str or Path).
     :return: The new normalized file path (Path).
     """
-    file_name = Path(file_path).name
+    file_name = Path(file_path).name.strip()
     path = Path(file_path)
     
     # Replace "automation" with "OrchestatorPart" (case-insensitive)

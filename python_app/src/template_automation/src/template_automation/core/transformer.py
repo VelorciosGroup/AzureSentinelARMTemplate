@@ -502,6 +502,25 @@ def _ensure_definition_connections_parameter(playbook: Dict[str, Any]) -> None:
             def_params["$connections"].setdefault("defaultValue", {})
 
 
+
+def _replace_numbered_azuresentinel_in_body(playbook: Dict[str, Any]) -> None:
+    def _walk(obj: Any) -> Any:
+        if isinstance(obj, str):
+            return re.sub(r"\['azuresentinel-\d+'\]", "['azuresentinel']", obj)
+        if isinstance(obj, dict):
+            for k, v in obj.items():
+                obj[k] = _walk(v)
+            return obj
+        if isinstance(obj, list):
+            for i, v in enumerate(obj):
+                obj[i] = _walk(v)
+            return obj
+        return obj
+
+    _walk(playbook)
+    logger.debug("Reemplazadas referencias 'azuresentinel-<n>' por 'azuresentinel' en el body.")
+
+    
 # ---------------------------------------------------------------------------
 # NUEVO: quitar conexiones "azuresentinel-<numero>" del $connections.value
 # ---------------------------------------------------------------------------
@@ -553,6 +572,8 @@ def _remove_numbered_azuresentinel_connections(playbook: Dict[str, Any]) -> None
             "Eliminadas %d entradas $connections.value tipo 'azuresentinel-<n>'.",
             removed_total,
         )
+    
+    _replace_numbered_azuresentinel_in_body(playbook)
 
 # ---------------------------------------------------------------------------
 # Bloques $connections + dependsOn usando AzureSentinelConnectionName y keyvault_Connection_Name
