@@ -1,0 +1,249 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_OrchestatorPart_AD_Block_Host_Playbook_name": {
+            "defaultValue": "OrchestatorPart_AD_Block_Host_Playbook",
+            "type": "String"
+        },
+        "workflows_OrchestatorPart_AD_Auth_Playbook_externalid": {
+            "defaultValue": "/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Sentinel_Desarollo_ResourceGroup/providers/Microsoft.Logic/workflows/OrchestatorPart_AD_Auth_Playbook",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_OrchestatorPart_AD_Block_Host_Playbook_name')]",
+            "location": "westeurope",
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "Manual": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "hosts": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "OrchestatorPart_AD_Auth_Playbook": {
+                            "runAfter": {},
+                            "type": "Workflow",
+                            "inputs": {
+                                "host": {
+                                    "workflow": {
+                                        "id": "[parameters('workflows_OrchestatorPart_AD_Auth_Playbook_externalid')]"
+                                    },
+                                    "triggerName": "Manual"
+                                }
+                            }
+                        },
+                        "Parse_JSON_Token": {
+                            "runAfter": {
+                                "OrchestatorPart_AD_Auth_Playbook": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('OrchestatorPart_AD_Auth_Playbook')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "AccessToken": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Response_auth_Error": {
+                            "runAfter": {
+                                "OrchestatorPart_AD_Auth_Playbook": [
+                                    "TimedOut",
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": "@body('OrchestatorPart_AD_Auth_Playbook')"
+                            }
+                        },
+                        "HTTP_POST_Runbook": {
+                            "runAfter": {
+                                "Parse_JSON_Token": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "https://2ec893b1-8843-42c6-a27d-efdc08f782ea.webhook.we.azure-automation.net/webhooks?token=c9g9GY%2bVDDrcvVkgYqUnaLXhm91kXRWfKW0S8L7%2fZzw%3d",
+                                "method": "POST",
+                                "headers": {
+                                    "Content-Type": "application/json"
+                                },
+                                "body": {
+                                    "hosts": "@triggerBody()?['hosts']"
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "Parse_JSON_Jobid": {
+                            "runAfter": {
+                                "HTTP_POST_Runbook": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "ParseJson",
+                            "inputs": {
+                                "content": "@body('HTTP_POST_Runbook')",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "JobIds": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        "Response_Error_Runbook": {
+                            "runAfter": {
+                                "HTTP_POST_Runbook": [
+                                    "TimedOut",
+                                    "Failed"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 400,
+                                "body": {
+                                    "message": "❌MSSP_OrchestatorPart_AD_Block_Host' falló.\nMotivo: Fallo en runbbok.\nAcción requerida: Revisión manual"
+                                }
+                            }
+                        },
+                        "Until": {
+                            "actions": {
+                                "Delay_30s": {
+                                    "type": "Wait",
+                                    "inputs": {
+                                        "interval": {
+                                            "count": 30,
+                                            "unit": "Second"
+                                        }
+                                    }
+                                },
+                                "HTTP_GET_Job_ID_Status": {
+                                    "runAfter": {
+                                        "Delay_30s": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "https://management.azure.com/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Orchestator_Runbooks_ResourceGroup/providers/Microsoft.OrchestatorPart/automationAccounts/MSSP-Runbooks-OrchestatorPart/jobs/@{first(body('Parse_JSON_Jobid')?['JobIds'])}?api-version=2024-10-23",
+                                        "method": "GET",
+                                        "headers": {
+                                            "Authorization": "@{body('Parse_JSON_Token')?['AccessToken']}"
+                                        },
+                                        "retryPolicy": {
+                                            "type": "none"
+                                        }
+                                    },
+                                    "runtimeConfiguration": {
+                                        "contentTransfer": {
+                                            "transferMode": "Chunked"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Parse_JSON_Jobid": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": "@equals(body('HTTP_GET_Job_ID_Status')?['properties']?['status'], 'Completed')",
+                            "limit": {
+                                "count": 10,
+                                "timeout": "PT5M"
+                            },
+                            "type": "Until"
+                        },
+                        "HTTP_GET_Job_Output": {
+                            "runAfter": {
+                                "Until": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Http",
+                            "inputs": {
+                                "uri": "https://management.azure.com/subscriptions/a7be9652-e6e6-4284-b1b2-14b4079f777d/resourceGroups/MSSP_Orchestator_Runbooks_ResourceGroup/providers/Microsoft.OrchestatorPart/automationAccounts/MSSP-Runbooks-OrchestatorPart/jobs/@{first(body('Parse_JSON_Jobid')?['JobIds'])}/output?api-version=2024-10-23",
+                                "method": "GET",
+                                "headers": {
+                                    "authorization": "@{body('Parse_JSON_Token')?['AccessToken']}"
+                                }
+                            },
+                            "runtimeConfiguration": {
+                                "contentTransfer": {
+                                    "transferMode": "Chunked"
+                                }
+                            }
+                        },
+                        "Response": {
+                            "runAfter": {
+                                "HTTP_GET_Job_Output": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "Response",
+                            "kind": "Http",
+                            "inputs": {
+                                "statusCode": 200,
+                                "body": "@body('HTTP_GET_Job_Output')"
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {}
+                    }
+                }
+            }
+        }
+    ]
+}
