@@ -23,7 +23,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Block_Host_Alert_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -46,7 +46,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Block_Host_Entity_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -69,7 +69,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Block_Host_Incident_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -92,7 +92,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Block_User_Alert_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -115,7 +115,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Block_User_Entity_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -138,7 +138,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Block_User_Incident_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -161,7 +161,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Unblock_Host_Alert_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -184,7 +184,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Unblock_Host_Entity_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -207,7 +207,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Unblock_Host_Incident_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -230,7 +230,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Unblock_User_Alert_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -253,7 +253,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Unblock_User_Entity_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -276,7 +276,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Action_AD_Unblock_User_Incident_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -299,7 +299,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/Enrich_AD_Host_Info_Incident_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -320,7 +320,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/OrchestatorPart_AD_Auth_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -343,7 +343,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/OrchestatorPart_AD_Block_Host_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -366,7 +366,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/OrchestatorPart_AD_Block_User_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -389,7 +389,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/OrchestatorPart_AD_Host_Info_Incident_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -412,7 +412,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/OrchestatorPart_AD_Unblock_Host_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -435,7 +435,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "",
+          "uri": "https://raw.githubusercontent.com/VelorciosGroup/AzureSentinelARMTemplate/main/AD/output/OrchestatorPart_AD_Unblock_User_Playbook.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
