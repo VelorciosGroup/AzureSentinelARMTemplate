@@ -84,6 +84,45 @@
   </tr>
 
   <tr>
+    <td><b>Plantillas AD</b></td>
+    <td>
+      <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FPlantillas%20AD%2Foutput%2Fdeploy.json">
+        <img src="./Button.png" alt="Deploy to Azure" width="140px" />
+      </a>
+    </td>
+    <td>
+      • <a href="./Plantillas AD/output/Action_AD_Block_Host_Alert_Playbook.json">Action_AD_Block_Host_Alert_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Block_Host_Entity_Playbook.json">Action_AD_Block_Host_Entity_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Block_Host_Incident_Playbook.json">Action_AD_Block_Host_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Block_User_Alert_Playbook.json">Action_AD_Block_User_Alert_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Block_User_Entity_Playbook.json">Action_AD_Block_User_Entity_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Block_User_Incident_Playbook.json">Action_AD_Block_User_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_ChangePassword_Alert_Playbook.json">Action_AD_ChangePassword_Alert_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_ChangePassword_Entity_Playbook.json">Action_AD_ChangePassword_Entity_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_ChangePswd_Incident_Playbook.json">Action_AD_ChangePswd_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Close_Sesion_Incident_Playbook.json">Action_AD_Close_Sesion_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Close_Session_Alert_Playbook.json">Action_AD_Close_Session_Alert_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Close_Session_Entity_Playbook.json">Action_AD_Close_Session_Entity_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Unblock_Host_Alert_Playbook.json">Action_AD_Unblock_Host_Alert_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Unblock_Host_Entity_Playbook.json">Action_AD_Unblock_Host_Entity_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Unblock_Host_Incident_Playbook.json">Action_AD_Unblock_Host_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Unblock_User_Alert_Playbook.json">Action_AD_Unblock_User_Alert_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Unblock_User_Entity_Playbook.json">Action_AD_Unblock_User_Entity_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Action_AD_Unblock_User_Incident_Playbook.json">Action_AD_Unblock_User_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/Enrich_AD_Host_Info_Incident_Playbook.json">Enrich_AD_Host_Info_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Auth_Playbook.json">OrchestatorPart_AD_Auth_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Block_Host_Playbook.json">OrchestatorPart_AD_Block_Host_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Block_User_Playbook.json">OrchestatorPart_AD_Block_User_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Change_Password_Playbook.json">OrchestatorPart_AD_Change_Password_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Close_Session_Playbook.json">OrchestatorPart_AD_Close_Session_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Host_Info_Incident_Playbook.json">OrchestatorPart_AD_Host_Info_Incident_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Unblock_Host_Playbook.json">OrchestatorPart_AD_Unblock_Host_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/OrchestatorPart_AD_Unblock_User_Playbook.json">OrchestatorPart_AD_Unblock_User_Playbook.json</a><br>
+      • <a href="./Plantillas AD/output/deploy.json">deploy.json</a
+    </td>
+  </tr>
+
+  <tr>
     <td><b>Sophos</b></td>
     <td>
       <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FVelorciosGroup%2FAzureSentinelARMTemplate%2Frefs%2Fheads%2Fmain%2FSophos%2Foutput%2Fdeploy.json">
@@ -119,6 +158,7 @@
   </tr>
 
 </table>
+
 
 
 
